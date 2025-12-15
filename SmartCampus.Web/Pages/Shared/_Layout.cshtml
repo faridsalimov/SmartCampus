@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartCampus</title>
+    
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" />
+    
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/navbar-sidebar-styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dashboards-unified.css" asp-append-version="true" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+        }
+
+        .top-header-wrapper {
+            flex-shrink: 0;
+        }
+
+        .app-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="top-header-wrapper">
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            @await Html.PartialAsync("_TopHeader")
+        }
+    </div>
+
+    
+    <div class="app-container">
+        
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            @await Html.PartialAsync("_Navbar")
+        }
+
+        
+        <main class="flex-grow-1">
+            <div class="container-fluid p-3">
+                
+                <div class="animate-fade-in">
+                    @RenderBody()
+                </div>
+            </div>
+        </main>
+    </div>
+
+    @await Html.PartialAsync("_ConfirmModal")
+
+    @await Html.PartialAsync("_Toast")
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        (function () {
+            // Initialize toast messages from TempData
+            document.addEventListener('DOMContentLoaded', function() {
+                const toastMessage = '@Html.Raw(TempData["ToastMessage"] ?? "")';
+                const toastType = '@Html.Raw(TempData["ToastType"] ?? "")';
+                
+                if (toastMessage && window.Toast && toastType) {
+                    window.Toast.show(toastMessage, toastType);
+                }
+            });
+
+            // Handle clicks on delete action buttons to populate confirm modal
+            document.addEventListener('click', function (e) {
+                var btn = e.target.closest && e.target.closest('[data-delete-url]');
+                if (!btn) return;
+ 
+                var url = btn.getAttribute('data-delete-url');
+                var entityId = btn.getAttribute('data-delete-entity');
+                var message = btn.getAttribute('data-delete-message') || 'Are you sure you want to delete this item?';
+ 
+                var modal = document.getElementById('confirmModal');
+                if (!modal) return;
+ 
+                var msgEl = modal.querySelector('#confirmModalMessage');
+                if (msgEl) msgEl.textContent = message;
+ 
+                var form = modal.querySelector('#confirmModalForm');
+                if (form) {
+                     form.action = url || '#';
+ 
+                     // add hidden input for entity id if provided
+                     var existing = form.querySelector('input[name="id"]');
+                     if (existing) existing.value = entityId || '';
+                     else if (entityId) {
+                         var input = document.createElement('input');
+                         input.type = 'hidden';
+                         input.name = 'id';
+                         input.value = entityId;
+                         form.appendChild(input);
+                     }
+                 }
+             }, false);
+
+             // Intercept confirm modal form submit to perform AJAX request
+             document.addEventListener('submit', function (e) {
+                 var form = e.target;
+                 if (form && form.id === 'confirmModalForm') {
+                     e.preventDefault();
+
+                     var action = form.action || '#';
+                     var formData = new FormData(form);
+
+                     // Extract antiforgery token value
+                     var tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
+                     var headers = {};
+                     if (tokenInput) headers['RequestVerificationToken'] = tokenInput.value;
+
+                     fetch(action, {
+                         method: 'POST',
+                         headers: headers,
+                         body: formData,
+                         credentials: 'same-origin'
+                     })
+                     .then(function (response) {
+                         // close modal
+                         var modalEl = document.getElementById('confirmModal');
+                         var modalInstance = bootstrap.Modal.getInstance(modalEl);
+                         if (modalInstance) modalInstance.hide();
+
+                         if (response.ok) {
+                             // show success toast and reload
+                             window.Toast.success('Deleted successfully.');
+                             setTimeout(function () { window.location.reload(); }, 900);
+                         } else {
+                             response.text().then(function (text) {
+                                 window.Toast.error('Error: ' + (text || response.statusText));
+                             });
+                         }
+                     })
+                     .catch(function (err) {
+                         window.Toast.error('Request failed: ' + err);
+                     });
+                 }
+             }, false);
+         })();
+     </script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

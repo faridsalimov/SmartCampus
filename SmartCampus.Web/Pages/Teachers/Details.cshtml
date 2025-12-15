@@ -1,0 +1,197 @@
+@page
+@model SmartCampus.Web.Pages.Teachers.DetailsModel
+@{
+    ViewData["Title"] = "Teacher Details";
+}
+
+
+<div style="background: linear-gradient(135deg, rgba(94, 92, 230, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(94, 92, 230, 0.1);">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+        <a asp-page="Index" class="text-decoration-none" style="color: #5e5ce6;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+        <span style="color: #a1a1a6;">/</span>
+        <span style="color: #636366;">Teacher Details</span>
+    </div>
+    <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
+        <i class="fas fa-user-circle me-2" style="color: #5e5ce6;"></i>@Model.Teacher?.FullName
+    </h1>
+    <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
+        <i class="fas fa-building me-1"></i>
+        @(Model.Teacher?.Department ?? "N/A")
+    </p>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light border-bottom">
+                <h5 class="mb-0">
+                    <i class="fas fa-file-alt me-2"></i>Personal Information
+                </h5>
+            </div>
+            <div class="card-body">
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <small class="text-muted d-block mb-1">
+                            <i class="fas fa-user me-1" style="color: #5e5ce6;"></i>Full Name
+                        </small>
+                        <p style="font-size: 1rem; font-weight: 600; color: #1d1d1f; margin: 0;">
+                            @Model.Teacher?.FullName
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block mb-1">
+                            <i class="fas fa-check-circle me-1" style="color: #5e5ce6;"></i>Status
+                        </small>
+                        <div>
+                            @if (Model.Teacher?.IsActive == true)
+                            {
+                                <span class="badge bg-success" style="background: rgba(52, 199, 89, 0.2) !important; color: #34c759; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem;">
+                                    <i class="fas fa-check-circle me-1"></i>Active
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary" style="background: rgba(161, 161, 166, 0.2) !important; color: #a1a1a6; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem;">
+                                    <i class="fas fa-circle me-1"></i>Inactive
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div style="border-top: 1px solid #e5e5ea; padding-top: 20px; margin-top: 20px;">
+                    <h6 style="font-weight: 600; color: #1d1d1f; margin-bottom: 16px;">
+                        <i class="fas fa-envelope me-2" style="color: #5e5ce6;"></i>Contact Information
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <small class="text-muted d-block mb-1">Email Address</small>
+                            <p style="margin: 0;">
+                                <a href="mailto:@Model.Teacher?.Email" style="color: #0066ff; text-decoration: none;">
+                                    @Model.Teacher?.Email
+                                </a>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <small class="text-muted d-block mb-1">Phone Number</small>
+                            <p style="margin: 0; color: #636366;">
+                                @(Model.Teacher?.PhoneNumber ?? "N/A")
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div style="border-top: 1px solid #e5e5ea; padding-top: 20px; margin-top: 20px;">
+                    <h6 style="font-weight: 600; color: #1d1d1f; margin-bottom: 16px;">
+                        <i class="fas fa-briefcase me-2" style="color: #5e5ce6;"></i>Faculty Information
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <small class="text-muted d-block mb-1">Department</small>
+                            <p style="margin: 0; color: #636366;">
+                                @(Model.Teacher?.Department ?? "N/A")
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <small class="text-muted d-block mb-1">Specialization</small>
+                            <p style="margin: 0; color: #636366;">
+                                @(Model.Teacher?.Specialization ?? "N/A")
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div style="border-top: 1px solid #e5e5ea; padding-top: 20px; margin-top: 20px;">
+                    <h6 style="font-weight: 600; color: #1d1d1f; margin-bottom: 16px;">
+                        <i class="fas fa-clock me-2" style="color: #5e5ce6;"></i>Record History
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <small class="text-muted d-block mb-1">Created</small>
+                            <p style="margin: 0; color: #636366; font-size: 0.95rem;">
+                                @Model.Teacher?.CreatedAt.ToString("g")
+                            </p>
+                        </div>
+                        @if (Model.Teacher?.UpdatedAt.HasValue == true)
+                        {
+                            <div class="col-md-6 mb-3">
+                                <small class="text-muted d-block mb-1">Last Updated</small>
+                                <p style="margin: 0; color: #636366; font-size: 0.95rem;">
+                                    @Model.Teacher?.UpdatedAt?.ToString("g")
+                                </p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer bg-light border-top">
+                <div class="d-flex gap-2 justify-content-between">
+                    <a asp-page="Index" class="btn btn-outline-secondary" style="border-radius: 8px;">
+                        <i class="fas fa-arrow-left me-1"></i>Back to List
+                    </a>
+                    <div class="d-flex gap-2">
+                        <a asp-page="Edit" asp-route-id="@Model.Teacher?.Id" class="btn btn-warning" style="border-radius: 8px; background: #ff9500; border: none; color: white;">
+                            <i class="fas fa-edit me-1"></i>Edit Teacher
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="col-lg-4">
+        <div class="card bg-light border-0">
+            <div class="card-header border-bottom">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2" style="color: #5e5ce6;"></i>Quick Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a asp-page="Edit" asp-route-id="@Model.Teacher?.Id" class="btn btn-primary" style="border-radius: 8px; background: #5e5ce6; border: none;">
+                        <i class="fas fa-edit me-2"></i>Edit Information
+                    </a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <button type="button" class="btn btn-outline-danger" style="border-radius: 8px; border: 1px solid #ff3b30;" data-bs-toggle="modal" data-bs-target="#confirmModal" data-delete-url="@Url.Page(null, new { handler = "Delete", id = Model.Teacher?.Id })" data-delete-entity="@Model.Teacher?.Id" data-delete-message="Delete this teacher permanently?">
+                            <i class="fas fa-trash me-2"></i>Remove Teacher
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-light border-0 mt-3">
+            <div class="card-header border-bottom">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2" style="color: #5e5ce6;"></i>Additional Info
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block">
+                        <strong>Contact:</strong> Use the email for official communication and inquiries.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block">
+                        <strong>Department:</strong> The faculty member's assigned department or faculty.
+                    </small>
+                </div>
+                <div class="alert alert-info small mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Click "Edit Information" to update any faculty details.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

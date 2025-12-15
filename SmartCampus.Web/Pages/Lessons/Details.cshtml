@@ -1,0 +1,166 @@
+@page
+@model SmartCampus.Web.Pages.Lessons.DetailsModel
+@{
+    ViewData["Title"] = "Lesson Details";
+}
+
+
+<div style="background: linear-gradient(135deg, #5e5ce6 0%, #0066ff 100%); border-radius: 20px; padding: 35px 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(94, 92, 230, 0.15); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; background: rgba(255, 255, 255, 0.1); border-radius: 50%;"></div>
+    <div style="position: relative; z-index: 1;">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <a asp-page="Index" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; font-size: 0.95rem;">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                    <span style="color: rgba(255, 255, 255, 0.6);">/</span>
+                    <span style="color: rgba(255, 255, 255, 0.8);">Details</span>
+                </div>
+                <h1 style="font-size: 2.5rem; font-weight: 800; color: white; margin: 0;">
+                    @Model.Lesson?.Title
+                </h1>
+                <p style="color: rgba(255, 255, 255, 0.9); margin: 8px 0 0 0; font-size: 1rem;">
+                    <i class="fas fa-users me-1"></i>@Model.Lesson?.CourseName
+                </p>
+            </div>
+            @if (Model.IsOwner)
+            {
+                <div style="background: rgba(255, 255, 255, 0.2); padding: 8px 14px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.3); color: white; font-weight: 600; font-size: 0.85rem;">
+                    <i class="fas fa-shield-alt me-1"></i>Your Lesson
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-8">
+        
+        <div class="card border-0 mb-4" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
+            <div style="background: linear-gradient(135deg, #f5f5f7, #efefef); border-bottom: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 14px 14px 0 0;">
+                <h5 style="margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-file-alt" style="color: #5e5ce6;"></i>Lesson Information
+                </h5>
+            </div>
+
+            <div class="card-body" style="padding: 24px;">
+                @if (Model.Lesson != null)
+                {
+                    
+                    <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <div style="background: #f0f4ff; padding: 10px 14px; border-radius: 8px; border-left: 4px solid #5e5ce6;">
+                            <small style="color: #636366; font-weight: 600;">
+                                <i class="fas fa-hashtag me-1" style="color: #5e5ce6;"></i>Lesson Number
+                            </small>
+                            <div style="color: #5e5ce6; font-weight: 700;">@Model.Lesson.LessonNumber</div>
+                        </div>
+                        <div style="background: #f0f4ff; padding: 10px 14px; border-radius: 8px; border-left: 4px solid #5e5ce6;">
+                            <small style="color: #636366; font-weight: 600;">
+                                <i class="fas fa-calendar-alt me-1" style="color: #5e5ce6;"></i>Date & Time
+                            </small>
+                            <div style="color: #5e5ce6; font-weight: 700;">@Model.Lesson.LessonDate.ToString("dddd, MMM dd")</div>
+                            <small style="color: #636366;">@Model.Lesson.LessonDate.ToString("h:mm tt")</small>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.Lesson.Location))
+                        {
+                            <div style="background: #f0f4ff; padding: 10px 14px; border-radius: 8px; border-left: 4px solid #5e5ce6;">
+                                <small style="color: #636366; font-weight: 600;">
+                                    <i class="fas fa-map-marker me-1" style="color: #5e5ce6;"></i>Location
+                                </small>
+                                <div style="color: #5e5ce6; font-weight: 700;">@Model.Lesson.Location</div>
+                            </div>
+                        }
+                        <div style="background: @(Model.Lesson.IsCompleted ? "#e8f5e9" : "#f0f4ff"); padding: 10px 14px; border-radius: 8px; border-left: 4px solid @(Model.Lesson.IsCompleted ? "#34c759" : "#5e5ce6");">
+                            <small style="color: #636366; font-weight: 600;">
+                                <i class="fas fa-@(Model.Lesson.IsCompleted ? "check-circle" : "calendar") me-1" style="color: @(Model.Lesson.IsCompleted ? "#34c759" : "#5e5ce6");"></i>Status
+                            </small>
+                            <div style="color: @(Model.Lesson.IsCompleted ? "#34c759" : "#5e5ce6"); font-weight: 700;">@(Model.Lesson.IsCompleted ? "Completed" : "Upcoming")</div>
+                        </div>
+                    </div>
+
+                    <hr style="border: none; height: 1px; background: #e5e5ea; margin: 20px 0;" />
+
+                    
+                    @if (!string.IsNullOrEmpty(Model.Lesson.Content))
+                    {
+                        <div style="margin-bottom: 20px;">
+                            <h6 style="color: #1d1d1f; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-align-left" style="color: #5e5ce6;"></i>Content & Materials
+                            </h6>
+                            <div style="background: #f9f9fb; padding: 16px; border-radius: 10px; border-left: 4px solid #5e5ce6; color: #636366; line-height: 1.7;">
+                                @Model.Lesson.Content
+                            </div>
+                        </div>
+
+                        <hr style="border: none; height: 1px; background: #e5e5ea; margin: 20px 0;" />
+                    }
+
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 6px;">
+                                <i class="fas fa-plus-circle me-1"></i>Created
+                            </small>
+                            <p style="margin: 0; color: #636366;">@Model.Lesson.CreatedAt.ToString("MMM dd, yyyy HH:mm")</p>
+                        </div>
+                        @if (Model.Lesson.UpdatedAt.HasValue)
+                        {
+                            <div>
+                                <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 6px;">
+                                    <i class="fas fa-sync me-1"></i>Updated
+                                </small>
+                                <p style="margin: 0; color: #636366;">@Model.Lesson.UpdatedAt?.ToString("MMM dd, yyyy HH:mm")</p>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            
+            <div style="background: #f9f9fb; border-top: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 0 0 14px 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <a asp-page="Index" class="btn" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500;">
+                    <i class="fas fa-arrow-left me-1"></i>Back to List
+                </a>
+
+                @if (Model.IsOwner)
+                {
+                    <a asp-page="Edit" asp-route-id="@Model.Lesson?.Id" class="btn" style="background: #0066ff; color: white; border: none; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; margin-left: auto;">
+                        <i class="fas fa-edit me-1"></i>Edit
+                    </a>
+                    <button type="button" class="btn" style="background: #ff3b30; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 500;" data-bs-toggle="modal" data-bs-target="#confirmModal" data-delete-url="@Url.Page(null, new { handler = "Delete", id = Model.Lesson?.Id })" data-delete-entity="@Model.Lesson?.Id">
+                        <i class="fas fa-trash me-1"></i>Delete
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="col-lg-4">
+        
+        <div class="card border-0" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
+            <div style="background: linear-gradient(135deg, #f5f5f7, #efefef); border-bottom: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 14px 14px 0 0;">
+                <h6 style="margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-info-circle" style="color: #5e5ce6;"></i>Information
+                </h6>
+            </div>
+            <div class="card-body" style="padding: 18px;">
+                <div style="margin-bottom: 12px;">
+                    <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 4px;">What is this?</small>
+                    <small style="color: #636366; line-height: 1.5;">
+                        @if (Model.IsOwner)
+                        {
+                            <span>This is your lesson. You can edit or delete it from this page.</span>
+                        }
+                        else
+                        {
+                            <span>This is a lesson from your teacher. Review the content and materials.</span>
+                        }
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

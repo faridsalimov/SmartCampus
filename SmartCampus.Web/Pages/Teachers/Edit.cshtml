@@ -1,0 +1,181 @@
+@page
+@model SmartCampus.Web.Pages.Teachers.EditModel
+@{
+    ViewData["Title"] = "Edit Teacher";
+}
+
+
+<div style="background: linear-gradient(135deg, rgba(94, 92, 230, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(94, 92, 230, 0.1);">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+        <a asp-page="Index" class="text-decoration-none" style="color: #5e5ce6;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+        <span style="color: #a1a1a6;">/</span>
+        <span style="color: #636366;">Edit Teacher</span>
+    </div>
+    <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
+        <i class="fas fa-user-edit me-2" style="color: #5e5ce6;"></i>Edit Teacher
+    </h1>
+    <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
+        <i class="fas fa-description me-1"></i>Update faculty member information and specialization
+    </p>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-8">
+        <form method="post" class="needs-validation" novalidate>
+            @Html.AntiForgeryToken()
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light border-bottom">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2"></i>Teacher Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show d-none" 
+                         role="alert" id="validationSummary">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Please fix the following errors:</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+
+                    <input type="hidden" asp-for="Teacher.Id" />
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Teacher.FullName" class="form-label">
+                                <i class="fas fa-user me-1" style="color: #5e5ce6;"></i>Full Name
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Teacher.FullName" class="form-control" 
+                                   style="border: 1.5px solid #e5e5ea; border-radius: 8px;" required />
+                            <small class="form-text text-muted">Complete legal name</small>
+                            <span asp-validation-for="Teacher.FullName" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Teacher.Email" class="form-label">
+                                <i class="fas fa-envelope me-1" style="color: #5e5ce6;"></i>Email
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Teacher.Email" class="form-control" type="email"
+                                   style="border: 1.5px solid #e5e5ea; border-radius: 8px;" required />
+                            <small class="form-text text-muted">School email address</small>
+                            <span asp-validation-for="Teacher.Email" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Teacher.PhoneNumber" class="form-label">
+                                <i class="fas fa-phone me-1" style="color: #5e5ce6;"></i>Phone Number
+                            </label>
+                            <input asp-for="Teacher.PhoneNumber" class="form-control" 
+                                   style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Contact phone number</small>
+                            <span asp-validation-for="Teacher.PhoneNumber" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Teacher.Department" class="form-label">
+                                <i class="fas fa-building me-1" style="color: #5e5ce6;"></i>Department
+                            </label>
+                            <input asp-for="Teacher.Department" class="form-control" 
+                                   style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Faculty department</small>
+                            <span asp-validation-for="Teacher.Department" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Teacher.Specialization" class="form-label">
+                            <i class="fas fa-star me-1" style="color: #5e5ce6;"></i>Specialization
+                        </label>
+                        <input asp-for="Teacher.Specialization" class="form-control" 
+                               style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                        <small class="form-text text-muted">Area of expertise or specialization</small>
+                        <span asp-validation-for="Teacher.Specialization" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <div class="form-check" style="padding: 12px; background: rgba(94, 92, 230, 0.05); border-radius: 8px; border: 1px solid rgba(94, 92, 230, 0.1);">
+                            <input class="form-check-input" type="checkbox" asp-for="Teacher.IsActive" id="isActive" style="width: 20px; height: 20px; cursor: pointer;">
+                            <label class="form-check-label ms-2" for="isActive" style="cursor: pointer; margin-top: 2px;">
+                                <i class="fas fa-check-circle me-1" style="color: #5e5ce6;"></i>Active Teacher
+                            </label>
+                        </div>
+                        <small class="form-text text-muted d-block mt-2">Check to mark teacher as active</small>
+                    </div>
+                </div>
+                <div class="card-footer bg-light border-top">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-page="Index" class="btn btn-outline-secondary" style="border-radius: 8px;">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary" style="border-radius: 8px; background: #5e5ce6; border: none;">
+                            <i class="fas fa-save me-1"></i>Update Teacher
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    
+    <div class="col-lg-4">
+        <div class="card bg-light border-0">
+            <div class="card-header border-bottom">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2" style="color: #5e5ce6;"></i>Tips & Guidelines
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Email:</strong> Use the official school email address for all communication.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Department:</strong> Assign to the appropriate academic department or faculty.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Specialization:</strong> Include areas of expertise, certifications, or research interests.
+                    </small>
+                </div>
+                <div class="alert alert-info small mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Fields marked with <span class="text-danger">*</span> are required.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.querySelectorAll('.needs-validation');
+                Array.prototype.slice.call(forms).forEach(function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            document.getElementById('validationSummary').classList.remove('d-none');
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+}

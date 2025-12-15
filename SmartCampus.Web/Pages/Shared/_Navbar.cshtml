@@ -1,0 +1,239 @@
+@using Microsoft.AspNetCore.Identity
+@using SmartCampus.Data.Entities
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<div class="sidebar-nav" id="sidebarNav">
+    <ul class="sidebar-menu">
+        
+        <li class="sidebar-menu-item">
+            <a href="/" class="sidebar-menu-link" title="Dashboard">
+                <div class="sidebar-menu-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <span class="sidebar-menu-text">Dashboard</span>
+            </a>
+        </li>
+
+        @if (SignInManager.IsSignedIn(User))
+        {
+            @if (User.IsInRole("Student"))
+            {
+                
+                <li class="sidebar-menu-item">
+                    <a href="/Homework" class="sidebar-menu-link" title="Homework">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Homeworks</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Lessons" class="sidebar-menu-link" title="Study Materials">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Lessons</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Schedule" class="sidebar-menu-link" title="Schedule">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Schedule</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Grades" class="sidebar-menu-link" title="Grades">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Grades</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Attendance" class="sidebar-menu-link" title="Attendance">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Attendance</span>
+                    </a>
+                </li>
+            }
+            else if (User.IsInRole("Teacher"))
+            {
+                
+                <li class="sidebar-menu-item">
+                    <a href="/Homework" class="sidebar-menu-link" title="Homework Management">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Homework</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Homework/Create" class="sidebar-menu-link" title="Create Homework">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Create Homework</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Lessons" class="sidebar-menu-link" title="Lessons">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Lessons</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Lessons/Create" class="sidebar-menu-link" title="Create Lesson">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-chalkboard"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Create Lesson</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Grades" class="sidebar-menu-link" title="Grades & Grading">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Grades</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Schedule" class="sidebar-menu-link" title="Schedule">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Schedule</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Attendance" class="sidebar-menu-link" title="Manage Attendance">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Attendance</span>
+                    </a>
+                </li>
+            }
+            else if (User.IsInRole("Admin"))
+            {
+                <li class="sidebar-divider"></li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Students" class="sidebar-menu-link" title="Manage Students">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Students</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Teachers" class="sidebar-menu-link" title="Manage Teachers">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-chalkboard-user"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Teachers</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Groups" class="sidebar-menu-link" title="Manage Groups">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Groups</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-divider"></li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Homework" class="sidebar-menu-link" title="Homework Management">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Homework</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Lessons" class="sidebar-menu-link" title="Lessons Management">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Lessons</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Grades" class="sidebar-menu-link" title="Grades Management">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Grades</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-divider"></li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Schedule" class="sidebar-menu-link" title="Schedule Management">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Schedule</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="/Attendance" class="sidebar-menu-link" title="Attendance Management">
+                        <div class="sidebar-menu-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <span class="sidebar-menu-text">Attendance</span>
+                    </a>
+                </li>
+            }
+
+            <li class="sidebar-divider"></li>
+
+            
+            <li class="sidebar-menu-item">
+                <a href="/Announcements" class="sidebar-menu-link" title="Announcements">
+                    <div class="sidebar-menu-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <span class="sidebar-menu-text">Announcements</span>
+                </a>
+            </li>
+
+            <li class="sidebar-menu-item">
+                <a href="/Messages" class="sidebar-menu-link" title="Messages">
+                    <div class="sidebar-menu-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <span class="sidebar-menu-text">Messages</span>
+                </a>
+            </li>
+        }
+    </ul>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

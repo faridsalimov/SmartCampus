@@ -1,0 +1,170 @@
+@page
+@model SmartCampus.Web.Pages.Grades.CreateModel
+@{
+    ViewData["Title"] = "Create Grade";
+}
+
+
+<div style="background: linear-gradient(135deg, rgba(94, 92, 230, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(94, 92, 230, 0.1);">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                <a asp-page="Index" class="text-decoration-none" style="color: #5e5ce6;">
+                    <i class="fas fa-arrow-left me-2"></i>Grades
+                </a>
+                <span style="color: #a1a1a6;">/</span>
+                <span style="color: #636366;">Create</span>
+            </div>
+            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
+                <i class="fas fa-star me-2" style="color: #5e5ce6;"></i>Create Grade
+            </h1>
+            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
+                <i class="fas fa-plus-circle me-1"></i>
+                Add a new grade for a student
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-8">
+        <form method="post" class="needs-validation" novalidate>
+            @Html.AntiForgeryToken()
+            
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-light border-bottom">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2" style="color: #5e5ce6;"></i>Grade Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show d-none" role="alert" id="validationSummary">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Please fix the following errors:</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Input.StudentId" class="form-label">
+                                <i class="fas fa-user me-1"></i>Student <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="Input.StudentId" class="form-select" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;">
+                                <option value="">-- Select Student --</option>
+                                @foreach (var student in Model.AvailableStudents)
+                                {
+                                    <option value="@student.Id">@student.FullName</option>
+                                }
+                            </select>
+                            <small class="form-text text-muted">Select the student receiving this grade</small>
+                            <span asp-validation-for="Input.StudentId" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Input.GroupId" class="form-label">
+                                <i class="fas fa-users me-1"></i>Group <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="Input.GroupId" class="form-select" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;">
+                                <option value="">-- Select Group --</option>
+                                @foreach (var group in Model.UserGroups)
+                                {
+                                    <option value="@group.Id">@group.GroupName</option>
+                                }
+                            </select>
+                            <small class="form-text text-muted">Select the group for this grade</small>
+                            <span asp-validation-for="Input.GroupId" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Input.CourseId" class="form-label">
+                                <i class="fas fa-book me-1"></i>Course <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="Input.CourseId" class="form-select" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;">
+                                <option value="">-- Select Course --</option>
+                                @foreach (var course in Model.AvailableCourses)
+                                {
+                                    <option value="@course.Id">@course.Title</option>
+                                }
+                            </select>
+                            <small class="form-text text-muted">Select the course for this grade</small>
+                            <span asp-validation-for="Input.CourseId" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Input.Score" class="form-label">
+                            <i class="fas fa-percentage me-1"></i>Score (0-100) <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Input.Score" class="form-control" type="number" step="0.01" min="0" max="100" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                        <small class="form-text text-muted">Enter a score between 0 and 100</small>
+                        <span asp-validation-for="Input.Score" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Input.Feedback" class="form-label">
+                            <i class="fas fa-comment me-1"></i>Feedback
+                        </label>
+                        <textarea asp-for="Input.Feedback" class="form-control" rows="4" placeholder="Enter feedback for the student..." style="border: 1.5px solid #e5e5ea; border-radius: 8px;"></textarea>
+                        <small class="form-text text-muted">Provide constructive feedback to help the student improve</small>
+                        <span asp-validation-for="Input.Feedback" class="text-danger small d-block mt-1"></span>
+                    </div>
+                </div>
+
+                
+                <div class="card-footer bg-light border-top">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-page="Index" class="btn btn-outline-secondary" style="border-radius: 8px;">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary" style="border-radius: 8px; background: #5e5ce6; border: none;">
+                            <i class="fas fa-save me-1"></i>Create Grade
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    
+    <div class="col-lg-4">
+        <div class="card bg-light border-0">
+            <div class="card-header border-bottom">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2" style="color: #5e5ce6;"></i>Tips
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Score Range:</strong> Enter scores from 0 to 100.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Feedback:</strong> Provide constructive comments about the student's performance.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Accuracy:</strong> Double-check the student and course before saving.
+                    </small>
+                </div>
+                <div class="alert alert-info small mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Fields marked with <span class="text-danger">*</span> are required.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

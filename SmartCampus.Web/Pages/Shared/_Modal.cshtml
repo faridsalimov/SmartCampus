@@ -1,0 +1,28 @@
+
+
+
+<div id="@ViewBag.ModalId" class="modal-soft">
+    <div class="modal-content-soft">
+        
+        <div class="modal-header-soft">
+            <h5 class="modal-title-soft">@ViewBag.ModalTitle</h5>
+            <button type="button" class="modal-close-btn" onclick="closeModal('@ViewBag.ModalId')" 
+                    aria-label="Close" title="Close modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        
+        <div class="modal-body-soft">
+            @Html.Raw(ViewBag.ModalContent)
+        </div>
+
+        
+        @if (!string.IsNullOrEmpty(ViewBag.ModalFooter))
+        {
+            <div class="modal-footer-soft">
+                @Html.Raw(ViewBag.ModalFooter)
+            </div>
+        }
+    </div>
+</div>

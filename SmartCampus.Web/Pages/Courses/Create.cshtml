@@ -1,0 +1,202 @@
+@page
+@model SmartCampus.Web.Pages.Courses.CreateModel
+@{
+    ViewData["Title"] = "Create Course";
+}
+
+
+<div style="background: linear-gradient(135deg, rgba(94, 92, 230, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(94, 92, 230, 0.1);">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                <a asp-page="Index" class="text-decoration-none" style="color: #5e5ce6;">
+                    <i class="fas fa-arrow-left me-2"></i>Courses
+                </a>
+                <span style="color: #a1a1a6;">/</span>
+                <span style="color: #636366;">Create</span>
+            </div>
+            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
+                <i class="fas fa-plus-circle me-2" style="color: #5e5ce6;"></i>Create New Course
+            </h1>
+            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
+                <i class="fas fa-book me-1"></i>Add a new course to the system
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-8">
+        <form method="post" class="needs-validation" novalidate>
+            @Html.AntiForgeryToken()
+            
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-light border-bottom">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2" style="color: #5e5ce6;"></i>Course Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show d-none" role="alert" id="validationSummary">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Please fix the following errors:</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Course.Code" class="form-label">
+                                <i class="fas fa-barcode me-1"></i>Course Code
+                            </label>
+                            <input asp-for="Course.Code" class="form-control" placeholder="e.g., CS101" style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Optional unique course identifier</small>
+                            <span asp-validation-for="Course.Code" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Course.Title" class="form-label">
+                                <i class="fas fa-book me-1"></i>Course Title <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Course.Title" class="form-control" placeholder="Enter course title" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <span asp-validation-for="Course.Title" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Course.Description" class="form-label">
+                            <i class="fas fa-align-left me-1"></i>Description
+                        </label>
+                        <textarea asp-for="Course.Description" class="form-control" rows="4" placeholder="Enter course description..." style="border: 1.5px solid #e5e5ea; border-radius: 8px;"></textarea>
+                        <small class="form-text text-muted">Provide a brief overview of the course content and objectives</small>
+                        <span asp-validation-for="Course.Description" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Course.TeacherId" class="form-label">
+                                <i class="fas fa-chalkboard-user me-1"></i>Teacher <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="Course.TeacherId" class="form-select" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;">
+                                <option value="">-- Select a Teacher --</option>
+                                @foreach (var teacher in Model.Teachers)
+                                {
+                                    <option value="@teacher.Id">@teacher.FullName</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Course.TeacherId" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Course.GroupId" class="form-label">
+                                <i class="fas fa-users me-1"></i>Group
+                            </label>
+                            <select asp-for="Course.GroupId" class="form-select" style="border: 1.5px solid #e5e5ea; border-radius: 8px;">
+                                <option value="">-- Select a Group --</option>
+                                @foreach (var group in Model.Groups)
+                                {
+                                    <option value="@group.Id">@(group.GroupName ?? group.Id.ToString())</option>
+                                }
+                            </select>
+                            <small class="form-text text-muted">Optional group homework</small>
+                            <span asp-validation-for="Course.GroupId" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Course.Credits" class="form-label">
+                                <i class="fas fa-star me-1"></i>Credits <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Course.Credits" class="form-control" type="number" placeholder="0" required min="0" step="0.5" style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Number of course credits</small>
+                            <span asp-validation-for="Course.Credits" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Course.Semester" class="form-label">
+                                <i class="fas fa-calendar me-1"></i>Semester
+                            </label>
+                            <select asp-for="Course.Semester" class="form-select" style="border: 1.5px solid #e5e5ea; border-radius: 8px;">
+                                <option value="">-- Select Semester --</option>
+                                <option value="Fall">Fall</option>
+                                <option value="Spring">Spring</option>
+                                <option value="Summer">Summer</option>
+                            </select>
+                            <span asp-validation-for="Course.Semester" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="card-footer bg-light border-top">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-page="Index" class="btn btn-outline-secondary" style="border-radius: 8px;">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary" style="border-radius: 8px; background: #5e5ce6; border: none;">
+                            <i class="fas fa-plus me-1"></i>Create Course
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    
+    <div class="col-lg-4">
+        <div class="card bg-light border-0">
+            <div class="card-header border-bottom">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2" style="color: #5e5ce6;"></i>Tips
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Course Code:</strong> Use a standard format like CS101, MATH201, etc.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Credits:</strong> Typically ranges from 1 to 4 credits per course.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Teacher:</strong> Each course must be assigned to a teacher.
+                    </small>
+                </div>
+                <div class="alert alert-info small mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Fields marked with <span class="text-danger">*</span> are required.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Bootstrap form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.querySelectorAll('.needs-validation');
+                Array.prototype.slice.call(forms).forEach(function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            document.getElementById('validationSummary').classList.remove('d-none');
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+}

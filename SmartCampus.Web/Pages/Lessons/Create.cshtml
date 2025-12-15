@@ -1,0 +1,166 @@
+@page
+@model SmartCampus.Web.Pages.Lessons.CreateModel
+@{
+    ViewData["Title"] = "Create Lesson";
+}
+
+
+<div style="background: linear-gradient(135deg, #5e5ce6 0%, #0066ff 100%); border-radius: 20px; padding: 35px 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(94, 92, 230, 0.15); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; background: rgba(255, 255, 255, 0.1); border-radius: 50%;"></div>
+    <div style="position: relative; z-index: 1;">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <a asp-page="Index" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; font-size: 0.95rem;">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                    <span style="color: rgba(255, 255, 255, 0.6);">/</span>
+                    <span style="color: rgba(255, 255, 255, 0.8);">Create New</span>
+                </div>
+                <h1 style="font-size: 2.5rem; font-weight: 800; color: white; margin: 0;">
+                    <i class="fas fa-plus-circle me-2"></i>Create Lesson
+                </h1>
+                <p style="color: rgba(255, 255, 255, 0.9); margin: 8px 0 0 0; font-size: 1rem;">
+                    <i class="fas fa-pen-fancy me-1"></i>Design and schedule a new lesson
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-8">
+        <form method="post" class="needs-validation" novalidate>
+            @Html.AntiForgeryToken()
+            
+            <div class="card border-0 mb-4" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
+                <div style="background: linear-gradient(135deg, #f5f5f7, #efefef); border-bottom: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 14px 14px 0 0;">
+                    <h5 style="margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-file-alt" style="color: #5e5ce6;"></i>Lesson Details
+                    </h5>
+                </div>
+
+                <div class="card-body" style="padding: 24px;">
+                    
+                    <div class="mb-4">
+                        <label asp-for="Lesson.Title" class="form-label" style="font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">
+                            <i class="fas fa-heading me-1" style="color: #5e5ce6;"></i>Lesson Title <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Lesson.Title" class="form-control" placeholder="e.g., Introduction to Data Structures" required style="border: 2px solid #e5e5ea; border-radius: 10px; padding: 10px 12px; font-size: 0.95rem;" />
+                        <small class="form-text text-muted">Give your lesson a clear, descriptive title</small>
+                        <span asp-validation-for="Lesson.Title" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Lesson.GroupId" class="form-label" style="font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">
+                            <i class="fas fa-users me-1" style="color: #5e5ce6;"></i>Target Group <span class="text-danger">*</span>
+                        </label>
+                        <select asp-for="Lesson.GroupId" class="form-select" required style="border: 2px solid #e5e5ea; border-radius: 10px; padding: 10px 12px; font-size: 0.95rem;">
+                            <option value="">-- Select Group --</option>
+                            @foreach (var group in Model.Groups)
+                            {
+                                <option value="@group.Id">@group.GroupName</option>
+                            }
+                        </select>
+                        <small class="form-text text-muted">Choose which group will attend this lesson</small>
+                        <span asp-validation-for="Lesson.GroupId" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Lesson.LessonNumber" class="form-label" style="font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">
+                                <i class="fas fa-hashtag me-1" style="color: #5e5ce6;"></i>Lesson Number <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Lesson.LessonNumber" class="form-control" type="number" required style="border: 2px solid #e5e5ea; border-radius: 10px; padding: 10px 12px; font-size: 0.95rem;" />
+                            <small class="form-text text-muted">Use sequential numbering (1, 2, 3...)</small>
+                            <span asp-validation-for="Lesson.LessonNumber" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Lesson.LessonDate" class="form-label" style="font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">
+                                <i class="fas fa-calendar-alt me-1" style="color: #5e5ce6;"></i>Date & Time <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Lesson.LessonDate" class="form-control" type="datetime-local" required style="border: 2px solid #e5e5ea; border-radius: 10px; padding: 10px 12px; font-size: 0.95rem;" />
+                            <small class="form-text text-muted">When will the lesson take place?</small>
+                            <span asp-validation-for="Lesson.LessonDate" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Lesson.Location" class="form-label" style="font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">
+                            <i class="fas fa-map-marker me-1" style="color: #5e5ce6;"></i>Location
+                        </label>
+                        <input asp-for="Lesson.Location" class="form-control" placeholder="e.g., Room 101 or Online" style="border: 2px solid #e5e5ea; border-radius: 10px; padding: 10px 12px; font-size: 0.95rem;" />
+                        <small class="form-text text-muted">Where will this lesson be held?</small>
+                        <span asp-validation-for="Lesson.Location" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Lesson.Content" class="form-label" style="font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">
+                            <i class="fas fa-align-left me-1" style="color: #5e5ce6;"></i>Lesson Content & Materials
+                        </label>
+                        <textarea asp-for="Lesson.Content" class="form-control" rows="7" placeholder="Include topics covered, learning objectives, resources, reading materials, and any special instructions..." style="border: 2px solid #e5e5ea; border-radius: 10px; padding: 12px; font-size: 0.95rem; font-family: inherit;"></textarea>
+                        <small class="form-text text-muted">Add detailed content, learning objectives, and resources for students</small>
+                        <span asp-validation-for="Lesson.Content" class="text-danger small d-block mt-1"></span>
+                    </div>
+                </div>
+
+                
+                <div style="background: #f9f9fb; border-top: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 0 0 14px 14px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+                    <a asp-page="Index" class="btn" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500;">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn" style="background: linear-gradient(135deg, #5e5ce6, #0066ff); color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 500;">
+                        <i class="fas fa-check-circle me-1"></i>Create Lesson
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    
+    <div class="col-lg-4">
+        <div class="card border-0" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); margin-bottom: 20px;">
+            <div style="background: linear-gradient(135deg, #f5f5f7, #efefef); border-bottom: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 14px 14px 0 0;">
+                <h6 style="margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-lightbulb" style="color: #5e5ce6;"></i>Best Practices
+                </h6>
+            </div>
+            <div class="card-body" style="padding: 18px;">
+                <div style="margin-bottom: 14px;">
+                    <small style="display: block; font-weight: 600; color: #1d1d1f; margin-bottom: 4px;">
+                        <i class="fas fa-check-circle me-1" style="color: #34c759;"></i>Clear Organization
+                    </small>
+                    <small style="color: #636366; line-height: 1.5;">Use sequential lesson numbers and set clear dates to help students stay organized.</small>
+                </div>
+                <div style="margin-bottom: 14px;">
+                    <small style="display: block; font-weight: 600; color: #1d1d1f; margin-bottom: 4px;">
+                        <i class="fas fa-check-circle me-1" style="color: #34c759;"></i>Comprehensive Content
+                    </small>
+                    <small style="color: #636366; line-height: 1.5;">Include learning objectives, topics, materials, and any pre-lesson preparation required.</small>
+                </div>
+                <div style="margin-bottom: 14px;">
+                    <small style="display: block; font-weight: 600; color: #1d1d1f; margin-bottom: 4px;">
+                        <i class="fas fa-check-circle me-1" style="color: #34c759;"></i>Location Details
+                    </small>
+                    <small style="color: #636366; line-height: 1.5;">Specify if the lesson is in-person or online, and provide the location/meeting link.</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert" style="background: #f0f4ff; border-left: 4px solid #5e5ce6; border-radius: 10px; color: #3f3fc4;">
+            <small style="font-weight: 600; display: block; margin-bottom: 6px;">
+                <i class="fas fa-info-circle me-1"></i>Remember
+            </small>
+            <small>Fields marked with <span class="text-danger">*</span> are required. Students will see this lesson immediately after creation.</small>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

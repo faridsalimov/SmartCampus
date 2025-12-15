@@ -1,0 +1,86 @@
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using SmartCampus.Data.Entities
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+
+
+@functions {
+    public class ActionButtonsModel
+    {
+        public bool CanView { get; set; } = true;
+        public bool CanEdit { get; set; } = true;
+        public bool CanDelete { get; set; } = true;
+        public string? ViewUrl { get; set; }
+        public string? EditUrl { get; set; }
+        public string? DeleteUrl { get; set; }
+        public string? EntityId { get; set; }
+        public bool UseSmall { get; set; } = false;
+    }
+
+    private ActionButtonsModel MapModel(object? incoming)
+    {
+        if (incoming == null) return new ActionButtonsModel();
+        if (incoming is ActionButtonsModel m) return m;
+
+        var result = new ActionButtonsModel();
+        var t = incoming.GetType();
+        object? val;
+
+        var prop = t.GetProperty("CanView");
+        if (prop != null && (val = prop.GetValue(incoming)) is bool bv) result.CanView = bv;
+
+        prop = t.GetProperty("CanEdit");
+        if (prop != null && (val = prop.GetValue(incoming)) is bool be) result.CanEdit = be;
+
+        prop = t.GetProperty("CanDelete");
+        if (prop != null && (val = prop.GetValue(incoming)) is bool bd) result.CanDelete = bd;
+
+        prop = t.GetProperty("ViewUrl");
+        if (prop != null && (val = prop.GetValue(incoming)) is string sview) result.ViewUrl = sview;
+
+        prop = t.GetProperty("EditUrl");
+        if (prop != null && (val = prop.GetValue(incoming)) is string sedit) result.EditUrl = sedit;
+
+        prop = t.GetProperty("DeleteUrl");
+        if (prop != null && (val = prop.GetValue(incoming)) is string sdel) result.DeleteUrl = sdel;
+
+        prop = t.GetProperty("EntityId");
+        if (prop != null && (val = prop.GetValue(incoming)) is string sid) result.EntityId = sid;
+
+        prop = t.GetProperty("UseSmall");
+        if (prop != null && (val = prop.GetValue(incoming)) is bool us) result.UseSmall = us;
+
+        return result;
+    }
+}
+
+@{
+    var vm = MapModel(Model);
+    var sizeClass = vm.UseSmall ? "action-btn-sm" : string.Empty;
+}
+
+<div class="actions-cell" role="group" aria-label="Item actions">
+    
+    @if (vm.CanView && !string.IsNullOrEmpty(vm.ViewUrl))
+    {
+        <a class="action-btn view @sizeClass" href="@vm.ViewUrl" title="View" aria-label="View">
+            <i class="fas fa-eye"></i>
+        </a>
+    }
+    
+    @if (vm.CanEdit && !string.IsNullOrEmpty(vm.EditUrl))
+    {
+        <a class="action-btn edit @sizeClass" href="@vm.EditUrl" title="Edit" aria-label="Edit">
+            <i class="fas fa-edit"></i>
+        </a>
+    }
+    
+    @if (vm.CanDelete && !string.IsNullOrEmpty(vm.DeleteUrl))
+    {
+        <button type="button" class="action-btn delete @sizeClass" data-bs-toggle="modal" data-bs-target="#confirmModal" data-delete-url="@vm.DeleteUrl" data-delete-entity="@vm.EntityId" title="Delete" aria-label="Delete">
+            <i class="fas fa-trash"></i>
+        </button>
+    }
+</div>

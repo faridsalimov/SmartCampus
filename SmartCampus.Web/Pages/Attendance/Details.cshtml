@@ -1,0 +1,264 @@
+@page
+@model SmartCampus.Web.Pages.Attendance.DetailsModel
+@{
+    ViewData["Title"] = "Attendance Details";
+}
+
+
+<div style="background: linear-gradient(135deg, rgba(52, 199, 89, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(52, 199, 89, 0.1);">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                <a asp-page="Index" class="text-decoration-none" style="color: #34c759;">
+                    <i class="fas fa-arrow-left me-2"></i>Attendance
+                </a>
+                <span style="color: #a1a1a6;">/</span>
+                <span style="color: #636366;">Details</span>
+            </div>
+            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
+                <i class="fas fa-clipboard-check me-2" style="color: #34c759;"></i>Attendance Details
+            </h1>
+            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
+                <i class="fas fa-eye me-1"></i>
+                View attendance record
+            </p>
+        </div>
+        <div>
+            <span class="badge" style="background-color: #34c759; font-size: 0.9rem; padding: 8px 12px;">
+                <i class="fas fa-list-ul me-1"></i>Details
+            </span>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-8">
+        
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-light border-bottom">
+                <h5 class="mb-0">
+                    <i class="fas fa-file-alt me-2" style="color: #34c759;"></i>Attendance Record
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (Model.Attendance != null)
+                {
+                    
+                    <div class="mb-4">
+                        <h6 style="color: #1d1d1f; font-weight: 600; margin-bottom: 12px;">
+                            <i class="fas fa-user-circle me-2" style="color: #34c759;"></i>Student
+                        </h6>
+                        <div style="background-color: #f5f5f7; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #34c759;">
+                            <p style="margin: 0; color: #1d1d1f;">
+                                <strong>@Model.Student?.FullName ?? Model.Attendance.StudentName</strong>
+                            </p>
+                            <small style="color: #636366;">ID: @Model.Attendance.StudentId</small>
+                        </div>
+                    </div>
+
+                    <hr style="border: none; height: 1px; background: #e5e5ea; margin: 24px 0;" />
+
+                    
+                    @if (Model.Lesson != null)
+                    {
+                        <div class="mb-4">
+                            <h6 style="color: #1d1d1f; font-weight: 600; margin-bottom: 12px;">
+                                <i class="fas fa-book me-2" style="color: #5e5ce6;"></i>Lesson
+                            </h6>
+                            <div style="background-color: #f5f5f7; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #5e5ce6;">
+                                <p style="margin: 0; color: #1d1d1f;">
+                                    <strong>@Model.Lesson.Title</strong>
+                                </p>
+                                <small style="color: #636366;">Date: @Model.Attendance.AttendanceDate.ToString("MMM dd, yyyy")</small>
+                            </div>
+                        </div>
+
+                        <hr style="border: none; height: 1px; background: #e5e5ea; margin: 24px 0;" />
+                    }
+
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 style="color: #1d1d1f; font-weight: 600; margin-bottom: 12px;">
+                                <i class="fas fa-check-circle me-1" style="color: #34c759;"></i>Status
+                            </h6>
+                            <p style="margin: 0;">
+                                @{
+                                    var statusColor = Model.Attendance.Status?.ToLower() switch
+                                    {
+                                        "present" => "#34c759",
+                                        "absent" => "#ff3b30",
+                                        "late" => "#ff9500",
+                                        "excused" => "#5e5ce6",
+                                        _ => "#636366"
+                                    };
+                                    var statusIcon = Model.Attendance.Status?.ToLower() switch
+                                    {
+                                        "present" => "fa-check-circle",
+                                        "absent" => "fa-times-circle",
+                                        "late" => "fa-clock",
+                                        "excused" => "fa-check",
+                                        _ => "fa-question-circle"
+                                    };
+                                }
+                                <span class="badge" style="background-color: @statusColor;">
+                                    <i class="fas @statusIcon me-1"></i>@Model.Attendance.Status
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 style="color: #1d1d1f; font-weight: 600; margin-bottom: 12px;">
+                                <i class="fas fa-calendar-alt me-1" style="color: #34c759;"></i>Date
+                            </h6>
+                            <p style="margin: 0; color: #636366;">
+                                @Model.Attendance.AttendanceDate.ToString("MMM dd, yyyy")
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr style="border: none; height: 1px; background: #e5e5ea; margin: 24px 0;" />
+
+                    
+                    @if (!string.IsNullOrEmpty(Model.Attendance.Notes))
+                    {
+                        <div class="mb-4">
+                            <h6 style="color: #1d1d1f; font-weight: 600; margin-bottom: 12px;">
+                                <i class="fas fa-sticky-note me-2" style="color: #34c759;"></i>Notes
+                            </h6>
+                            <div style="background-color: #f9f9fb; padding: 16px; border-radius: 8px; border-left: 4px solid #34c759;">
+                                <p style="margin: 0; color: #636366; line-height: 1.6;">
+                                    @Model.Attendance.Notes
+                                </p>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Attendance record not found.
+                    </div>
+                }
+            </div>
+
+            
+            <div class="card-footer bg-light border-top">
+                <div class="d-flex gap-2 justify-content-end">
+                    <a asp-page="Index" class="btn btn-secondary" style="border-radius: 8px;">
+                        <i class="fas fa-arrow-left me-1"></i>Back to List
+                    </a>
+                    @if (Model.Attendance != null)
+                    {
+                        <a asp-page="Edit" asp-route-id="@Model.Attendance.Id" class="btn btn-primary" style="border-radius: 8px; background: #34c759; border: none;">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                        {
+                            <button type="button" class="btn btn-danger" style="border-radius: 8px;" data-bs-toggle="modal" data-bs-target="#confirmModal" data-delete-url="@Url.Page(null, new { handler = "Delete", id = Model.Attendance.Id })" data-delete-entity="@Model.Attendance.Id" data-delete-message="Delete this attendance record?">
+                                <i class="fas fa-trash me-1"></i>Delete
+                            </button>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="col-lg-4">
+        <div class="card bg-light border-0 mb-4">
+            <div class="card-header border-bottom">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2" style="color: #34c759;"></i>Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Student:</strong> Name of the student.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Status:</strong> Present, Absent, Late, or Excused.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Date:</strong> When attendance was recorded.
+                    </small>
+                </div>
+                <div class="alert alert-info small mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Use the Edit button to modify this attendance record.
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-light border-0">
+            <div class="card-header border-bottom">
+                <h6 class="mb-0">
+                    <i class="fas fa-clock me-2" style="color: #34c759;"></i>Timeline
+                </h6>
+            </div>
+            <div class="card-body">
+                <small class="text-muted d-block mb-2">
+                    <strong>Recorded:</strong> @Model.Attendance?.AttendanceDate.ToString("MMM dd, yyyy")
+                </small>
+                @if (Model.Attendance?.UpdatedAt.HasValue == true)
+                {
+                    <small class="text-muted d-block">
+                        <strong>Updated:</strong> @Model.Attendance.UpdatedAt?.ToString("MMM dd, yyyy HH:mm")
+                    </small>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0" id="confirmModalMessage"></p>
+                <form id="deleteForm" method="post" class="d-none">
+                    <input type="hidden" name="id" id="deleteEntityId" value="" />
+                    <button type="submit" class="btn btn-danger mt-3 w-100">
+                        <i class="fas fa-trash me-2"></i>Delete Record
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // JavaScript to handle delete button click and show modal
+        document.addEventListener('DOMContentLoaded', function () {
+            var confirmModal = document.getElementById('confirmModal');
+            confirmModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget; // Button that triggered the modal
+                var deleteUrl = button.getAttribute('data-delete-url');
+                var entityId = button.getAttribute('data-delete-entity');
+                var message = button.getAttribute('data-delete-message');
+
+                // Update the modal's content.
+                var modalMessage = confirmModal.querySelector('#confirmModalMessage');
+                modalMessage.textContent = message;
+
+                // Update form action URL
+                var deleteForm = document.getElementById('deleteForm');
+                deleteForm.setAttribute('action', deleteUrl);
+                deleteForm.querySelector('#deleteEntityId').value = entityId;
+            });
+        });
+    </script>
+}

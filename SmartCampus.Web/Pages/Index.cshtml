@@ -1,0 +1,53 @@
+@page
+@model SmartCampus.Web.Pages.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<link rel="stylesheet" href="~/css/index-styles.css" />
+
+<div class="home-container">
+    <header>
+        <div style="position: relative; z-index:1;">
+            @{
+                var parts = Model.CurrentUserFullName?.Split(' ') ?? new[] { "N/A" };
+                var firstName = parts.Length > 0 ? parts[0] : "N/A";
+            }
+            <h1>Welcome back, @firstName 👋</h1>
+            <div class="date-time">
+                <i class="fas fa-calendar-alt"></i>
+                @DateTime.Now.ToString("dddd, MMMM d, yyyy")
+            </div>
+        </div>
+    </header>
+
+    @{
+        var isStudent = User.IsInRole("Student");
+        var isTeacher = User.IsInRole("Teacher");
+        var isAdmin = User.IsInRole("Admin");
+    }
+
+    @if (isStudent)
+    {
+        <partial name="_StudentDashboard" model="Model.StudentDashboard" />
+    }
+    else if (isTeacher)
+    {
+        <partial name="_TeacherDashboard" model="Model.TeacherDashboard" />
+    }
+    else if (isAdmin)
+    {
+        <partial name="_AdminDashboard" model="Model.AdminDashboard" />
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toastMessage = '@Html.Raw(TempData["ToastMessage"] ?? "")';
+            const toastType = '@Html.Raw(TempData["ToastType"] ?? "info")';
+            if (toastMessage && window.Toast) window.Toast.show(toastMessage, toastType);
+        });
+    </script>
+}

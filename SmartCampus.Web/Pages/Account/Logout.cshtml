@@ -1,0 +1,14 @@
+@page
+@model SmartCampus.Web.Pages.Account.LogoutModel
+@{
+    Layout = null;
+}
+
+<form method="post" id="logoutForm" style="display:none"></form>
+
+<script>
+    (function () {
+        var f = document.getElementById('logoutForm');
+        if (f) f.submit();
+    })();
+</script>

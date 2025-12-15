@@ -1,0 +1,797 @@
+@page
+@model SmartCampus.Web.Pages.Homework.DetailsModel
+@{
+    ViewData["Title"] = "Homework Details";
+}
+
+
+<div style="background: linear-gradient(135deg, #ff9500 0%, #ff6b35 100%); border-radius: 20px; padding: 35px 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(255, 149, 0, 0.15); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; background: rgba(255, 255, 255, 0.1); border-radius: 50%;"></div>
+    <div style="position: relative; z-index: 1;">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <a asp-page="Index" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; font-size: 0.95rem;">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                    <span style="color: rgba(255, 255, 255, 0.6);">/</span>
+                    <span style="color: rgba(255, 255, 255, 0.8);">Details</span>
+                </div>
+                <h1 style="font-size: 2.5rem; font-weight: 800; color: white; margin: 0;">
+                    @Model.Homework?.Title
+                </h1>
+                <p style="color: rgba(255, 255, 255, 0.9); margin: 8px 0 0 0; font-size: 1rem;">
+                    <i class="fas fa-users me-1"></i>@Model.Homework?.CourseName
+                </p>
+            </div>
+            @if (Model.IsOwner)
+            {
+                <div style="background: rgba(255, 255, 255, 0.2); padding: 8px 14px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.3); color: white; font-weight: 600; font-size: 0.85rem;">
+                    <i class="fas fa-shield-alt me-1"></i>Your Homework
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-8">
+        
+        <div class="card border-0 mb-4" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
+            <div style="background: linear-gradient(135deg, #f5f5f7, #efefef); border-bottom: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 14px 14px 0 0;">
+                <h5 style="margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-file-alt" style="color: #ff9500;"></i>Homework Details
+                </h5>
+            </div>
+
+            <div class="card-body" style="padding: 24px;">
+                @if (Model.Homework != null)
+                {
+                    
+                    <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <div style="background: #fff3e0; padding: 10px 14px; border-radius: 8px; border-left: 4px solid #ff9500;">
+                            <small style="color: #636366; font-weight: 600;">
+                                <i class="fas fa-calendar-alt me-1" style="color: #ff9500;"></i>Due Date
+                            </small>
+                            <div style="color: #ff9500; font-weight: 700;">@Model.Homework.DueDate.ToString("MMM dd, yyyy")</div>
+                        </div>
+                        @if (Model.Homework.Type != null)
+                        {
+                            <div style="background: #e3f2fd; padding: 10px 14px; border-radius: 8px; border-left: 4px solid #0066ff;">
+                                <small style="color: #636366; font-weight: 600;">
+                                    <i class="fas fa-tag me-1" style="color: #0066ff;"></i>Type
+                                </small>
+                                <div style="color: #0066ff; font-weight: 700;">@Model.Homework.Type</div>
+                            </div>
+                        }
+                        @if (Model.Homework.IsCompleted)
+                        {
+                            <div style="background: #e8f5e9; padding: 10px 14px; border-radius: 8px; border-left: 4px solid #34c759;">
+                                <small style="color: #636366; font-weight: 600;">
+                                    <i class="fas fa-check-circle me-1" style="color: #34c759;"></i>Status
+                                </small>
+                                <div style="color: #34c759; font-weight: 700;">Completed</div>
+                            </div>
+                        }
+                    </div>
+
+                    <hr style="border: none; height: 1px; background: #e5e5ea; margin: 20px 0;" />
+
+                    
+                    @if (!string.IsNullOrEmpty(Model.Homework.Description))
+                    {
+                        <div style="margin-bottom: 20px;">
+                            <h6 style="color: #1d1d1f; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-align-left" style="color: #ff9500;"></i>Description
+                            </h6>
+                            <div style="background: #f9f9fb; padding: 16px; border-radius: 10px; border-left: 4px solid #ff9500; color: #636366; line-height: 1.7;">
+                                @Model.Homework.Description
+                            </div>
+                        </div>
+
+                        <hr style="border: none; height: 1px; background: #e5e5ea; margin: 20px 0;" />
+                    }
+
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 4px;">
+                                <i class="fas fa-plus-circle me-1"></i>Created
+                            </small>
+                            <p style="margin: 0; color: #636366;">@Model.Homework.CreatedDate.ToString("MMM dd, yyyy HH:mm")</p>
+                        </div>
+                        @if (Model.Homework.UpdatedAt.HasValue)
+                        {
+                            <div>
+                                <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 4px;">
+                                    <i class="fas fa-sync me-1"></i>Updated
+                                </small>
+                                <p style="margin: 0; color: #636366;">@Model.Homework.UpdatedAt?.ToString("MMM dd, yyyy HH:mm")</p>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            
+            <div style="background: #f9f9fb; border-top: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 0 0 14px 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <a asp-page="Index" class="btn" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500;">
+                    <i class="fas fa-arrow-left me-1"></i>Back to List
+                </a>
+
+                @if (Model.IsStudent && !Model.IsCompleted)
+                {
+                    <form method="post" asp-page-handler="Complete" style="margin-left: auto;">
+                        <button type="submit" class="btn" style="background: #34c759; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 500;">
+                            <i class="fas fa-check-circle me-1"></i>Mark as Completed
+                        </button>
+                    </form>
+                }
+
+                @if (Model.IsOwner)
+                {
+                    <a asp-page="Edit" asp-route-id="@Model.Homework?.Id" class="btn" style="background: #0066ff; color: white; border: none; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; margin-left: auto;">
+                        <i class="fas fa-edit me-1"></i>Edit
+                    </a>
+                    <button type="button" class="btn" style="background: #ff3b30; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 500;" data-bs-toggle="modal" data-bs-target="#confirmModal" data-delete-url="@Url.Page(null, new { handler = "Delete", id = Model.Homework?.Id })" data-delete-entity="@Model.Homework?.Id">
+                        <i class="fas fa-trash me-1"></i>Delete
+                    </button>
+                }
+            </div>
+        </div>
+
+        
+        @if (Model.IsStudent)
+        {
+            <div class="card border-0 mb-4" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border: 2px solid #e8f5e9;">
+                <div style="background: linear-gradient(135deg, #34c759, #30b347); border-bottom: 1px solid #2d974e; padding: 18px 20px; border-radius: 14px 14px 0 0;">
+                    <h5 style="margin: 0; font-weight: 700; color: white; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-paper-plane" style="color: white;"></i>Submit Your Work
+                    </h5>
+                </div>
+
+                <div class="card-body" style="padding: 24px;">
+                    <form method="post" enctype="multipart/form-data" asp-page-handler="Submit" asp-route-id="@Model.Homework?.Id">
+                        <div class="mb-4">
+                            <label style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 12px;">
+                                <i class="fas fa-file-upload me-1" style="color: #34c759;"></i>Upload File
+                                <span style="color: #ff3b30; font-weight: 700;">*</span>
+                            </label>
+
+                            
+                            <div id="fileDropZone" style="border: 2px dashed #34c759; border-radius: 12px; padding: 32px; text-align: center; cursor: pointer; background: #f0fdf4; transition: all 0.3s ease;" onmouseover="this.style.background='#e8f5e9'" onmouseout="this.style.background='#f0fdf4'">
+                                <input type="file" id="fileInput" name="submissionFile" style="display: none;" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.xlsx,.xls,.pptx,.ppt" />
+                                
+                                <div style="margin-bottom: 12px;">
+                                    <i class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: #34c759;"></i>
+                                </div>
+                                
+                                <p style="margin: 0; color: #1d1d1f; font-weight: 600; font-size: 1.05rem; cursor: pointer;">
+                                    Click to upload or drag and drop
+                                </p>
+                                <p style="margin: 8px 0 0 0; color: #a1a1a6; font-size: 0.9rem;">
+                                    PDF, Word, Excel, PowerPoint, Images (Max 25MB)
+                                </p>
+                                <p id="fileName" style="margin: 12px 0 0 0; color: #34c759; font-weight: 600; display: none;"></p>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 12px;">
+                                <i class="fas fa-keyboard me-1" style="color: #0066ff;"></i>Or Write Your Response
+                            </label>
+                            <textarea name="submissionText" placeholder="Write your response here... You can also upload a file for more complex submissions." style="width: 100%; border: 2px solid #e5e5ea; border-radius: 10px; padding: 14px; font-size: 0.95rem; font-family: inherit; resize: vertical; min-height: 150px; transition: border-color 0.3s ease;" onfocus="this.style.borderColor='#0066ff'" onblur="this.style.borderColor='#e5e5ea'"></textarea>
+                        </div>
+
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #34c759, #30b347); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <i class="fas fa-check-circle me-1"></i>Submit Assignment
+                            </button>
+                            <button type="button" class="btn" onclick="document.getElementById('fileDropZone').click();" style="background: #e8f5e9; color: #34c759; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                                <i class="fas fa-plus me-1"></i>Add File
+                            </button>
+                        </div>
+                    </form>
+
+                    <script>
+                        const fileDropZone = document.getElementById('fileDropZone');
+                        const fileInput = document.getElementById('fileInput');
+                        const fileName = document.getElementById('fileName');
+
+                        fileDropZone.addEventListener('click', () => fileInput.click());
+                        fileDropZone.addEventListener('dragover', (e) => {
+                            e.preventDefault();
+                            fileDropZone.style.background = '#e8f5e9';
+                            fileDropZone.style.borderColor = '#2d974e';
+                        });
+                        fileDropZone.addEventListener('dragleave', () => {
+                            fileDropZone.style.background = '#f0fdf4';
+                            fileDropZone.style.borderColor = '#34c759';
+                        });
+                        fileDropZone.addEventListener('drop', (e) => {
+                            e.preventDefault();
+                            fileDropZone.style.background = '#f0fdf4';
+                            fileDropZone.style.borderColor = '#34c759';
+                            fileInput.files = e.dataTransfer.files;
+                            updateFileName();
+                        });
+
+                        fileInput.addEventListener('change', updateFileName);
+
+                        function updateFileName() {
+                            if (fileInput.files.length > 0) {
+                                fileName.textContent = fileInput.files[0].name;
+                                fileName.style.display = 'block';
+                            } else {
+                                fileName.style.display = 'none';
+                            }
+                        }
+                    </script>
+                </div>
+            </div>
+
+            
+            @if (Model.StudentSubmission != null)
+            {
+                <div class="card border-0 mb-4" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border-left: 4px solid #34c759;">
+                    <div style="background: linear-gradient(135deg, #34c759, #30b347); border-bottom: 1px solid #2d974e; padding: 18px 20px; border-radius: 14px 14px 0 0;">
+                        <h5 style="margin: 0; font-weight: 700; color: white; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-check-circle" style="color: white;"></i>Your Submission
+                        </h5>
+                    </div>
+                    <div class="card-body" style="padding: 24px;">
+                        
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
+                            @if (Model.StudentSubmission.Status == "Rejected")
+                            {
+                                <span style="background: #ffebee; color: #c62828; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-times-circle"></i>Rejected
+                                </span>
+                            }
+                            else if (Model.StudentSubmission.Status == "Graded" || Model.StudentSubmission.Grade != null)
+                            {
+                                <span style="background: #e8f5e9; color: #1b5e20; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-star"></i>Graded
+                                </span>
+                            }
+                            else
+                            {
+                                <span style="background: #e3f2fd; color: #0052cc; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-paper-plane"></i>Submitted
+                                </span>
+                            }
+                            
+                            @if (Model.StudentSubmission.IsLate)
+                            {
+                                <span style="background: #fff3e0; color: #f57c00; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-clock"></i>Late Submission
+                                </span>
+                            }
+                        </div>
+
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div style="background: #f9f9fb; padding: 12px 14px; border-radius: 8px; border-left: 4px solid #0066ff;">
+                                <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 4px;">
+                                    <i class="fas fa-calendar-check me-1"></i>Submitted On
+                                </small>
+                                <p style="margin: 0; color: #1d1d1f; font-weight: 500;">@Model.StudentSubmission.SubmissionDate.ToString("MMM dd, yyyy HH:mm")</p>
+                            </div>
+                            <div style="background: #f9f9fb; padding: 12px 14px; border-radius: 8px; border-left: 4px solid #0066ff;">
+                                <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 4px;">
+                                    <i class="fas fa-clipboard-check me-1"></i>Status
+                                </small>
+                                <p style="margin: 0; color: #1d1d1f; font-weight: 500;">@Model.StudentSubmission.Status</p>
+                            </div>
+                        </div>
+
+                        
+                        @if (Model.StudentSubmission.IsLate)
+                        {
+                            <div style="background: #fff3e0; border-left: 4px solid #ff9500; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                                <small style="color: #e65100; font-weight: 600; display: block; margin-bottom: 4px;">
+                                    <i class="fas fa-exclamation me-1"></i>Late Submission
+                                </small>
+                                <small style="color: #f57c00;">This submission was made after the due date.</small>
+                            </div>
+                        }
+
+                        @if (Model.StudentSubmission.Status == "Rejected")
+                        {
+                            <div style="background: #ffebee; border-left: 4px solid #ff3b30; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                                <small style="color: #c62828; font-weight: 600; display: block; margin-bottom: 8px;">
+                                    <i class="fas fa-ban me-1"></i>Submission Rejected
+                                </small>
+                                <p style="margin: 8px 0 0 0; color: #d32f2f; font-size: 0.95rem;">
+                                    Your submission has been rejected by your teacher. Please review the feedback and resubmit if required.
+                                </p>
+                            </div>
+                        }
+
+                        
+                        @if (!string.IsNullOrWhiteSpace(Model.StudentSubmission.SubmissionText) || !string.IsNullOrWhiteSpace(Model.StudentSubmission.FileUrl))
+                        {
+                            <hr style="border: none; height: 1px; background: #e5e5ea; margin: 20px 0;" />
+                            <div style="margin-bottom: 20px;">
+                                <h6 style="color: #1d1d1f; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-inbox" style="color: #0066ff;"></i>Submission Content
+                                </h6>
+                                
+                                @if (!string.IsNullOrWhiteSpace(Model.StudentSubmission.SubmissionText))
+                                {
+                                    <div style="margin-bottom: 16px;">
+                                        <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 8px;">
+                                            <i class="fas fa-align-left me-1"></i>Your Text Response
+                                        </small>
+                                        <div style="background: #f9f9fb; padding: 12px; border-radius: 8px; border-left: 4px solid #0066ff; color: #636366; line-height: 1.6; max-height: 250px; overflow-y: auto;">
+                                            @Model.StudentSubmission.SubmissionText
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(Model.StudentSubmission.FileUrl))
+                                {
+                                    <div>
+                                        <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 8px;">
+                                            <i class="fas fa-paperclip me-1"></i>Attached File
+                                        </small>
+                                        <div style="background: #f9f9fb; padding: 12px; border-radius: 8px; border-left: 4px solid #0066ff; display: flex; align-items: center; justify-content: space-between;">
+                                            <span style="color: #636366; font-weight: 500;">
+                                                <i class="fas fa-file me-2" style="color: #ff9500;"></i>@Model.StudentSubmission.FileUrl.Split('/').Last()
+                                            </span>
+                                            <a href="@Model.StudentSubmission.FileUrl" target="_blank" class="btn" style="background: #0066ff; color: white; border: none; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 0.85rem;">
+                                                <i class="fas fa-download me-1"></i>Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        
+                        @if (Model.StudentSubmission.Grade != null)
+                        {
+                            <hr style="border: none; height: 1px; background: #e5e5ea; margin: 20px 0;" />
+                            <div style="margin-bottom: 0;">
+                                <h6 style="color: #1d1d1f; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-trophy" style="color: #34c759;"></i>Your Grade
+                                </h6>
+                                <div style="background: #e8f5e9; padding: 24px; border-radius: 12px; border: 2px solid #34c759; margin-bottom: 20px;">
+                                    <div style="text-align: center;">
+                                        <small style="color: #2d5016; font-weight: 700; display: block; margin-bottom: 12px; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Score</small>
+                                        <p style="margin: 0; font-size: 3.5rem; font-weight: 900; color: #34c759;">@Model.StudentSubmission.Grade.Score</p>
+                                        <small style="color: #2d5016; font-weight: 600; font-size: 0.9rem;">/10</small>
+                                    </div>
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(Model.StudentSubmission.Grade.Feedback))
+                                {
+                                    <div>
+                                        <small style="color: #a1a1a6; font-weight: 700; display: block; margin-bottom: 12px, text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">
+                                            <i class="fas fa-comment me-2" style="color: #ff9500;"></i>Teacher's Feedback
+                                        </small>
+                                        <div style="background: #fffbf0; padding: 16px; border-radius: 10px; border-left: 4px solid #ff9500; color: #636366; line-height: 1.8; font-size: 0.95rem;">
+                                            @Model.StudentSubmission.Grade.Feedback
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div style="background: #f0f0f0; padding: 16px; border-radius: 10px; border-left: 4px solid #a1a1a6; color: #636366; text-align: center; font-size: 0.9rem;">
+                                        <i class="fas fa-comment-slash me-2" style="color: #a1a1a6;"></i>No feedback provided
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+
+        
+        @if (Model.IsTeacher && Model.StudentSubmissions.Any())
+        {
+            <div class="card border-0 mb-4" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
+                <div style="background: linear-gradient(135deg, #0066ff, #0052cc); border-bottom: 1px solid #e5e5ea; padding: 20px; border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                    <h5 style="margin: 0; font-weight: 700; color: white; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-file-circle-check"></i>Student Submissions
+                    </h5>
+                    <span style="background: rgba(255, 255, 255, 0.3); color: white; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">@Model.StudentSubmissions.Count() Total</span>
+                </div>
+
+                <div class="card-body" style="padding: 0;">
+                    @{
+                        var submittedCount = Model.StudentSubmissions.Count(s => !string.IsNullOrWhiteSpace(s.Status));
+                        var gradedCount = Model.StudentSubmissions.Count(s => s.Grade != null);
+                        var rejectedCount = Model.StudentSubmissions.Count(s => s.Status == "Rejected");
+                    }
+
+                    
+                    <div style="background: #f9f9fb; padding: 18px 20px; border-bottom: 1px solid #e5e5ea; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                        <div style="text-align: center;">
+                            <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 8px;">
+                                <i class="fas fa-inbox me-1" style="color: #0066ff;"></i>Submitted
+                            </small>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #0066ff;">@submittedCount</p>
+                        </div>
+                        <div style="text-align: center; border-left: 1px solid #e5e5ea; border-right: 1px solid #e5e5ea;">
+                            <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 8px;">
+                                <i class="fas fa-star me-1" style="color: #34c759;"></i>Graded
+                            </small>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #34c759;">@gradedCount</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 8px;">
+                                <i class="fas fa-ban me-1" style="color: #ff9500;"></i>Rejected
+                            </small>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #ff9500;">@rejectedCount</p>
+                        </div>
+                    </div>
+
+                    
+                    <div style="max-height: 800px; overflow-y: auto;">
+                        @foreach (var submission in Model.StudentSubmissions)
+                        {
+                            <div style="border-bottom: 1px solid #e5e5ea; padding: 16px 20px; transition: all 0.2s ease;" onmouseover="this.style.background='#f9f9fb'" onmouseout="this.style.background='white'">
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                    <div>
+                                        <h6 style="margin: 0 0 6px 0; color: #1d1d1f; font-weight: 700;">
+                                            <i class="fas fa-user-circle me-2" style="color: #0066ff;"></i>@submission.StudentName
+                                        </h6>
+                                        <small style="color: #a1a1a6;">
+                                            <i class="fas fa-calendar me-1"></i>@submission.SubmissionDate.ToString("MMM dd, yyyy HH:mm")
+                                        </small>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
+                                        <span style="background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 0.8rem;">
+                                            @submission.Status
+                                        </span>
+                                        @if (submission.IsLate)
+                                        {
+                                            <span style="background: #fff3e0; color: #f57c00; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 0.8rem;">
+                                                <i class="fas fa-clock me-1"></i>Late
+                                            </span>
+                                        }
+                                        @if (submission.Grade != null)
+                                        {
+                                            <span style="background: #e3f2fd; color: #0066ff; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 0.8rem;">
+                                                @submission.Grade.Score/10
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+
+                                
+                                @if (!string.IsNullOrWhiteSpace(submission.SubmissionText) || !string.IsNullOrWhiteSpace(submission.FileUrl))
+                                {
+                                    <div style="background: #f9f9fb; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #0066ff;">
+                                        @if (!string.IsNullOrWhiteSpace(submission.SubmissionText))
+                                        {
+                                            <small style="color: #636366; display: block; margin-bottom: 6px;">
+                                                <i class="fas fa-align-left me-1" style="color: #0066ff;"></i><strong>Text:</strong>
+                                            </small>
+                                            <p style="margin: 0; color: #636366; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                @submission.SubmissionText.Substring(0, Math.Min(100, submission.SubmissionText.Length))@(submission.SubmissionText.Length > 100 ? "..." : "")
+                                            </p>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(submission.FileUrl))
+                                        {
+                                            <small style="color: #636366; display: block; margin-top: 6px;">
+                                                <i class="fas fa-file me-1" style="color: #ff9500;"></i><strong>File:</strong> 
+                                                <a href="@submission.FileUrl" target="_blank" style="color: #0066ff; text-decoration: none;">@submission.FileUrl.Split('/').Last()</a>
+                                            </small>
+                                        }
+                                    </div>
+                                }
+
+                                
+                                @if (submission.Grade != null)
+                                {
+                                    <div style="background: #e8f5e9; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #34c759;">
+                                        <small style="color: #2e7d32; font-weight: 600; display: block; margin-bottom: 6px;">
+                                            <i class="fas fa-star me-1"></i>Graded
+                                        </small>
+                                        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 8px;">
+                                            <div>
+                                                <small style="color: #a1a1a6;">Score: <strong style="color: #34c759;">@submission.Grade.Score/10</strong></small>
+                                            </div>
+                                        </div>
+                                        @if (!string.IsNullOrWhiteSpace(submission.Grade.Feedback))
+                                        {
+                                            <small style="color: #636366; display: block; padding-top: 8px; border-top: 1px solid rgba(52, 199, 89, 0.2);">
+                                                <strong>Feedback:</strong> @submission.Grade.Feedback.Substring(0, Math.Min(70, submission.Grade.Feedback.Length))@(submission.Grade.Feedback.Length > 70 ? "..." : "")
+                                            </small>
+                                        }
+                                    </div>
+                                }
+                                else if (submission.Status != "Rejected")
+                                {
+                                    <div style="background: #fff3e0; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #ff9500;">
+                                        <small style="color: #e65100; font-weight: 600;">
+                                            <i class="fas fa-hourglass-half me-1"></i>Pending grading - needs your attention
+                                        </small>
+                                    </div>
+                                }
+
+                                
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    @if (submission.Status != "Rejected")
+                                    {
+                                        <button type="button" class="btn" style="background: #0066ff; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer;" 
+                                                data-bs-toggle="modal" data-bs-target="#gradeModal" 
+                                                data-submission-id="@submission.Id" 
+                                                data-student-name="@submission.StudentName">
+                                            <i class="fas fa-star me-1"></i>Grade
+                                        </button>
+                                        <button type="button" class="btn" style="background: #ff9500; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer;" 
+                                                data-bs-toggle="modal" data-bs-target="#rejectModal" 
+                                                data-submission-id="@submission.Id" 
+                                                data-student-name="@submission.StudentName">
+                                            <i class="fas fa-ban me-1"></i>Reject
+                                        </button>
+                                    }
+                                    <button type="button" class="btn" style="background: #ff3b30; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer;" 
+                                            data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" 
+                                            data-submission-id="@submission.Id" 
+                                            data-student-name="@submission.StudentName">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    
+    <div class="col-lg-4">
+        
+        <div class="card border-0 mb-4" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
+            <div style="background: linear-gradient(135deg, #f5f5f7, #efefef); border-bottom: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 14px 14px 0 0;">
+                <h6 style="margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-clock" style="color: #ff9500;"></i>Timeline & Status
+                </h6>
+            </div>
+            <div class="card-body" style="padding: 18px;">
+                @{
+                    var daysRemaining = (Model.Homework?.DueDate ?? DateTime.UtcNow) - DateTime.UtcNow;
+                    var isOverdue = Model.Homework?.DueDate < DateTime.UtcNow;
+                    var isDueSoon = Model.Homework?.DueDate <= DateTime.UtcNow.AddDays(7) && !isOverdue;
+                }
+
+                @if (isOverdue)
+                {
+                    <div style="background: #ffebee; border-left: 4px solid #ff3b30; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                        <small style="color: #c62828; font-weight: 600; display: block; margin-bottom: 4px;">
+                            <i class="fas fa-exclamation-circle me-1"></i>Overdue
+                        </small>
+                        <small style="color: #d32f2f;">@Math.Abs(daysRemaining.Days) days overdue</small>
+                    </div>
+                }
+                else if (isDueSoon)
+                {
+                    <div style="background: #fff3e0; border-left: 4px solid #f57c00; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                        <small style="color: #e65100; font-weight: 600; display: block; margin-bottom: 4px;">
+                            <i class="fas fa-clock me-1"></i>Due Soon
+                        </small>
+                        <small style="color: #f57c00;">@daysRemaining.Days days remaining</small>
+                    </div>
+                }
+                else
+                {
+                    <div style="background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                        <small style="color: #1b5e20; font-weight: 600, display: block; margin-bottom: 4px;">
+                            <i class="fas fa-check-circle me-1"></i>On Time
+                        </small>
+                        <small style="color: #2e7d32;">@daysRemaining.Days days remaining</small>
+                    </div>
+                }
+
+                @if (Model.Homework?.IsCompleted == true)
+                {
+                    <div style="background: #e8f5e9; border-left: 4px solid #34c759; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                        <small style="color: #2d5016; font-weight: 600; display: block; margin-bottom: 4px;">
+                            <i class="fas fa-check-double me-1"></i>Completion Status
+                        </small>
+                        <small style="color: #34c759;">Marked as completed</small>
+                    </div>
+                }
+            </div>
+        </div>
+
+        
+        <div class="card border-0" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
+            <div style="background: linear-gradient(135deg, #f5f5f7, #efefef); border-bottom: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 14px 14px 0 0;">
+                <h6 style="margin: 0; font-weight: 700; display: flex; align-items: center, gap: 8px;">
+                    <i class="fas fa-lightbulb" style="color: #ff9500;"></i>Information
+                </h6>
+            </div>
+            <div class="card-body" style="padding: 18px;">
+                <div style="margin-bottom: 12px;">
+                    <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 4px;">What is this?</small>
+                    <small style="color: #636366; line-height: 1.5;">
+                        @if (Model.IsStudent)
+                        {
+                            <span>This is a homework assignment you need to complete. Upload your work or type your response above to submit your homework.</span>
+                        }
+                        else if (Model.IsOwner)
+                        {
+                            <span>This is your homework assignment. You can view student submissions and grade them on this page.</span>
+                        }
+                        else
+                        {
+                            <span>This is a homework assignment from your teacher. Review the instructions and submit your work on time.</span>
+                        }
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="gradeModal" tabindex="-1" aria-labelledby="gradeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 14px; border: none;">
+            <div style="background: linear-gradient(135deg, #0066ff, #0052cc); padding: 20px; border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                <h5 class="modal-title" id="gradeModalLabel" style="color: white; font-weight: 700; margin: 0;">
+                    <i class="fas fa-star me-2"></i>Grade Submission
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="GradeSubmission">
+                <input type="hidden" id="homeworkId" name="id" />
+                <input type="hidden" id="gradeSubmissionId" name="submissionId" />
+                
+                <div class="modal-body" style="padding: 24px;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 8px;">
+                            Student Name
+                        </label>
+                        <p id="studentNameDisplay" style="margin: 0; color: #636366;"></p>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label for="gradeScore" style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 8px;">
+                            Score (Out of 10)
+                            <span style="color: #ff3b30;">*</span>
+                        </label>
+                        <input type="number" id="gradeScore" name="gradeScore" min="0" max="10" step="0.1" required style="width: 100%; padding: 10px; border: 2px solid #e5e5ea; border-radius: 8px; font-size: 0.95rem;" />
+                        <small style="color: #a1a1a6; display: block; margin-top: 6px;">Enter a score between 0 and 10</small>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label for="gradeFeedback" style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 8px;">
+                            Feedback (Optional)
+                        </label>
+                        <textarea id="gradeFeedback" name="gradeFeedback" style="width: 100%; padding: 10px; border: 2px solid #e5e5ea; border-radius: 8px; font-size: 0.95rem; resize: vertical; min-height: 100px;"></textarea>
+                        <small style="color: #a1a1a6; display: block; margin-top: 6px;">Provide constructive feedback for the student</small>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e5e5ea;">
+                    <button type="button" class="btn" data-bs-dismiss="modal" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 500;">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn" style="background: #0066ff; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 500;">
+                        <i class="fas fa-check me-1"></i>Submit Grade
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 14px; border: none;">
+            <div style="background: linear-gradient(135deg, #ff9500, #ff8c00); padding: 20px; border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                <h5 class="modal-title" id="rejectModalLabel" style="color: white; font-weight: 700; margin: 0;">
+                    <i class="fas fa-ban me-2"></i>Reject Submission
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="RejectSubmission">
+                <input type="hidden" id="rejectHomeworkId" name="id" />
+                <input type="hidden" id="rejectSubmissionId" name="submissionId" />
+                
+                <div class="modal-body" style="padding: 24px;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 8px;">
+                            Student Name
+                        </label>
+                        <p id="rejectStudentNameDisplay" style="margin: 0; color: #636366;"></p>
+                    </div>
+
+                    <div style="background: #fff3e0; border-left: 4px solid #ff9500; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+                        <small style="color: #e65100; font-weight: 600;">
+                            <i class="fas fa-exclamation-circle me-1"></i>This action will mark the submission as rejected.
+                        </small>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label for="rejectionReason" style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 8px;">
+                            Rejection Reason (Optional)
+                        </label>
+                        <textarea id="rejectionReason" name="rejectionReason" placeholder="Explain why the submission is being rejected..." style="width: 100%; padding: 10px; border: 2px solid #e5e5ea; border-radius: 8px; font-size: 0.95rem; resize: vertical; min-height: 100px;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e5e5ea;">
+                    <button type="button" class="btn" data-bs-dismiss="modal" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 500;">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn" style="background: #ff9500; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 500;">
+                        <i class="fas fa-ban me-1"></i>Reject Submission
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 14px; border: none;">
+            <div style="background: linear-gradient(135deg, #ff3b30, #e63026); padding: 20px; border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                <h5 class="modal-title" id="deleteConfirmLabel" style="color: white; font-weight: 700; margin: 0;">
+                    <i class="fas fa-trash me-2"></i>Delete Submission
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="DeleteSubmission">
+                <input type="hidden" id="deleteHomeworkId" name="id" />
+                <input type="hidden" id="deleteSubmissionId" name="submissionId" />
+                
+                <div class="modal-body" style="padding: 24px;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 8px;">
+                            Student Name
+                        </label>
+                        <p id="deleteStudentNameDisplay" style="margin: 0; color: #636366;"></p>
+                    </div>
+
+                    <div style="background: #ffebee; border-left: 4px solid #ff3b30; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+                        <small style="color: #c62828; font-weight: 600;">
+                            <i class="fas fa-exclamation-circle me-1"></i>This action cannot be undone. The submission will be permanently deleted.
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e5e5ea;">
+                    <button type="button" class="btn" data-bs-dismiss="modal" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 500;">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn" style="background: #ff3b30; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 500;">
+                        <i class="fas fa-check me-1"></i>Yes, Delete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Grade Modal
+    document.addEventListener('show.bs.modal', function (e) {
+        if (e.target.id === 'gradeModal' && e.relatedTarget) {
+            document.getElementById('gradeSubmissionId').value = e.relatedTarget.getAttribute('data-submission-id');
+            document.getElementById('studentNameDisplay').textContent = e.relatedTarget.getAttribute('data-student-name');
+            const urlParams = new URLSearchParams(window.location.search);
+            document.getElementById('homeworkId').value = urlParams.get('id') || '';
+        }
+        if (e.target.id === 'rejectModal' && e.relatedTarget) {
+            document.getElementById('rejectSubmissionId').value = e.relatedTarget.getAttribute('data-submission-id');
+            document.getElementById('rejectStudentNameDisplay').textContent = e.relatedTarget.getAttribute('data-student-name');
+            document.getElementById('rejectHomeworkId').value = new URLSearchParams(window.location.search).get('id') || '';
+        }
+        if (e.target.id === 'deleteConfirmModal' && e.relatedTarget) {
+            document.getElementById('deleteSubmissionId').value = e.relatedTarget.getAttribute('data-submission-id');
+            document.getElementById('deleteStudentNameDisplay').textContent = e.relatedTarget.getAttribute('data-student-name');
+            document.getElementById('deleteHomeworkId').value = new URLSearchParams(window.location.search).get('id') || '';
+        }
+    });
+</script>

@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="SmartCampus.Core/SmartCampus.Core.csproj" Id="eedb63a8-87fc-47fd-a981-6abe7cceca5d" />
+  <Project Path="SmartCampus.Data/SmartCampus.Data.csproj" Id="d9f489ba-4f7f-444b-b8bb-9eae06b39e19" />
+  <Project Path="SmartCampus.Services/SmartCampus.Services.csproj" Id="d1a8a6a4-9471-4617-b52d-4ba54d036a5f" />
+  <Project Path="SmartCampus.Web/SmartCampus.Web.csproj" Id="9ae3c6a4-d2fa-46b2-869b-f89c3edcd071" />
+</Solution>

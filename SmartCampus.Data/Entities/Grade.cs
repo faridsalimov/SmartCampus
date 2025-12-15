@@ -1,0 +1,53 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SmartCampus.Data.Entities
+{
+
+
+
+    public class Grade
+    {
+        [Key]
+        public Guid Id { get; set; }
+
+        [Required]
+        public Guid StudentId { get; set; }
+
+        [ForeignKey(nameof(StudentId))]
+        public virtual Student? Student { get; set; }
+
+        public Guid? HomeworkSubmissionId { get; set; }
+
+        [ForeignKey(nameof(HomeworkSubmissionId))]
+        public virtual HomeworkSubmission? HomeworkSubmission { get; set; }
+
+        public Guid? CourseId { get; set; }
+
+        [ForeignKey(nameof(CourseId))]
+        public virtual Course? Course { get; set; }
+
+        public Guid? GroupId { get; set; }
+
+        [ForeignKey(nameof(GroupId))]
+        public virtual Group? Group { get; set; }
+
+        [Range(0, 100)]
+        public decimal Score { get; set; }
+
+        [StringLength(2)]
+        public string? LetterGrade { get; set; }
+
+        [StringLength(500)]
+        public string? Feedback { get; set; }
+
+        [StringLength(100)]
+        public string? GradeType { get; set; }
+
+        public DateTime GradedDate { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
+
+
+        public virtual Teacher? GradedByTeacher { get; set; }
+    }
+}

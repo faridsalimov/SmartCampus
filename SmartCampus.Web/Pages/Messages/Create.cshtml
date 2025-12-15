@@ -1,0 +1,179 @@
+@page
+@model SmartCampus.Web.Pages.Messages.CreateModel
+@{
+    ViewData["Title"] = "Send Message";
+}
+
+
+<div style="background: linear-gradient(135deg, rgba(0, 102, 255, 0.05) 0%, rgba(94, 92, 230, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(0, 102, 255, 0.1);">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                <a asp-page="Index" class="text-decoration-none" style="color: #0066ff;">
+                    <i class="fas fa-arrow-left me-2"></i>Messages
+                </a>
+                <span style="color: #a1a1a6;">/</span>
+                <span style="color: #636366;">Create</span>
+            </div>
+            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
+                <i class="fas fa-envelope me-2" style="color: #0066ff;"></i>Send Message
+            </h1>
+            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
+                <i class="fas fa-paper-plane me-1"></i>
+                Compose and send a new message
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-8">
+        <form method="post" class="needs-validation" novalidate>
+            @Html.AntiForgeryToken()
+            
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-light border-bottom">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2" style="color: #0066ff;"></i>Message Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show d-none" 
+                         role="alert" id="validationSummary">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Please fix the following errors:</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Input.ReceiverId" class="form-label">
+                            <i class="fas fa-user-circle me-1"></i>Recipient <span class="text-danger">*</span>
+                        </label>
+                        <select asp-for="Input.ReceiverId" class="form-select" required 
+                                style="border: 1.5px solid #e5e5ea; border-radius: 8px;">
+                            <option value="">-- Select a recipient --</option>
+                            @foreach (var (id, name, type) in Model.Recipients)
+                            {
+                                <option value="@id">@name</option>
+                            }
+                        </select>
+                        <small class="form-text text-muted">Choose who will receive this message</small>
+                        <span asp-validation-for="Input.ReceiverId" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Input.SenderName" class="form-label">
+                            <i class="fas fa-user me-1"></i>From <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Input.SenderName" class="form-control" 
+                               placeholder="Your name" required 
+                               style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                        <small class="form-text text-muted">Your name or identifier</small>
+                        <span asp-validation-for="Input.SenderName" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Input.Subject" class="form-label">
+                            <i class="fas fa-heading me-1"></i>Subject <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Input.Subject" class="form-control" 
+                               placeholder="Message subject" required 
+                               style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                        <small class="form-text text-muted">Brief subject line</small>
+                        <span asp-validation-for="Input.Subject" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Input.Content" class="form-label">
+                            <i class="fas fa-align-left me-1"></i>Message <span class="text-danger">*</span>
+                        </label>
+                        <textarea asp-for="Input.Content" class="form-control" rows="8" 
+                                  placeholder="Type your message here..." required 
+                                  style="border: 1.5px solid #e5e5ea; border-radius: 8px;"></textarea>
+                        <small class="form-text text-muted">Your full message content</small>
+                        <span asp-validation-for="Input.Content" class="text-danger small d-block mt-1"></span>
+                    </div>
+                </div>
+
+                
+                <div class="card-footer bg-light border-top">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-page="Index" class="btn btn-outline-secondary" style="border-radius: 8px;">
+                            <i class="fas fa-times me-1"></i>Discard
+                        </a>
+                        <button type="submit" class="btn btn-primary" 
+                                style="border-radius: 8px; background: #0066ff; border: none;">
+                            <i class="fas fa-paper-plane me-1"></i>Send Message
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    
+    <div class="col-lg-4">
+        <div class="card bg-light border-0">
+            <div class="card-header border-bottom">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2" style="color: #0066ff;"></i>Tips
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Recipient:</strong> Select the person you want to send this message to from the dropdown.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>From:</strong> Include your name or identifier so the recipient knows who sent the message.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Subject:</strong> A clear subject line helps organize and prioritize messages.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Message:</strong> Be clear, concise, and professional in your communication.
+                    </small>
+                </div>
+                <div class="alert alert-info small mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Fields marked with <span class="text-danger">*</span> are required.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Bootstrap form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.querySelectorAll('.needs-validation');
+                Array.prototype.slice.call(forms).forEach(function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            document.getElementById('validationSummary').classList.remove('d-none');
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+}

@@ -1,0 +1,150 @@
+@page
+@model SmartCampus.Web.Pages.Attendance.CreateModel
+@{
+    ViewData["Title"] = "Create Attendance Record";
+}
+
+
+<div style="background: linear-gradient(135deg, rgba(52, 199, 89, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(52, 199, 89, 0.1);">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                <a asp-page="Index" class="text-decoration-none" style="color: #34c759;">
+                    <i class="fas fa-arrow-left me-2"></i>Attendance
+                </a>
+                <span style="color: #a1a1a6;">/</span>
+                <span style="color: #636366;">Create</span>
+            </div>
+            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
+                <i class="fas fa-clipboard-check me-2" style="color: #34c759;"></i>Record Attendance
+            </h1>
+            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
+                <i class="fas fa-plus-circle me-1"></i>
+                Create a new attendance record for a student
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-8">
+        <form method="post" class="needs-validation" novalidate>
+            
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-light border-bottom">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2" style="color: #34c759;"></i>Attendance Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    
+                    <div class="mb-4">
+                        <label for="studentSelect" class="form-label">
+                            <i class="fas fa-user me-1"></i>Student <span class="text-danger">*</span>
+                        </label>
+                        <select id="studentSelect" name="Input.StudentId" class="form-select" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;">
+                            <option value="">-- Select Student --</option>
+                            @foreach (var student in Model.Students)
+                            {
+                                <option value="@student.Id">@student.FullName</option>
+                            }
+                        </select>
+                        <small class="form-text text-muted">Select the student for this attendance record</small>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label for="lessonSelect" class="form-label">
+                            <i class="fas fa-book me-1"></i>Lesson <span class="text-danger">*</span>
+                        </label>
+                        <select id="lessonSelect" name="Input.LessonId" class="form-select" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;">
+                            <option value="">-- Select Lesson --</option>
+                            @foreach (var lesson in Model.Lessons)
+                            {
+                                <option value="@lesson.Id">@lesson.Title</option>
+                            }
+                        </select>
+                        <small class="form-text text-muted">Select the lesson for this attendance record</small>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label for="statusSelect" class="form-label">
+                            <i class="fas fa-check-circle me-1"></i>Status <span class="text-danger">*</span>
+                        </label>
+                        <select id="statusSelect" name="Input.Status" class="form-select" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;">
+                            <option value="">-- Select Status --</option>
+                            <option value="Present">
+                                <i class="fas fa-check-circle"></i>Present
+                            </option>
+                            <option value="Absent">
+                                <i class="fas fa-times-circle"></i>Absent
+                            </option>
+                            <option value="Late">
+                                <i class="fas fa-clock"></i>Late
+                            </option>
+                            <option value="Excused">
+                                <i class="fas fa-file-alt"></i>Excused
+                            </option>
+                        </select>
+                        <small class="form-text text-muted">Mark the student's attendance status</small>
+                    </div>
+                </div>
+
+                
+                <div class="card-footer bg-light border-top">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-page="Index" class="btn btn-outline-secondary" style="border-radius: 8px;">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary" style="border-radius: 8px; background: #34c759; border: none;">
+                            <i class="fas fa-save me-1"></i>Record Attendance
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    
+    <div class="col-lg-4">
+        <div class="card bg-light border-0">
+            <div class="card-header border-bottom">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2" style="color: #34c759;"></i>Tips
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Present:</strong> Student attended the lesson.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Absent:</strong> Student did not attend.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Late:</strong> Student attended but arrived late.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Excused:</strong> Student had an approved excuse.
+                    </small>
+                </div>
+                <div class="alert alert-info small mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Fields marked with <span class="text-danger">*</span> are required.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,1256 @@
+@model SmartCampus.Web.ViewModels.TeacherDashboardViewModel
+
+@if (Model == null)
+{
+    <div style="padding: 40px 20px; text-align: center; color: #8e8e93;">
+        <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 16px;"></i>
+        <p>Unable to load teacher dashboard. Please refresh the page or contact support.</p>
+    </div>
+    return;
+}
+
+<div class="metrics-grid">
+    <div class="metric-card fade-in" style="--delay: 0.1s;">
+        <div class="metric-icon-wrapper classes">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="metric-content">
+            <div class="metric-value">@Model.TotalGroupsAssigned</div>
+            <div class="metric-label">Classes Assigned</div>
+        </div>
+    </div>
+
+    <div class="metric-card fade-in" style="--delay: 0.2s;">
+        <div class="metric-icon-wrapper students">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+        <div class="metric-content">
+            <div class="metric-value">@Model.TotalStudentsManaging</div>
+            <div class="metric-label">Students Managing</div>
+        </div>
+    </div>
+
+    <div class="metric-card fade-in" style="--delay: 0.3s;">
+        <div class="metric-icon-wrapper homework">
+            <i class="fas fa-file-alt"></i>
+        </div>
+        <div class="metric-content">
+            <div class="metric-value">@Model.PendingHomeworkCount</div>
+            <div class="metric-label">To Grade</div>
+        </div>
+    </div>
+
+    <div class="metric-card fade-in" style="--delay: 0.4s;">
+        <div class="metric-icon-wrapper lessons">
+            <i class="fas fa-book"></i>
+        </div>
+        <div class="metric-content">
+            <div class="metric-value">@Model.TotalLessonsCreated</div>
+            <div class="metric-label">Lessons Created</div>
+        </div>
+    </div>
+</div>
+
+
+<div class="teacher-dashboard-grid">
+    
+    <div class="dashboard-left">
+        
+        <div class="dashboard-card slide-up" style="--delay: 0.1s;">
+            <div class="card-header">
+                <div class="header-icon-group">
+                    <i class="fas fa-calendar"></i>
+                    <h3>Weekly Schedule</h3>
+                </div>
+                <div class="header-action">
+                    <a href="/Schedule" class="view-more-link">View Full Schedule</a>
+                </div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                @if (Model.WeekLessons != null && Model.WeekLessons.Any())
+                {
+                    foreach (var dayGroup in Model.WeekLessons.GroupBy(x => x.LessonDate.Date.DayOfWeek).OrderBy(x => x.Key))
+                    {
+                        <div style="border-bottom: 1px solid #e5e5ea; padding: 20px;">
+                            <h5 style="margin: 0 0 16px 0; font-weight: 700; color: #1d1d1f; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-calendar-day" style="color: #5e5ce6;"></i>
+                                @dayGroup.Key.ToString()
+                            </h5>
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                @foreach (var lesson in dayGroup.OrderBy(x => x.LessonDate.TimeOfDay).Take(5))
+                                {
+                                    <div style="background: linear-gradient(135deg, #f5f5f7 0%, #efefef 100%); padding: 16px; border-radius: 10px; border-left: 5px solid #5e5ce6; display: flex; gap: 16px; align-items: flex-start;">
+                                        <div style="min-width: 65px; display: flex; flex-direction: column; align-items: flex-start;">
+                                            <div style="font-weight: 700; color: #5e5ce6; font-size: 1.1rem;">@lesson.LessonDate.ToString("HH:mm")</div>
+                                            <small style="color: #a1a1a6; font-size: 0.75rem;">@lesson.LessonDate.ToString("MMM dd")</small>
+                                        </div>
+                                        <div style="flex: 1; min-width: 0;">
+                                            <div style="font-weight: 700; color: #1d1d1f; margin-bottom: 6px; font-size: 0.95rem;">@lesson.Title</div>
+                                            <div style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #636366; margin-bottom: 4px;">
+                                                <i class="fas fa-book" style="color: #5e5ce6; flex-shrink: 0;"></i>
+                                                <span>@lesson.CourseName</span>
+                                            </div>
+                                            <div style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #a1a1a6;">
+                                                <i class="fas fa-map-pin" style="color: #5e5ce6; flex-shrink: 0;"></i>
+                                                <span>@lesson.Location</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+                else if (Model.TodayLessons != null && Model.TodayLessons.Any())
+                {
+                    <div style="padding: 20px;">
+                        <h5 style="margin: 0 0 16px 0; font-weight: 700; color: #1d1d1f; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-calendar-day" style="color: #5e5ce6;"></i>
+                            Today
+                        </h5>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            @foreach (var lesson in Model.TodayLessons.Take(4))
+                            {
+                                <div style="background: linear-gradient(135deg, #f5f5f7 0%, #efefef 100%); padding: 14px; border-radius: 10px; border-left: 4px solid #34c759; display: flex; gap: 14px; align-items: flex-start;">
+                                    <div style="min-width: 60px;">
+                                        <div style="font-weight: 700; color: #34c759; font-size: 1rem;">@lesson.Time</div>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 700; color: #1d1d1f; margin-bottom: 4px;">@lesson.Title</div>
+                                        <div style="font-size: 0.8rem; color: #a1a1a6;">
+                                            <i class="fas fa-map-pin me-1"></i>@lesson.Location
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-placeholder">No upcoming lessons</div>
+                }
+            </div>
+        </div>
+
+        
+        <div class="dashboard-card slide-up" style="--delay: 0.2s;">
+            <div class="card-header">
+                <div class="header-icon-group">
+                    <i class="fas fa-layer-group"></i>
+                    <h3>Assigned Groups</h3>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (Model.AssignedGroups != null && Model.AssignedGroups.Any())
+                {
+                    <div class="members-list">
+                        @foreach (var group in Model.AssignedGroups.Take(6))
+                        {
+                            <div class="member-card fade-in-item" style="flex-direction: column; align-items: flex-start;">
+                                <div style="width: 100%;">
+                                    <div class="member-name">@group.GroupName</div>
+                                    <div class="member-id">@group.GroupCode</div>
+                                </div>
+                                <div style="font-size: 0.85rem; color: var(--gray); display: flex; align-items: center; gap: 6px; margin-top: 8px;">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <span>@group.StudentCount students</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-placeholder">No groups assigned</div>
+                }
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="dashboard-middle">
+        
+        <div class="dashboard-card slide-up" style="--delay: 0.15s;">
+            <div class="card-header">
+                <div class="header-icon-group">
+                    <i class="fas fa-tasks"></i>
+                    <h3>Pending Grades</h3>
+                </div>
+                <div class="header-badge pending">@Model.PendingHomeworkCount</div>
+            </div>
+            <div class="card-body activity-feed" style="padding: 0">
+                @if (Model.PendingHomework != null && Model.PendingHomework.Any())
+                {
+                    <div class="activity-timeline">
+                        @foreach (var hw in Model.PendingHomework.Take(8))
+                        {
+                            <div class="activity-entry fade-in-item">
+                                <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255, 59, 48, 0.15); display: flex; align-items: center; justify-content: center; color: #ff3b30; flex-shrink: 0;">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="activity-text" style="flex-direction: column; justify-content: flex-start;">
+                                    <span class="activity-action">@hw.Title</span>
+                                    <div style="font-size: 0.75rem; color: var(--gray); display: flex; gap: 12px; margin-top: 4px;">
+                                        <span><i class="fas fa-book"></i> @hw.CourseName</span>
+                                        <span><i class="fas fa-calendar"></i> @hw.DueDate.ToString("MMM dd")</span>
+                                    </div>
+                                </div>
+                                <div style="text-align: right; flex-shrink: 0;">
+                                    <div style="font-size: 1.5rem; font-weight: 800; color: #ff3b30;">@hw.PendingCount</div>
+                                    <div style="font-size: 0.7rem; color: var(--gray); font-weight: 600;">Pending</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-placeholder">No homework to grade</div>
+                }
+            </div>
+        </div>
+
+        
+        <div class="dashboard-card slide-up" style="--delay: 0.25s;">
+            <div class="card-header">
+                <div class="header-icon-group">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>Statistics</h3>
+                </div>
+            </div>
+            <div class="card-body">
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div>
+                        <div style="color: var(--gray); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Active Courses</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--primary);">@Model.ActiveCourses</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--gray); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Announcements Made</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--success);">@Model.TotalAnnouncementsMade</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--gray); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Lessons Created</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--info);">@Model.TotalLessonsCreated</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="dashboard-right">
+        
+        @if (Model.GroupStudentStats != null && Model.GroupStudentStats.Any())
+        {
+            <div class="dashboard-card slide-up" style="--delay: 0.3s;">
+                <div class="card-header">
+                    <div class="header-icon-group">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Group Performance</h3>
+                    </div>
+                </div>
+                <div class="card-body activity-feed">
+                    @foreach (var stat in Model.GroupStudentStats.Take(4))
+                    {
+                        <div class="activity-entry fade-in-item" style="flex-direction: column; align-items: flex-start; padding: 16px 24px; border-bottom: 1px solid var(--border);">
+                            <div style="font-weight: 700; font-size: 0.95rem; color: var(--dark); margin-bottom: 12px; width: 100%;">@stat.GroupName</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; margin-bottom: 12px;">
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--gray); font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">GPA</div>
+                                    <div style="font-size: 1.3rem; font-weight: 800; color: var(--primary);">@stat.AverageGPA.ToString("F2")</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--gray); font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Attendance</div>
+                                    <div style="font-size: 1.3rem; font-weight: 800; color: var(--primary);">@stat.AttendanceRate.ToString("F0")%</div>
+                                </div>
+                            </div>
+                            <div style="height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; width: 100%;">
+                                <div style="height: 100%; background: linear-gradient(90deg, var(--primary), #7c3aed); border-radius: 3px; width: @stat.AttendanceRate%"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        
+        @if (Model.RecentLessonsCreated != null && Model.RecentLessonsCreated.Any())
+        {
+            <div class="dashboard-card slide-up" style="--delay: 0.4s;">
+                <div class="card-header">
+                    <div class="header-icon-group">
+                        <i class="fas fa-file-pdf"></i>
+                        <h3>Recent Content</h3>
+                    </div>
+                </div>
+                <div class="card-body activity-feed">
+                    @foreach (var lesson in Model.RecentLessonsCreated.Take(5))
+                    {
+                        <div class="activity-entry fade-in-item">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, rgba(94, 92, 230, 0.15), rgba(94, 92, 230, 0.05)); display: flex; align-items: center; justify-content: center; color: var(--primary); flex-shrink: 0;">
+                                <i class="fas fa-bookmark" style="font-size: 0.9rem;"></i>
+                            </div>
+                            <div class="activity-text" style="flex-direction: column; justify-content: flex-start;">
+                                <span class="activity-action">@lesson.Title</span>
+                                <div style="font-size: 0.75rem; color: var(--gray); margin-top: 4px;">
+                                    @lesson.GroupName  @lesson.CreatedDate.ToString("MMM dd")
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary: #5e5ce6;
+        --success: #34c759;
+        --warning: #ff9500;
+        --danger: #ff3b30;
+        --info: #0066ff;
+        --dark: #1c1c1e;
+        --gray: #8e8e93;
+        --light-gray: #f5f5f7;
+        --border: #e5e5ea;
+        --background: #f5f5f7;
+    }
+
+    /* ========== ANIMATIONS ========== */
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes fadeInItem {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.6s ease-out forwards;
+        opacity: 0;
+        animation-delay: var(--delay, 0);
+    }
+
+    .slide-up {
+        animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        opacity: 0;
+        animation-delay: var(--delay, 0);
+    }
+
+    .fade-in-item {
+        animation: fadeInItem 0.5s ease-out forwards;
+        opacity: 0;
+    }
+
+    /* ========== METRICS GRID (Top) ========== */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .metric-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        border-color: var(--primary);
+    }
+
+    .metric-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        flex-shrink: 0;
+    }
+
+    .metric-icon-wrapper.classes {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+        color: #f59e0b;
+    }
+
+    .metric-icon-wrapper.students {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05));
+        color: #3b82f6;
+    }
+
+    .metric-icon-wrapper.homework {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
+        color: #ef4444;
+    }
+
+    .metric-icon-wrapper.lessons {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.05));
+        color: #22c55e;
+    }
+
+    .metric-content {
+        flex: 1;
+    }
+
+    .metric-value {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--dark);
+        line-height: 1;
+        margin-bottom: 6px;
+    }
+
+    .metric-label {
+        color: var(--gray);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    /* ========== MAIN DASHBOARD GRID ========== */
+    .teacher-dashboard-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1.3fr 1fr;
+        gap: 24px;
+    }
+
+    .dashboard-left,
+    .dashboard-middle,
+    .dashboard-right {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    /* ========== CARD STYLES ========== */
+    .card-modern {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+
+    .card-modern:hover {
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+        padding: 24px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .header-flex {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex: 1;
+    }
+
+    .header-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(94, 92, 230, 0.15), rgba(94, 92, 230, 0.05));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .card-header h3 {
+        margin: 0;
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .header-badge {
+        display: inline-block;
+        background: rgba(94, 92, 230, 0.1);
+        color: var(--primary);
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .header-badge.pending {
+        background: rgba(255, 59, 48, 0.1);
+        color: #ff3b30;
+    }
+
+    .card-body {
+        padding: 24px;
+    }
+
+    /* ========== CALENDAR SCHEDULE STYLES ========== */
+    .calendar-schedule {
+        padding: 0;
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 20px 24px 0 24px;
+    }
+
+    .calendar-nav-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--primary);
+        font-size: 1.2rem;
+        padding: 8px;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .calendar-nav-btn:hover {
+        background: rgba(94, 92, 230, 0.1);
+    }
+
+    #monthYear,
+    #monthYearTeacher {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .calendar-grid-wrapper {
+        margin-bottom: 24px;
+        padding: 0 24px;
+    }
+
+    .calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .weekday {
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: var(--gray);
+        padding: 8px 4px;
+        text-transform: uppercase;
+    }
+
+    .calendar-dates {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+        grid-auto-rows: 1fr;
+    }
+
+    .calendar-date {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        cursor: pointer;
+        position: relative;
+        font-weight: 600;
+        color: var(--dark);
+        transition: all 0.2s;
+        font-size: 0.9rem;
+        border: 2px solid transparent;
+    }
+
+    .calendar-date.empty {
+        color: transparent;
+        cursor: default;
+    }
+
+    .calendar-date.today {
+        background: var(--primary);
+        color: white;
+        font-weight: 700;
+    }
+
+    .calendar-date:not(.empty):hover {
+        background: var(--light-gray);
+        border-color: var(--primary);
+    }
+
+    .calendar-date.has-sessions {
+        background: linear-gradient(135deg, rgba(94, 92, 230, 0.08), rgba(94, 92, 230, 0.02));
+        border: 2px solid rgba(94, 92, 230, 0.3);
+    }
+
+    .calendar-date.has-sessions:not(.today):hover {
+        border-color: var(--primary);
+        background: linear-gradient(135deg, rgba(94, 92, 230, 0.15), rgba(94, 92, 230, 0.05));
+    }
+
+    .calendar-date.has-sessions::after {
+        content: '';
+        position: absolute;
+        bottom: 6px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #5e5ce6;
+    }
+
+    .calendar-date.has-exam::after {
+        content: '';
+        position: absolute;
+        bottom: 6px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #ff9500;
+    }
+
+    .calendar-date.has-holidays::after {
+        content: '';
+        position: absolute;
+        bottom: 6px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #34c759;
+    }
+
+    .calendar-legend {
+        display: flex;
+        gap: 20px;
+        padding: 16px 24px;
+        background: var(--light-gray);
+        border-radius: 10px;
+        margin: 0 24px 24px 24px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: var(--dark);
+        font-weight: 600;
+    }
+
+    .legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    .legend-dot.sessions {
+        background: #5e5ce6;
+    }
+
+    .legend-dot.exam {
+        background: #ff9500;
+    }
+
+    .legend-dot.holidays {
+        background: #34c759;
+    }
+
+    .schedule-for-today {
+        border-top: 2px solid var(--border);
+        padding: 24px;
+    }
+
+    .schedule-for-today h5 {
+        margin: 0 0 16px 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .today-schedule {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .today-items {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .today-item {
+        display: flex;
+        gap: 16px;
+        padding: 12px;
+        background: var(--light-gray);
+        border-radius: 10px;
+        align-items: flex-start;
+    }
+
+    .today-time {
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 0.95rem;
+        white-space: nowrap;
+        min-width: 50px;
+    }
+
+    .today-details {
+        flex: 1;
+    }
+
+    .today-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--dark);
+        margin-bottom: 4px;
+    }
+
+    .today-location {
+        font-size: 0.8rem;
+        color: var(--gray);
+    }
+
+    .no-sessions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        gap: 12px;
+        color: var(--gray);
+    }
+
+    .empty-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--light-gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: #ccc;
+    }
+
+    /* ========== ASSIGNED GROUPS STYLES ========== */
+    .groups-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 16px;
+    }
+
+    .group-card {
+        background: var(--light-gray);
+        border-radius: 12px;
+        padding: 16px;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+    .group-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 8px 20px rgba(94, 92, 230, 0.15);
+        transform: translateY(-4px);
+    }
+
+    .group-header {
+        margin-bottom: 12px;
+    }
+
+    .group-header h4 {
+        margin: 0 0 6px 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .group-code {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--gray);
+        font-weight: 600;
+    }
+
+    .group-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        color: var(--gray);
+        font-weight: 600;
+    }
+
+    .group-meta i {
+        color: var(--primary);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--gray);
+        font-size: 0.95rem;
+    }
+
+    /* ========== HOMEWORK/PENDING GRADE STYLES ========== */
+    .homework-list {
+        padding: 0;
+    }
+
+    .homework-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border);
+        gap: 16px;
+    }
+
+    .homework-item:last-child {
+        border-bottom: none;
+    }
+
+    .homework-item:hover {
+        background: var(--light-gray);
+    }
+
+    .homework-left {
+        flex: 1;
+    }
+
+    .homework-title {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--dark);
+        margin-bottom: 6px;
+    }
+
+    .homework-course {
+        font-size: 0.85rem;
+        color: var(--gray);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 4px;
+    }
+
+    .homework-due {
+        font-size: 0.8rem;
+        color: var(--gray);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .homework-count {
+        text-align: center;
+        min-width: 60px;
+    }
+
+    .count-number {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #ff3b30;
+        line-height: 1;
+    }
+
+    .count-label {
+        font-size: 0.75rem;
+        color: var(--gray);
+        font-weight: 600;
+        margin-top: 4px;
+    }
+
+    /* ========== STATISTICS STYLES ========== */
+    .stats-list {
+        padding: 0;
+    }
+
+    .stat-item {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+
+    .stat-label {
+        font-size: 0.95rem;
+        color: var(--gray);
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .stat-value.primary {
+        color: var(--primary);
+    }
+
+    .stat-value.success {
+        color: var(--success);
+    }
+
+    .stat-value.info {
+        color: var(--info);
+    }
+
+    /* ========== GROUP PERFORMANCE STYLES ========== */
+    .performance-list {
+        padding: 0;
+    }
+
+    .perf-item {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .perf-item:last-child {
+        border-bottom: none;
+    }
+
+    .perf-name {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--dark);
+        margin-bottom: 12px;
+    }
+
+    .perf-metrics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .perf-metric {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .metric-label {
+        font-size: 0.75rem;
+        color: var(--gray);
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .metric-value {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    .perf-bar {
+        height: 6px;
+        background: var(--light-gray);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .perf-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--info));
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    /* ========== RECENT CONTENT STYLES ========== */
+    .recent-list {
+        padding: 0;
+    }
+
+    .recent-item {
+        display: flex;
+        gap: 12px;
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border);
+        align-items: flex-start;
+    }
+
+    .recent-item:last-child {
+        border-bottom: none;
+    }
+
+    .recent-item:hover {
+        background: var(--light-gray);
+    }
+
+    .recent-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, rgba(94, 92, 230, 0.15), rgba(94, 92, 230, 0.05));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .recent-data {
+        flex: 1;
+    }
+
+    .recent-title {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--dark);
+        margin-bottom: 4px;
+    }
+
+    .recent-group {
+        font-size: 0.85rem;
+        color: var(--primary);
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    .recent-date {
+        font-size: 0.8rem;
+        color: var(--gray);
+    }
+
+    /* ========== RESPONSIVE STYLES ========== */
+    @@media (max-width: 1200px) {
+        .teacher-dashboard-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .dashboard-right {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .teacher-dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-right {
+            grid-column: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .groups-grid {
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        }
+
+        .perf-metrics {
+            grid-template-columns: 1fr;
+        }
+
+        .calendar-legend {
+            flex-direction: column;
+            gap: 12px;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .metrics-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .groups-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .header-flex {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .calendar-header {
+            padding: 20px 16px 0 16px;
+        }
+
+        .calendar-grid-wrapper {
+            padding: 0 16px;
+        }
+
+        .calendar-legend {
+            margin: 0 16px 24px 16px;
+        }
+
+        .schedule-for-today {
+            padding: 16px;
+        }
+
+        .card-header {
+            padding: 16px;
+        }
+
+        .card-body {
+            padding: 16px;
+        }
+
+        .homework-item,
+        .recent-item,
+        .perf-item,
+        .stat-item {
+            padding: 12px 16px;
+        }
+    }
+</style>
+
+<script>
+    // Calendar functionality for Teacher Dashboard
+    const teacherLessons = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+        (object)(Model?.TodayLessons != null && Model.TodayLessons.Any()
+            ? Model.TodayLessons.GroupBy(l => l.LessonDate.Date.ToString("yyyy-MM-dd"))
+                .ToDictionary(g => g.Key, g => g.ToList())
+            : new Dictionary<string, object>())
+    ));
+
+    let currentDateTeacher = new Date();
+
+    function renderCalendarTeacher() {
+        const year = currentDateTeacher.getFullYear();
+        const month = currentDateTeacher.getMonth();
+        
+        // Update month/year display
+        const monthYear = currentDateTeacher.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        const monthElement = document.getElementById('monthYearTeacher');
+        if (monthElement) {
+            monthElement.textContent = monthYear;
+        }
+
+        // Clear calendar
+        const calendarDates = document.getElementById('calendarDatesTeacher');
+        if (!calendarDates) return;
+        
+        calendarDates.innerHTML = '';
+
+        // Get first day of month and number of days
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+        // Add previous month's dates
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const dateEl = document.createElement('div');
+            dateEl.className = 'calendar-date empty';
+            dateEl.textContent = daysInPrevMonth - i;
+            calendarDates.appendChild(dateEl);
+        }
+
+        // Add current month's dates
+        const today = new Date();
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateEl = document.createElement('div');
+            const fullDate = new Date(year, month, day);
+            const dateStr = fullDate.toISOString().split('T')[0];
+
+            dateEl.className = 'calendar-date';
+            dateEl.textContent = day;
+
+            // Mark today
+            if (fullDate.toDateString() === today.toDateString()) {
+                dateEl.classList.add('today');
+            }
+
+            // Check for lessons/sessions on this date
+            if (teacherLessons && teacherLessons[dateStr] && teacherLessons[dateStr].length > 0) {
+                dateEl.classList.add('has-sessions');
+            }
+
+            calendarDates.appendChild(dateEl);
+        }
+
+        // Add next month's dates
+        const totalCells = calendarDates.children.length;
+        const remainingCells = 42 - totalCells; // 6 rows * 7 days
+        for (let day = 1; day <= remainingCells; day++) {
+            const dateEl = document.createElement('div');
+            dateEl.className = 'calendar-date empty';
+            dateEl.textContent = day;
+            calendarDates.appendChild(dateEl);
+        }
+    }
+
+    // Navigation for Teacher Dashboard
+    const prevBtn = document.getElementById('prevMonthTeacher');
+    const nextBtn = document.getElementById('nextMonthTeacher');
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            currentDateTeacher.setMonth(currentDateTeacher.getMonth() - 1);
+            renderCalendarTeacher();
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            currentDateTeacher.setMonth(currentDateTeacher.getMonth() + 1);
+            renderCalendarTeacher();
+        });
+    }
+
+    // Initial render with safety check
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', renderCalendarTeacher);
+    } else {
+        renderCalendarTeacher();
+    }
+</script>

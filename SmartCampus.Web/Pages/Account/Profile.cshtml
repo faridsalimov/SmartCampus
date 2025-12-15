@@ -1,0 +1,389 @@
+@page
+@model SmartCampus.Web.Pages.Account.ProfileModel
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<style>
+    .nav-tabs {
+        border-bottom: 2px solid #e5e5ea;
+    }
+
+    .nav-tabs .nav-link {
+        color: #636366;
+        font-weight: 500;
+        border: none;
+        border-bottom: 3px solid transparent;
+        padding-bottom: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .nav-tabs .nav-link:hover {
+        color: #0066ff;
+        border-bottom-color: transparent;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #0066ff;
+        border-bottom-color: #0066ff;
+        background: transparent;
+    }
+
+    .alert-success {
+        background: rgba(52, 199, 89, 0.1);
+        border-left: 3px solid #34c759;
+        color: #107c10;
+    }
+
+    .alert-danger {
+        background: rgba(255, 59, 48, 0.1);
+        border-left: 3px solid #ff3b30;
+        color: #d70015;
+    }
+
+    .form-control, .form-select {
+        border: 1.5px solid #e5e5ea;
+        border-radius: 10px;
+        padding: 10px 14px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0066ff;
+        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #0066ff 0%, #5e5ce6 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 10px 24px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 102, 255, 0.4);
+    }
+
+    .btn-outline-secondary {
+        border: 1.5px solid #e5e5ea;
+        border-radius: 10px;
+        color: #636366;
+        font-weight: 600;
+    }
+
+    .btn-outline-secondary:hover {
+        background: #f5f5f7;
+        color: #1d1d1f;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #ff3b30 0%, #ff6b63 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 59, 48, 0.4);
+    }
+
+    .avatar-section {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .avatar-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #e5e5ea;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .file-input-wrapper input[type="file"] {
+        display: none;
+    }
+
+    .file-input-label {
+        display: inline-block;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #0066ff 0%, #5e5ce6 100%);
+        color: white;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .file-input-label:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 102, 255, 0.4);
+    }
+
+    .danger-zone {
+        border: 2px solid #ff3b30;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 40px;
+    }
+
+    .danger-zone-header {
+        background: linear-gradient(135deg, rgba(255, 59, 48, 0.05) 0%, rgba(255, 59, 48, 0.02) 100%);
+        padding: 16px;
+        border-bottom: 1px solid #ff3b30;
+    }
+
+    .danger-zone-header h5 {
+        color: #ff3b30;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .danger-zone-content {
+        padding: 24px;
+    }
+
+    .validation-error {
+        color: #d70015;
+        font-size: 12px;
+        margin-top: 4px;
+        display: block;
+    }
+</style>
+
+
+<div style="background: linear-gradient(135deg, #0066ff 0%, #5e5ce6 100%); color: white; border-radius: 16px; padding: 40px; margin-bottom: 40px; position: relative; overflow: hidden;">
+    <div style="position: absolute; right: -50px; top: -50px; font-size: 200px; opacity: 0.1;">
+        <i class="fas fa-user-circle"></i>
+    </div>
+    <div class="row align-items-center position-relative" style="z-index: 1;">
+        <div class="col-md-8">
+            <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 8px;">My Profile</h1>
+            <p style="font-size: 1rem; opacity: 0.9; margin-bottom: 0;">Manage your personal information and account settings</p>
+        </div>
+    </div>
+</div>
+
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert @(Model.IsStatusSuccess ? "alert-success" : "alert-danger") alert-dismissible fade show" role="alert">
+        <i class="fas fa-@(Model.IsStatusSuccess ? "check-circle" : "exclamation-circle") me-2"></i>
+        @Model.StatusMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row mb-4">
+    
+    <div class="col-lg-4 mb-4">
+        
+        <div class="card" style="border: 1px solid #e5e5ea;">
+            <div style="background: linear-gradient(135deg, #0066ff, #5e5ce6); padding: 40px 20px; text-align: center;">
+                <img src="@(string.IsNullOrEmpty(Model.CurrentUser?.ProfilePhoto) ? $"https://ui-avatars.com/api/?name={Model.CurrentUser?.FullName}&background=0066ff&color=fff&bold=true&size=120" : Model.CurrentUser.ProfilePhoto)" 
+                     alt="Profile" 
+                     class="avatar-preview"
+                     style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);">
+            </div>
+            <div class="card-body" style="padding: 30px;">
+                <h4 style="font-weight: 700; color: #1d1d1f; margin-bottom: 4px;">@Model.CurrentUser?.FullName</h4>
+                <p style="color: #636366; font-size: 0.875rem; margin-bottom: 20px;">
+                    <i class="fas fa-@(Model.CurrentUser?.UserRole == "Student" ? "graduation-cap" : Model.CurrentUser?.UserRole == "Teacher" ? "chalkboard-user" : "shield-alt") me-1" style="color: #0066ff;"></i>
+                    @Model.CurrentUser?.UserRole
+                </p>
+                <div style="display: flex; gap: 8px; margin-bottom: 20px; justify-content: center;">
+                    <span style="display: inline-block; background: rgba(0, 102, 255, 0.1); color: #0066ff; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">
+                        <i class="fas fa-check-circle me-1"></i>@(Model.CurrentUser?.IsActive == true ? "Active" : "Inactive")
+                    </span>
+                    <span style="display: inline-block; background: rgba(52, 199, 89, 0.1); color: #34c759; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">
+                        <i class="fas fa-envelope-circle-check me-1"></i>@(Model.CurrentUser?.EmailConfirmed == true ? "Verified" : "Unverified")
+                    </span>
+                </div>
+                <hr style="border: none; border-top: 1px solid #e5e5ea; margin: 20px 0;">
+                <p style="color: #636366; font-size: 0.875rem; margin-bottom: 8px;">
+                    <i class="fas fa-envelope me-2" style="color: #636366;"></i>
+                    @Model.CurrentUser?.Email
+                </p>
+                @if (!string.IsNullOrEmpty(Model.CurrentUser?.PhoneNumber))
+                {
+                    <p style="color: #636366; font-size: 0.875rem; margin-bottom: 8px;">
+                        <i class="fas fa-phone me-2" style="color: #636366;"></i>
+                        @Model.CurrentUser?.PhoneNumber
+                    </p>
+                }
+                <p style="color: #636366; font-size: 0.875rem; margin-bottom: 0;">
+                    <i class="fas fa-calendar me-2" style="color: #636366;"></i>
+                    Joined @Model.CurrentUser?.CreatedAt.ToString("MMM dd, yyyy")
+                </p>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="col-lg-8">
+        
+        <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal-content" type="button" role="tab" aria-controls="personal-content" aria-selected="true">
+                    <i class="fas fa-user me-2"></i>Personal Info
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="avatar-tab" data-bs-toggle="tab" data-bs-target="#avatar-content" type="button" role="tab" aria-controls="avatar-content" aria-selected="false">
+                    <i class="fas fa-image me-2"></i>Avatar
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security-content" type="button" role="tab" aria-controls="security-content" aria-selected="false">
+                    <i class="fas fa-lock me-2"></i>Security
+                </button>
+            </li>
+        </ul>
+
+        
+        <div class="tab-content">
+            
+            <div class="tab-pane fade show active" id="personal-content" role="tabpanel" aria-labelledby="personal-tab">
+                <form method="post" asp-page-handler="UpdateProfile">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="font-weight: 600; color: #1d1d1f;">First Name</label>
+                                <input asp-for="Input.FirstName" type="text" class="form-control" />
+                                <span asp-validation-for="Input.FirstName" class="validation-error"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="font-weight: 600; color: #1d1d1f;">Last Name</label>
+                                <input asp-for="Input.LastName" type="text" class="form-control" />
+                                <span asp-validation-for="Input.LastName" class="validation-error"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label" style="font-weight: 600; color: #1d1d1f;">Email Address</label>
+                        <input asp-for="Input.Email" type="email" class="form-control" />
+                        <span asp-validation-for="Input.Email" class="validation-error"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label" style="font-weight: 600; color: #1d1d1f;">Phone Number</label>
+                        <input asp-for="Input.PhoneNumber" type="tel" class="form-control" placeholder="+1 (555) 000-0000" />
+                        <span asp-validation-for="Input.PhoneNumber" class="validation-error"></span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                        <a href="/Account/Profile" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            
+            <div class="tab-pane fade" id="avatar-content" role="tabpanel" aria-labelledby="avatar-tab">
+                <form method="post" asp-page-handler="UploadAvatar" enctype="multipart/form-data">
+                    <div class="avatar-section">
+                        <div class="alert alert-info" style="background: rgba(0, 102, 255, 0.1); border-left: 3px solid #0066ff; color: #0066ff; margin-bottom: 20px;">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Upload a profile picture (JPG, PNG, GIF - Max 5MB)
+                        </div>
+
+                        <div class="file-input-wrapper">
+                            <input type="file" id="avatarFile" name="avatarFile" accept="image/*" required />
+                            <label for="avatarFile" class="file-input-label">
+                                <i class="fas fa-upload me-2"></i>Choose Image
+                            </label>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check me-2"></i>Upload Avatar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            
+            <div class="tab-pane fade" id="security-content" role="tabpanel" aria-labelledby="security-tab">
+                <form method="post" asp-page-handler="ChangePassword">
+                    <div class="alert alert-info" style="background: rgba(0, 102, 255, 0.1); border-left: 3px solid #0066ff; color: #0066ff;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Keep your account secure by changing your password regularly.
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label" style="font-weight: 600; color: #1d1d1f;">Current Password</label>
+                        <input asp-for="PasswordInput.OldPassword" type="password" class="form-control" />
+                        <span asp-validation-for="PasswordInput.OldPassword" class="validation-error"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label" style="font-weight: 600; color: #1d1d1f;">New Password</label>
+                        <input asp-for="PasswordInput.NewPassword" type="password" class="form-control" />
+                        <span asp-validation-for="PasswordInput.NewPassword" class="validation-error"></span>
+                        <small style="color: #636366;">At least 6 characters long</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label" style="font-weight: 600; color: #1d1d1f;">Confirm New Password</label>
+                        <input asp-for="PasswordInput.ConfirmPassword" type="password" class="form-control" />
+                        <span asp-validation-for="PasswordInput.ConfirmPassword" class="validation-error"></span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-shield-alt me-2"></i>Update Password
+                        </button>
+                        <a href="/Account/Profile" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="danger-zone">
+    <div class="danger-zone-header">
+        <h5>
+            <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
+        </h5>
+    </div>
+    <div class="danger-zone-content">
+        <p style="color: #636366; margin-bottom: 16px;">
+            <strong>Delete Account:</strong> This action is permanent and irreversible. All your data will be deleted.
+        </p>
+        <form method="post" asp-page-handler="DeleteAccount" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone!');">
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash me-2"></i>Delete My Account
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

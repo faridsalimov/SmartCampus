@@ -1,0 +1,99 @@
+@page
+@model SmartCampus.Web.Pages.Grades.IndexModel
+@{
+    ViewData["Title"] = "Grades";
+    var canCreate = User.IsInRole("Admin") || User.IsInRole("Teacher");
+    var canEdit = User.IsInRole("Admin") || User.IsInRole("Teacher");
+    var canDelete = User.IsInRole("Admin") || User.IsInRole("Teacher");
+}
+
+
+<div style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.05) 0%, rgba(52, 199, 89, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(255, 149, 0, 0.1);">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
+                <i class="fas fa-star me-2" style="color: #ff9500;"></i>Your Grades
+            </h1>
+            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
+                <i class="fas fa-calendar-alt me-1"></i>
+                View and track your academic performance
+            </p>
+        </div>
+        @if (canCreate)
+        {
+            <a asp-page="Create" class="btn btn-success" style="display:inline-flex; align-items:center; gap:8px;">
+                <i class="fas fa-plus"></i> Add Grade
+            </a>
+        }
+    </div>
+</div>
+
+
+@if (Model.Grades?.Count > 0)
+{
+    <div class="card" style="border: 1px solid #e5e5ea; overflow: hidden;">
+        <div style="overflow-x: auto;">
+            <table class="table table-hover" style="margin-bottom: 0;">
+                <thead style="background: #f5f5f7; border-bottom: 2px solid #e5e5ea;">
+                    <tr>
+                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Student</th>
+                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Score</th>
+                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Grade</th>
+                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Type</th>
+                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Date</th>
+                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var grade in Model.Grades)
+                    {
+                        <tr style="border-bottom: 1px solid #e5e5ea; transition: background 0.2s ease;">
+                            <td style="padding: 16px; color: #1d1d1f;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <img src="@(string.IsNullOrEmpty(User.FindFirst("ProfilePhoto")?.Value) ? $"https://ui-avatars.com/api/?name={System.Net.WebUtility.UrlEncode(grade.StudentName ?? "User")}&background=0066ff&color=fff&size=36&bold=true" : User.FindFirst("ProfilePhoto")?.Value)"
+                                         alt="@(grade.StudentName ?? "Student")"
+                                         style="width: 36px; height: 36px; border-radius: 50%; display: block; object-fit: cover;">
+                                    <span>@(!string.IsNullOrEmpty(grade.StudentName) ? grade.StudentName : "N/A")</span>
+                                </div>
+                            </td>
+                            <td style="padding: 16px;">
+                                <span style="font-weight: 600; font-size: 1.125rem; color: #0066ff;">@grade.Score</span>
+                            </td>
+                            <td style="padding: 16px;">
+                                @if (!string.IsNullOrEmpty(grade.LetterGrade))
+                                {
+                                    <span style="display: inline-block; background: rgba(52, 199, 89, 0.1); color: #34c759; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 0.875rem;">
+                                        @grade.LetterGrade
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span style="color: #a1a1a6;">N/A</span>
+                                }
+                            </td>
+                            <td style="padding: 16px; color: #636366;">@(grade.GradeType ?? "N/A")</td>
+                            <td style="padding: 16px; color: #636366; font-size: 0.875rem;">
+                                @grade.GradedDate.ToString("dd MMM yyyy")
+                            </td>
+                            <td style="padding: 16px;">
+                                <div style="display: flex; gap: 8px;">
+                                    @await Html.PartialAsync("_ActionButtons", new { CanView = false, CanEdit = canEdit, CanDelete = canDelete, ViewUrl = "", EditUrl = Url.Page("Edit", new { id = grade.Id }), DeleteUrl = Url.Page("Index", new { handler = "Delete", id = grade.Id }), EntityId = grade.Id })
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div style="background: linear-gradient(135deg, rgba(0, 102, 255, 0.05) 0%, rgba(94, 92, 230, 0.05) 100%); border: 1px solid rgba(0, 102, 255, 0.1); border-radius: 12px; padding: 40px; text-align: center;">
+        <div style="font-size: 3rem; color: #0066ff; opacity: 0.3; margin-bottom: 16px;">
+            <i class="fas fa-inbox"></i>
+        </div>
+        <h4 style="color: #1d1d1f; font-weight: 600; margin-bottom: 8px;">No Grades Found</h4>
+        <p style="color: #636366; margin-bottom: 0;">Add your first grade to get started.</p>
+    </div>
+}

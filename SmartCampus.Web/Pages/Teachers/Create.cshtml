@@ -1,0 +1,169 @@
+@page
+@model SmartCampus.Web.Pages.Teachers.CreateModel
+@{
+    ViewData["Title"] = "Create Teacher";
+}
+
+
+<div style="background: linear-gradient(135deg, rgba(94, 92, 230, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(94, 92, 230, 0.1);">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                <a asp-page="Index" class="text-decoration-none" style="color: #5e5ce6;">
+                    <i class="fas fa-arrow-left me-2"></i>Teachers
+                </a>
+                <span style="color: #a1a1a6;">/</span>
+                <span style="color: #636366;">Create</span>
+            </div>
+            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
+                <i class="fas fa-user-tie me-2" style="color: #5e5ce6;"></i>Create New Teacher
+            </h1>
+            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
+                <i class="fas fa-plus-circle me-1"></i>
+                Register a new teacher in the system
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-8">
+        <form method="post" class="needs-validation" novalidate>
+            @Html.AntiForgeryToken()
+            
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-light border-bottom">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2" style="color: #5e5ce6;"></i>Teacher Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show d-none" role="alert" id="validationSummary">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Please fix the following errors:</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Teacher.FullName" class="form-label">
+                                <i class="fas fa-user me-1"></i>Full Name <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Teacher.FullName" class="form-control" placeholder="Enter full name" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Teacher's complete name</small>
+                            <span asp-validation-for="Teacher.FullName" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Teacher.Email" class="form-label">
+                                <i class="fas fa-envelope me-1"></i>Email <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Teacher.Email" class="form-control" type="email" placeholder="teacher@university.edu" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Valid email address</small>
+                            <span asp-validation-for="Teacher.Email" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Teacher.PhoneNumber" class="form-label">
+                                <i class="fas fa-phone me-1"></i>Phone Number
+                            </label>
+                            <input asp-for="Teacher.PhoneNumber" class="form-control" placeholder="+1 (555) 123-4567" style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Optional contact number</small>
+                            <span asp-validation-for="Teacher.PhoneNumber" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Teacher.Department" class="form-label">
+                                <i class="fas fa-building me-1"></i>Department
+                            </label>
+                            <input asp-for="Teacher.Department" class="form-control" placeholder="e.g., Computer Science" style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Academic department</small>
+                            <span asp-validation-for="Teacher.Department" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Teacher.Specialization" class="form-label">
+                            <i class="fas fa-graduation-cap me-1"></i>Specialization
+                        </label>
+                        <input asp-for="Teacher.Specialization" class="form-control" placeholder="e.g., Software Engineering" style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                        <small class="form-text text-muted">Teacher's area of specialization</small>
+                        <span asp-validation-for="Teacher.Specialization" class="text-danger small d-block mt-1"></span>
+                    </div>
+                </div>
+
+                
+                <div class="card-footer bg-light border-top">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-page="Index" class="btn btn-outline-secondary" style="border-radius: 8px;">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary" style="border-radius: 8px; background: #5e5ce6; border: none;">
+                            <i class="fas fa-save me-1"></i>Create Teacher
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    
+    <div class="col-lg-4">
+        <div class="card bg-light border-0">
+            <div class="card-header border-bottom">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2" style="color: #5e5ce6;"></i>Tips
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Full Name:</strong> Enter the teacher's complete name.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Email:</strong> Ensure the email address is valid and active.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Department:</strong> Assign to the correct academic department.
+                    </small>
+                </div>
+                <div class="alert alert-info small mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Fields marked with <span class="text-danger">*</span> are required.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Bootstrap form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.querySelectorAll('.needs-validation');
+                Array.prototype.slice.call(forms).forEach(function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            document.getElementById('validationSummary').classList.remove('d-none');
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+}

@@ -1,0 +1,218 @@
+@model SmartCampus.Web.ViewModels.AdminDashboardViewModel
+
+@if (Model == null)
+{
+    <div style="padding: 40px 20px; text-align: center; color: #8e8e93;">
+        <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 16px;"></i>
+        <p>Unable to load admin dashboard. Please refresh the page or contact support.</p>
+    </div>
+    return;
+}
+
+<div class="kpi-grid">
+    <div class="kpi-card fade-in" style="--delay: 0.1s;">
+        <div class="kpi-icon-wrapper primary">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Total Users</div>
+            <div class="kpi-value">@(Model.SystemOverview?.TotalUsers ?? 0)</div>
+        </div>
+        <div class="kpi-glow"></div>
+    </div>
+
+    <div class="kpi-card fade-in" style="--delay: 0.2s;">
+        <div class="kpi-icon-wrapper success">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Students</div>
+            <div class="kpi-value">@(Model.SystemOverview?.TotalStudents ?? 0)</div>
+        </div>
+        <div class="kpi-glow"></div>
+    </div>
+
+    <div class="kpi-card fade-in" style="--delay: 0.3s;">
+        <div class="kpi-icon-wrapper warning">
+            <i class="fas fa-chalkboard-user"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Teachers</div>
+            <div class="kpi-value">@(Model.SystemOverview?.TotalTeachers ?? 0)</div>
+        </div>
+        <div class="kpi-glow"></div>
+    </div>
+
+    <div class="kpi-card fade-in" style="--delay: 0.4s;">
+        <div class="kpi-icon-wrapper info">
+            <i class="fas fa-book"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Courses</div>
+            <div class="kpi-value">@(Model.SystemOverview?.TotalCourses ?? 0)</div>
+        </div>
+        <div class="kpi-glow"></div>
+    </div>
+</div>
+
+
+<div class="dashboard-grid-main">
+    
+    <div class="dashboard-left">
+        
+        <div class="dashboard-card slide-up" style="--delay: 0.1s;">
+            <div class="card-header">
+                <div class="header-icon-group">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Quick Actions</h3>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="action-grid-modern">
+                    @foreach (var action in Model.QuickActions.Take(6))
+                    {
+                        <a href="@action.Url" class="action-item-modern">
+                            <div class="action-icon-bg">
+                                <i class="@action.Icon"></i>
+                            </div>
+                            <span class="action-text">@action.Label</span>
+                            <div class="action-arrow-icon">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="dashboard-card slide-up" style="--delay: 0.2s;">
+            <div class="card-header">
+                <div class="header-icon-group">
+                    <i class="fas fa-server"></i>
+                    <h3>System Resources</h3>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="resource-items">
+                    <div class="resource-item-modern groups-res">
+                        <div class="res-icon"><i class="fas fa-users-rectangle"></i></div>
+                        <div class="res-info">
+                            <div class="res-label">Total Groups</div>
+                            <div class="res-value">@(Model.SystemOverview?.TotalGroups ?? 0)</div>
+                        </div>
+                    </div>
+                    <div class="resource-item-modern lessons-res">
+                        <div class="res-icon"><i class="fas fa-chalkboard"></i></div>
+                        <div class="res-info">
+                            <div class="res-label">Total Lessons</div>
+                            <div class="res-value">@(Model.SystemOverview?.TotalLessons ?? 0)</div>
+                        </div>
+                    </div>
+                    <div class="resource-item-modern homework-res">
+                        <div class="res-icon"><i class="fas fa-book-open"></i></div>
+                        <div class="res-info">
+                            <div class="res-label">Total Homework</div>
+                            <div class="res-value">@(Model.SystemOverview?.TotalHomework ?? 0)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="dashboard-middle">
+        
+        <div class="dashboard-card slide-up" style="--delay: 0.15s;">
+            <div class="card-header">
+                <div class="header-icon-group">
+                    <i class="fas fa-history"></i>
+                    <h3>Recent Activity</h3>
+                </div>
+                <div class="header-badge">
+                    <span class="pulse-dot"></span> Live
+                </div>
+            </div>
+            <div class="card-body activity-list">
+                @if (Model.RecentActivity != null && Model.RecentActivity.Any())
+                {
+                    foreach (var act in Model.RecentActivity.Take(8))
+                    {
+                        <div class="activity-item-modern fade-in-item">
+                            <div class="activity-timeline-dot"></div>
+                            <div class="activity-content-modern">
+                                <div class="activity-desc">@act.Description</div>
+                                <div class="activity-meta-modern">
+                                    <span class="meta-actor"><i class="fas fa-user-circle"></i> @act.Actor</span>
+                                    <span class="meta-time"><i class="fas fa-clock"></i> @act.Timestamp.ToString("HH:mm")</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-state">No recent activity</div>
+                }
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="dashboard-right">
+        
+        <div class="dashboard-card slide-up" style="--delay: 0.25s;">
+            <div class="card-header">
+                <div class="header-icon-group">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Performance</h3>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="perf-stats">
+                    <div class="perf-item">
+                        <div class="perf-label">Attendance Rate</div>
+                        <div class="perf-value">@(Model.AcademicStatistics?.AverageAttendanceRate.ToString("F0") ?? "0")%</div>
+                        <div class="perf-bar">
+                            <div class="perf-fill" style="width: @(Model.AcademicStatistics?.AverageAttendanceRate ?? 0)%"></div>
+                        </div>
+                    </div>
+                    <div class="perf-item">
+                        <div class="perf-label">Avg GPA</div>
+                        <div class="perf-value">@(Model.AcademicStatistics?.AverageGPA.ToString("F2") ?? "0.00")</div>
+                        <div class="perf-bar">
+                            <div class="perf-fill" style="width: @((Model.AcademicStatistics?.AverageGPA ?? 0) / 4.0 * 100)%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="dashboard-card slide-up" style="--delay: 0.3s;">
+            <div class="card-header">
+                <div class="header-icon-group">
+                    <i class="fas fa-heart-pulse"></i>
+                    <h3>System Health</h3>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="health-items">
+                    <div class="health-item-modern">
+                        <div class="health-status-dot"></div>
+                        <div class="health-label">Database</div>
+                    </div>
+                    <div class="health-item-modern">
+                        <div class="health-status-dot"></div>
+                        <div class="health-label">API Services</div>
+                    </div>
+                    <div class="health-item-modern">
+                        <div class="health-status-dot"></div>
+                        <div class="health-label">File Storage</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

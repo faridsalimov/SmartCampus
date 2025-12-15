@@ -1,0 +1,121 @@
+@page
+@model SmartCampus.Web.Pages.Messages.IndexModel
+@{
+    ViewData["Title"] = "Messages";
+    var canCreate = (User?.IsInRole("Admin") ?? false) || (User?.IsInRole("Teacher") ?? false) || (User?.IsInRole("Student") ?? false);
+}
+
+
+<div style="background: linear-gradient(135deg, rgba(0, 102, 255, 0.05) 0%, rgba(94, 92, 230, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(0, 102, 255, 0.1);">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
+                <i class="fas fa-envelope me-2" style="color: #0066ff;"></i>Messages
+            </h1>
+            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
+                <i class="fas fa-inbox me-1"></i>
+                You have @(Model.Messages?.Count(m => m.IsRead == false) ?? 0) new messages
+            </p>
+        </div>
+        @if (canCreate)
+        {
+            <a asp-page="Create" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:8px;">
+                <i class="fas fa-plus"></i> New Message
+            </a>
+        }
+    </div>
+</div>
+
+
+<div class="mb-4">
+    <form method="get" class="d-flex gap-2">
+        <div style="flex: 1; position: relative;">
+            <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #a1a1a6;"></i>
+            <input type="text" name="search" placeholder="Search messages..." class="form-control" 
+                   style="border: 1.5px solid #e5e5ea; border-radius: 10px; padding: 10px 14px 10px 40px;" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="border-radius: 10px; padding: 10px 20px;">
+            Search
+        </button>
+    </form>
+</div>
+
+
+<div class="row g-3">
+    @if (Model.Messages != null && Model.Messages.Count > 0)
+    {
+        @foreach (var message in Model.Messages.OrderByDescending(m => m.SentDate))
+        {
+            <div class="col-12">
+                <a asp-page="Details" asp-route-id="@message.Id" style="text-decoration: none; color: inherit;">
+                    <div class="card" style="border: @(message.IsRead == false ? "2px solid #0066ff" : "1px solid #e5e5ea"); overflow: hidden; cursor: pointer; transition: all 0.3s ease; @(message.IsRead == false ? "" : "opacity: 0.85;")">
+                        <div class="card-body p-0">
+                            <div style="display: flex; align-items: center; gap: 16px; padding: 16px; @(message.IsRead == false ? "" : "background: #f5f5f7;")">
+                                
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #0066ff, #5e5ce6); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.125rem; flex-shrink: 0;">
+                                    @(string.Join("", message.SenderName?.Split(' ').Select(n => n[0]) ?? new char[] { 'U' }))
+                                </div>
+
+                                
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;">
+                                        <h5 style="font-weight: @(message.IsRead == false ? "700" : "600"); color: @(message.IsRead == false ? "#1d1d1f" : "#636366"); margin: 0;">@message.SenderName</h5>
+                                        <span style="font-size: 0.875rem; color: #a1a1a6; flex-shrink: 0;">@message.SentDate.ToString("MMM dd, yyyy h:mm tt")</span>
+                                    </div>
+                                    <p style="color: #636366; font-size: 0.875rem; margin: 0; margin-bottom: 4px;">
+                                        <strong>Subject:</strong> Message
+                                    </p>
+                                    <p style="color: @(message.IsRead == false ? "#636366" : "#a1a1a6"); font-size: 0.875rem; margin: 0; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">
+                                        @message.Content
+                                    </p>
+                                </div>
+
+                                
+                                <div style="flex-shrink: 0;">
+                                    @if (message.IsRead == false)
+                                    {
+                                        <span style="display: inline-block; background: #0066ff; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                                            New
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12" style="padding: 40px; text-align: center; color: #a1a1a6;">
+            <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+            <p>No messages found.</p>
+        </div>
+    }
+</div>
+
+
+<nav aria-label="Page navigation" style="margin-top: 30px;">
+    <ul class="pagination justify-content-center" style="gap: 4px;">
+        <li class="page-item">
+            <a class="page-link" href="#" style="color: #0066ff; border: 1px solid #e5e5ea; border-radius: 8px; padding: 8px 12px;">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link active" href="#" style="background: #0066ff; border: 1px solid #0066ff; color: white; border-radius: 8px; padding: 8px 12px;">1</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="#" style="color: #0066ff; border: 1px solid #e5e5ea; border-radius: 8px; padding: 8px 12px;">2</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="#" style="color: #0066ff; border: 1px solid #e5e5ea; border-radius: 8px; padding: 8px 12px;">3</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="#" style="color: #0066ff; border: 1px solid #e5e5ea; border-radius: 8px; padding: 8px 12px;">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+    </ul>
+</nav>

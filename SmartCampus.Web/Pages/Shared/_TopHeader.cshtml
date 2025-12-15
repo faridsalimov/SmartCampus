@@ -1,0 +1,122 @@
+@using Microsoft.AspNetCore.Identity
+
+
+<div class="top-header">
+    
+    <div class="header-left">
+        <button class="header-toggle-btn" id="headerToggleBtn" data-toggle-sidebar title="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a href="/" class="header-brand-link">
+            <span class="header-brand-text">SmartCampus</span>
+        </a>
+    </div>
+
+    
+    <div class="header-right">
+        <div class="header-icons">
+            
+            <div class="dropdown">
+                @{
+                    var userFullName = User.FindFirst("FullName")?.Value ?? User?.Identity?.Name ?? "User";
+                    var userProfilePhoto = User.FindFirst("ProfilePhoto")?.Value;
+                    var avatarUrl = string.IsNullOrEmpty(userProfilePhoto) 
+                        ? $"https://ui-avatars.com/api/?name={System.Net.WebUtility.UrlEncode(userFullName)}&background=5e5ce6&color=fff&bold=true&size=40"
+                        : userProfilePhoto;
+                }
+                
+                <img class="header-user-avatar-btn" 
+                     src="@avatarUrl" 
+                     alt="Profile" id="userHeaderBtn"
+                     data-bs-toggle="dropdown" 
+                     aria-expanded="false" 
+                     title="User menu"
+                     style="cursor: pointer; border-radius: 50%; object-fit: cover; width: 40px; height: 40px;">
+
+                <div class="dropdown-menu dropdown-menu-end header-user-dropdown" aria-labelledby="userHeaderBtn">
+                    
+                    <div class="header-user-card">
+                        <div class="user-card-avatar">
+                            <img src="@avatarUrl" 
+                                 alt="Profile"
+                                 style="border-radius: 50%; object-fit: cover; width: 48px; height: 48px;">
+                        </div>
+                        <div class="user-card-info">
+                            <h6 class="user-card-name">@userFullName</h6>
+                            <p class="user-card-role">
+                                @(User.IsInRole("Admin") ? "Administrator" : User.IsInRole("Teacher") ? "Teacher" : User.IsInRole("Student") ? "Student" : "User")
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr class="dropdown-divider">
+
+                    <a class="dropdown-item header-dropdown-item" href="/Account/Profile">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </a>
+
+                    <form method="post" asp-page="/Account/Logout" class="d-block">
+                        <button type="submit" class="dropdown-item header-dropdown-item header-dropdown-logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('TopHeader script loaded');
+    
+    const sidebarNav = document.getElementById('sidebarNav');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const toggleBtn = document.getElementById('headerToggleBtn');
+
+    if (!sidebarNav || !sidebarOverlay || !toggleBtn) {
+        console.error('Required elements not found');
+        return;
+    }
+
+    // Toggle sidebar on button click
+    toggleBtn.addEventListener('click', function(e) {
+        console.log('Toggle button clicked');
+        e.stopPropagation();
+        sidebarNav.classList.toggle('expanded');
+        sidebarOverlay.classList.toggle('active');
+        console.log('Sidebar expanded:', sidebarNav.classList.contains('expanded'));
+    });
+
+    // Close sidebar when clicking on overlay
+    sidebarOverlay.addEventListener('click', function() {
+        console.log('Overlay clicked');
+        sidebarNav.classList.remove('expanded');
+        sidebarOverlay.classList.remove('active');
+    });
+
+    // Close sidebar when clicking a menu link
+    const menuLinks = document.querySelectorAll('.sidebar-menu-link');
+    console.log('Menu links found:', menuLinks.length);
+    menuLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            console.log('Menu link clicked');
+            sidebarNav.classList.remove('expanded');
+            sidebarOverlay.classList.remove('active');
+        });
+    });
+
+    // Close sidebar when clicking outside
+    document.addEventListener('click', function(event) {
+        const isInSidebar = sidebarNav.contains(event.target);
+        const isToggleBtn = toggleBtn.contains(event.target);
+        
+        if (!isInSidebar && !isToggleBtn) {
+            sidebarNav.classList.remove('expanded');
+            sidebarOverlay.classList.remove('active');
+        }
+    });
+});
+</script>

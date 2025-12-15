@@ -1,0 +1,164 @@
+@page
+@model SmartCampus.Web.Pages.Homework.CreateModel
+@{
+    ViewData["Title"] = "Create Homework";
+}
+
+
+<div style="background: linear-gradient(135deg, #ff9500 0%, #ff6b35 100%); border-radius: 20px; padding: 35px 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(255, 149, 0, 0.15); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; background: rgba(255, 255, 255, 0.1); border-radius: 50%;"></div>
+    <div style="position: relative; z-index: 1;">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <a asp-page="Index" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; font-size: 0.95rem;">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                    <span style="color: rgba(255, 255, 255, 0.6);">/</span>
+                    <span style="color: rgba(255, 255, 255, 0.8);">Create New</span>
+                </div>
+                <h1 style="font-size: 2.5rem; font-weight: 800; color: white; margin: 0;">
+                    <i class="fas fa-plus-circle me-2"></i>Create Homework
+                </h1>
+                <p style="color: rgba(255, 255, 255, 0.9); margin: 8px 0 0 0; font-size: 1rem;">
+                    <i class="fas fa-pen-fancy me-1"></i>Add a new homework for your students
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-8">
+        <form method="post" class="needs-validation" novalidate>
+            @Html.AntiForgeryToken()
+            
+            <div class="card border-0 mb-4" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
+                <div style="background: linear-gradient(135deg, #f5f5f7, #efefef); border-bottom: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 14px 14px 0 0;">
+                    <h5 style="margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-file-alt" style="color: #ff9500;"></i>Homework Details
+                    </h5>
+                </div>
+
+                <div class="card-body" style="padding: 24px;">
+                    
+                    <div class="mb-4">
+                        <label asp-for="Homework.Title" class="form-label" style="font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">
+                            <i class="fas fa-heading me-1" style="color: #ff9500;"></i>Homework Title <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Homework.Title" class="form-control" placeholder="e.g., Chapter 5-7 Reading and Exercises" required style="border: 2px solid #e5e5ea; border-radius: 10px; padding: 10px 12px; font-size: 0.95rem;" />
+                        <small class="form-text text-muted">Use a clear and descriptive title that students will recognize</small>
+                        <span asp-validation-for="Homework.Title" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Homework.GroupId" class="form-label" style="font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">
+                                <i class="fas fa-users me-1" style="color: #5e5ce6;"></i>Target Group <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="Homework.GroupId" class="form-select" required style="border: 2px solid #e5e5ea; border-radius: 10px; padding: 10px 12px; font-size: 0.95rem;">
+                                <option value="">-- Select Group --</option>
+                                @foreach (var group in Model.Groups)
+                                {
+                                    <option value="@group.Id">@group.GroupName</option>
+                                }
+                            </select>
+                            <small class="form-text text-muted">Choose which group will receive this homework</small>
+                            <span asp-validation-for="Homework.GroupId" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Homework.DueDate" class="form-label" style="font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">
+                                <i class="fas fa-calendar-check me-1" style="color: #ff9500;"></i>Due Date & Time <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Homework.DueDate" class="form-control" type="datetime-local" required style="border: 2px solid #e5e5ea; border-radius: 10px; padding: 10px 12px; font-size: 0.95rem;" />
+                            <small class="form-text text-muted">When should students submit this homework?</small>
+                            <span asp-validation-for="Homework.DueDate" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Homework.Type" class="form-label" style="font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">
+                            <i class="fas fa-tag me-1" style="color: #5e5ce6;"></i>Homework Type
+                        </label>
+                        <select asp-for="Homework.Type" class="form-select" style="border: 2px solid #e5e5ea; border-radius: 10px; padding: 10px 12px; font-size: 0.95rem;">
+                            <option value="">-- Select Type --</option>
+                            <option value="Reading">Reading Homework</option>
+                            <option value="Essay">Essay</option>
+                            <option value="Project">Project</option>
+                            <option value="Quiz">Quiz</option>
+                            <option value="Presentation">Presentation</option>
+                            <option value="Discussion">Discussion</option>
+                            <option value="Problem Set">Problem Set</option>
+                        </select>
+                        <small class="form-text text-muted">Categorize the type of homework</small>
+                    </div>
+
+                    
+                    <div class="mb-4">
+                        <label asp-for="Homework.Description" class="form-label" style="font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">
+                            <i class="fas fa-align-left me-1" style="color: #ff9500;"></i>Instructions & Description
+                        </label>
+                        <textarea asp-for="Homework.Description" class="form-control" rows="7" placeholder="Include detailed instructions, requirements, and any resources students should use..." style="border: 2px solid #e5e5ea; border-radius: 10px; padding: 12px; font-size: 0.95rem; font-family: inherit;"></textarea>
+                        <small class="form-text text-muted">Be specific about what students need to do and how to submit</small>
+                        <span asp-validation-for="Homework.Description" class="text-danger small d-block mt-1"></span>
+                    </div>
+                </div>
+
+                
+                <div style="background: #f9f9fb; border-top: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 0 0 14px 14px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+                    <a asp-page="Index" class="btn" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500;">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn" style="background: linear-gradient(135deg, #ff9500, #ff7500); color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 500;">
+                        <i class="fas fa-check-circle me-1"></i>Create Homework
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    
+    <div class="col-lg-4">
+        <div class="card border-0" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); margin-bottom: 20px;">
+            <div style="background: linear-gradient(135deg, #f5f5f7, #efefef); border-bottom: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 14px 14px 0 0;">
+                <h6 style="margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-lightbulb" style="color: #ff9500;"></i>Best Practices
+                </h6>
+            </div>
+            <div class="card-body" style="padding: 18px;">
+                <div style="margin-bottom: 14px;">
+                    <small style="display: block; font-weight: 600; color: #1d1d1f; margin-bottom: 4px;">
+                        <i class="fas fa-check-circle me-1" style="color: #34c759;"></i>Title
+                    </small>
+                    <small style="color: #636366; line-height: 1.5;">Use a clear, specific title so students know exactly what homework they're completing.</small>
+                </div>
+                <div style="margin-bottom: 14px;">
+                    <small style="display: block; font-weight: 600; color: #1d1d1f; margin-bottom: 4px;">
+                        <i class="fas fa-check-circle me-1" style="color: #34c759;"></i>Due Date
+                    </small>
+                    <small style="color: #636366; line-height: 1.5;">Set a realistic deadline that gives students enough time to complete quality work.</small>
+                </div>
+                <div style="margin-bottom: 14px;">
+                    <small style="display: block; font-weight: 600; color: #1d1d1f; margin-bottom: 4px;">
+                        <i class="fas fa-check-circle me-1" style="color: #34c759;"></i>Instructions
+                    </small>
+                    <small style="color: #636366; line-height: 1.5;">Provide comprehensive instructions including objectives, requirements, and submission guidelines.</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert" style="background: #fff3e0; border-left: 4px solid #ff9500; border-radius: 10px; color: #e65100;">
+            <small style="font-weight: 600; display: block; margin-bottom: 6px;">
+                <i class="fas fa-info-circle me-1"></i>Remember
+            </small>
+            <small>Fields marked with <span class="text-danger">*</span> are required. Students will see this homework once you create it.</small>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
