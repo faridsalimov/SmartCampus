@@ -233,7 +233,7 @@
                         @foreach (var mate in Model.GroupOverview.Groupmates.Take(6))
                         {
                             <div class="member-card fade-in-item">
-                                <img src="https://ui-avatars.com/api/?name=@System.Net.WebUtility.UrlEncode(mate.FullName ?? "User")&background=5e5ce6&color=fff&size=40&bold=true"
+                                <img src="https://ui-avatars.com/api/?name=@System.Net.WebUtility.UrlEncode(mate.FullName ?? "User")&background=random&color=fff"
                                      alt="@(mate.FullName ?? "Student")"
                                      class="member-avatar">
                                 <div class="member-info">

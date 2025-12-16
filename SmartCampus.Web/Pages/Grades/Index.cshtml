@@ -1,32 +1,35 @@
 @page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Grades.IndexModel
 @{
     ViewData["Title"] = "Grades";
     var canCreate = User.IsInRole("Admin") || User.IsInRole("Teacher");
     var canEdit = User.IsInRole("Admin") || User.IsInRole("Teacher");
     var canDelete = User.IsInRole("Admin") || User.IsInRole("Teacher");
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = "Your Grades",
+        Subtitle = "View and track your academic performance",
+        IconClass = "fas fa-star",
+        IconColor = "#ff9500",
+        GradientStart = "rgba(255, 149, 0, 0.05)",
+        GradientEnd = "rgba(52, 199, 89, 0.05)",
+        BorderColor = "rgba(255, 149, 0, 0.1)",
+        Actions = canCreate ? new()
+        {
+            new PageHeaderAction
+            {
+                Label = "Add Grade",
+                Url = Url.Page("Create"),
+                CssClass = "btn-success",
+                IconClass = "fas fa-plus"
+            }
+        } : new()
+    };
 }
 
-
-<div style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.05) 0%, rgba(52, 199, 89, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(255, 149, 0, 0.1);">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
-                <i class="fas fa-star me-2" style="color: #ff9500;"></i>Your Grades
-            </h1>
-            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
-                <i class="fas fa-calendar-alt me-1"></i>
-                View and track your academic performance
-            </p>
-        </div>
-        @if (canCreate)
-        {
-            <a asp-page="Create" class="btn btn-success" style="display:inline-flex; align-items:center; gap:8px;">
-                <i class="fas fa-plus"></i> Add Grade
-            </a>
-        }
-    </div>
-</div>
+<partial name="_PageHeader" model="pageHeader" />
 
 
 @if (Model.Grades?.Count > 0)
@@ -50,7 +53,7 @@
                         <tr style="border-bottom: 1px solid #e5e5ea; transition: background 0.2s ease;">
                             <td style="padding: 16px; color: #1d1d1f;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
-                                    <img src="@(string.IsNullOrEmpty(User.FindFirst("ProfilePhoto")?.Value) ? $"https://ui-avatars.com/api/?name={System.Net.WebUtility.UrlEncode(grade.StudentName ?? "User")}&background=0066ff&color=fff&size=36&bold=true" : User.FindFirst("ProfilePhoto")?.Value)"
+                                    <img src="@(string.IsNullOrEmpty(User.FindFirst("ProfilePhoto")?.Value) ? $"https://ui-avatars.com/api/?name={System.Net.WebUtility.UrlEncode(grade.StudentName ?? "User")}&background=random&color=fff" : User.FindFirst("ProfilePhoto")?.Value)"
                                          alt="@(grade.StudentName ?? "Student")"
                                          style="width: 36px; height: 36px; border-radius: 50%; display: block; object-fit: cover;">
                                     <span>@(!string.IsNullOrEmpty(grade.StudentName) ? grade.StudentName : "N/A")</span>

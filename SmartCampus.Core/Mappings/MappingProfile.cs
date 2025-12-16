@@ -93,7 +93,9 @@ namespace SmartCampus.Core.Mappings
 
             CreateMap<Message, MessageDto>()
                 .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.Sender!.FullName))
+                .ForMember(dest => dest.SenderProfilePhoto, opt => opt.MapFrom(src => src.Sender!.ProfilePhoto))
                 .ForMember(dest => dest.ReceiverName, opt => opt.MapFrom(src => src.Receiver!.FullName))
+                .ForMember(dest => dest.ReceiverProfilePhoto, opt => opt.MapFrom(src => src.Receiver!.ProfilePhoto))
                 .ReverseMap()
                 .ForMember(dest => dest.Sender, opt => opt.Ignore())
                 .ForMember(dest => dest.Receiver, opt => opt.Ignore());

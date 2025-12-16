@@ -42,12 +42,10 @@ namespace SmartCampus.Web.Pages.Account
 
         public class ProfileInputModel
         {
-            [Required(ErrorMessage = "First name is required")]
             [StringLength(50, ErrorMessage = "First name cannot exceed 50 characters")]
             [Display(Name = "First Name")]
             public string? FirstName { get; set; }
 
-            [Required(ErrorMessage = "Last name is required")]
             [StringLength(50, ErrorMessage = "Last name cannot exceed 50 characters")]
             [Display(Name = "Last Name")]
             public string? LastName { get; set; }
@@ -136,26 +134,13 @@ namespace SmartCampus.Web.Pages.Account
 
             try
             {
-                if (Input?.FirstName != null && Input.LastName != null)
+                // Only allow phone number updates
+                // First Name, Last Name, and Email cannot be changed
+                var phoneNumberUpdated = false;
+                if (Input?.PhoneNumber != user.PhoneNumber)
                 {
-                    user.FullName = $"{Input.FirstName} {Input.LastName}".Trim();
-                }
-
-                if (!string.IsNullOrEmpty(Input?.Email) && Input.Email != user.Email)
-                {
-                    var setEmailResult = await _userManager.SetEmailAsync(user, Input.Email);
-                    if (!setEmailResult.Succeeded)
-                    {
-                        StatusMessage = "Error: Failed to update email";
-                        IsStatusSuccess = false;
-                        return await OnGetAsync();
-                    }
-                    user.UserName = Input.Email.Split()[0];
-                }
-
-                if (!string.IsNullOrEmpty(Input?.PhoneNumber))
-                {
-                    user.PhoneNumber = Input.PhoneNumber;
+                    user.PhoneNumber = Input?.PhoneNumber;
+                    phoneNumberUpdated = true;
                 }
 
                 var result = await _userManager.UpdateAsync(user);
@@ -163,7 +148,14 @@ namespace SmartCampus.Web.Pages.Account
                 {
                     await _signInManager.RefreshSignInAsync(user);
 
-                    StatusMessage = "Your profile has been updated successfully!";
+                    if (phoneNumberUpdated)
+                    {
+                        StatusMessage = "Your phone number has been updated successfully!";
+                    }
+                    else
+                    {
+                        StatusMessage = "No changes were made.";
+                    }
                     IsStatusSuccess = true;
                     _logger.LogInformation("User '{UserName}' updated their profile", user.UserName);
                 }

@@ -1,30 +1,22 @@
 @page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Announcements.CreateModel
 @{
     ViewData["Title"] = "Create Announcement";
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = "Create Announcement",
+        Subtitle = "Add a new announcement for your students",
+        IconClass = "fas fa-bullhorn",
+        IconColor = "#ff9500",
+        GradientStart = "rgba(255, 149, 0, 0.05)",
+        GradientEnd = "rgba(255, 59, 48, 0.05)",
+        BorderColor = "rgba(255, 149, 0, 0.1)"
+    };
 }
 
-
-<div style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.05) 0%, rgba(255, 59, 48, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(255, 149, 0, 0.1);">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-                <a asp-page="Index" class="text-decoration-none" style="color: #ff9500;">
-                    <i class="fas fa-arrow-left me-2"></i>Announcements
-                </a>
-                <span style="color: #a1a1a6;">/</span>
-                <span style="color: #636366;">Create</span>
-            </div>
-            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
-                <i class="fas fa-bullhorn me-2" style="color: #ff9500;"></i>Create Announcement
-            </h1>
-            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
-                <i class="fas fa-plus-circle me-1"></i>
-                Add a new announcement for your students
-            </p>
-        </div>
-    </div>
-</div>
+<partial name="_PageHeader" model="pageHeader" />
 
 
 <div class="row">
@@ -40,7 +32,7 @@
                 </div>
                 <div class="card-body">
                     
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show d-none" role="alert" id="validationSummary">
+                    <div asp-validation-summary="All" class="alert alert-danger alert-dismissible fade show" role="alert" id="validationSummary">
                         <i class="fas fa-exclamation-circle me-2"></i>
                         <strong>Please fix the following errors:</strong>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -65,6 +57,30 @@
                         <small class="form-text text-muted">Provide detailed information about the announcement</small>
                         <span asp-validation-for="Announcement.Content" class="text-danger small d-block mt-1"></span>
                     </div>
+
+                    <div class="mb-4">
+                        <div class="form-check form-switch" style="display: flex; align-items: center; gap: 12px; padding-left: 0;">
+                            <input type="checkbox" asp-for="Announcement.IsPinned" class="form-check-input" id="isPinnedCheckbox" style="width: 3em; height: 1.5em; cursor: pointer; margin: 0;">
+                            <div style="flex: 1;">
+                                <label class="form-check-label" for="isPinnedCheckbox" style="font-weight: 600; color: #1d1d1f; cursor: pointer; margin: 0;">
+                                    <i class="fas fa-thumbtack me-1" style="color: #ff3b30;"></i>Pin this announcement
+                                </label>
+                                <small class="form-text text-muted d-block mt-1">Pinned announcements will appear at the top of the list for all users</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <style>
+                        /* Ensure toggle is unchecked by default */
+                        input[type="checkbox"]#isPinnedCheckbox {
+                            accent-color: #0066ff;
+                            flex-shrink: 0;
+                        }
+                        
+                        input[type="checkbox"]#isPinnedCheckbox:not(:checked) {
+                            accent-color: #e5e5ea;
+                        }
+                    </style>
                 </div>
 
                 

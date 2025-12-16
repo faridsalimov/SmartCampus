@@ -31,20 +31,5 @@ namespace SmartCampus.Web.Pages.Announcements
 
             return Page();
         }
-
-        public async Task<IActionResult> OnPostDeleteAsync(Guid id)
-        {
-            try
-            {
-                await _announcementService.DeleteAnnouncementAsync(id);
-                ToastHelper.ShowSuccess(this, "Announcement deleted successfully.");
-                return RedirectToPage("Index");
-            }
-            catch (Exception ex)
-            {
-                ToastHelper.ShowError(this, $"Error deleting announcement: {ex.Message}");
-                return RedirectToPage("Index");
-            }
-        }
     }
 }

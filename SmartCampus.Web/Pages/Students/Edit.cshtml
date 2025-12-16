@@ -1,25 +1,22 @@
 @page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Students.EditModel
 @{
     ViewData["Title"] = "Edit Student";
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = "Edit Student",
+        Subtitle = "Update student information and enrollment details",
+        IconClass = "fas fa-user-edit",
+        IconColor = "#34c759",
+        GradientStart = "rgba(52, 199, 89, 0.05)",
+        GradientEnd = "rgba(0, 102, 255, 0.05)",
+        BorderColor = "rgba(52, 199, 89, 0.1)"
+    };
 }
 
-
-<div style="background: linear-gradient(135deg, rgba(52, 199, 89, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(52, 199, 89, 0.1);">
-    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-        <a asp-page="Index" class="text-decoration-none" style="color: #34c759;">
-            <i class="fas fa-arrow-left me-2"></i>Back
-        </a>
-        <span style="color: #a1a1a6;">/</span>
-        <span style="color: #636366;">Edit Student</span>
-    </div>
-    <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
-        <i class="fas fa-user-edit me-2" style="color: #34c759;"></i>Edit Student
-    </h1>
-    <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
-        <i class="fas fa-description me-1"></i>Update student information and enrollment details
-    </p>
-</div>
+<partial name="_PageHeader" model="pageHeader" />
 
 
 <div class="row">

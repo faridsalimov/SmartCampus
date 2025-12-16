@@ -7,6 +7,7 @@ namespace SmartCampus.Core.DTOs
         public string? Content { get; set; }
         public Guid TeacherId { get; set; }
         public string TeacherName { get; set; } = string.Empty;
+        public string? TeacherPhoto { get; set; }
         public Guid? CourseId { get; set; }
         public string? CourseName { get; set; }
         public bool IsPinned { get; set; }

@@ -9,6 +9,7 @@ namespace SmartCampus.Data.Repositories.Interfaces
 
         Task<IEnumerable<TEntity>> GetAllAsync();
         Task<TEntity?> GetByIdAsync(Guid id);
+        Task<TEntity?> GetByIdAsNoTrackingAsync(Guid id);
         Task<IEnumerable<TEntity>> FindAsync(Func<TEntity, bool> predicate);
         Task<TEntity?> FirstOrDefaultAsync(Func<TEntity, bool> predicate);
 

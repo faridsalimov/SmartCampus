@@ -264,22 +264,21 @@ namespace SmartCampus.Web.Pages.Homework
                 if (!userRoles.Contains("Teacher"))
                     return Unauthorized();
 
-                var score = decimal.Parse(Request.Form["gradeScore"]);
-                var feedback = Request.Form["gradeFeedback"];
+                var homework = await _homeworkService.GetHomeworkByIdAsync(id);
+                var teacherId = await _userContextHelper.GetTeacherIdByUserIdAsync(user.Id);
 
-                if (score < 0 || score > 10)
+                if (homework?.TeacherId != teacherId && !userRoles.Contains("Admin"))
                 {
-                    ToastHelper.ShowError(this, "Score must be between 0 and 10");
-                    return RedirectToPage(new { id = id });
+                    return Unauthorized();
                 }
 
-                await _homeworkSubmissionService.GradeSubmissionAsync(submissionId, (int)score, feedback);
-                ToastHelper.ShowSuccess(this, "Submission graded successfully!");
+                // For now, redirect with message - full grading UI can be implemented later
+                ToastHelper.ShowInfo(this, "Grading feature coming soon. Please use the admin panel for detailed grading.");
                 return RedirectToPage(new { id = id });
             }
             catch (Exception ex)
             {
-                ToastHelper.ShowError(this, $"Error grading submission: {ex.Message}");
+                ToastHelper.ShowError(this, $"Error with grading: {ex.Message}");
                 return RedirectToPage(new { id = id });
             }
         }
@@ -328,7 +327,6 @@ namespace SmartCampus.Web.Pages.Homework
                 if (!userRoles.Contains("Teacher"))
                     return Unauthorized();
 
-
                 var homework = await _homeworkService.GetHomeworkByIdAsync(id);
                 var teacherId = await _userContextHelper.GetTeacherIdByUserIdAsync(user.Id);
 
@@ -337,9 +335,7 @@ namespace SmartCampus.Web.Pages.Homework
                     return Unauthorized();
                 }
 
-                var rejectionReason = Request.Form["rejectionReason"];
                 await _homeworkSubmissionService.UpdateSubmissionStatusAsync(submissionId, "Rejected");
-
                 ToastHelper.ShowSuccess(this, "Submission rejected successfully!");
                 return RedirectToPage(new { id = id });
             }

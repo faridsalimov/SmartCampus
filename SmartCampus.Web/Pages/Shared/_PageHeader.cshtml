@@ -1,0 +1,37 @@
+@using SmartCampus.Web.Pages.Shared
+@model PageHeaderModel
+
+<div class="page-header" style="background: linear-gradient(135deg, @Model.GradientStart 0%, @Model.GradientEnd 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid @Model.BorderColor;">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="page-header-title" style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
+                @if (!string.IsNullOrEmpty(Model.IconClass))
+                {
+                    <i class="@Model.IconClass me-2" style="color: @Model.IconColor;"></i>
+                }
+                @Model.Title
+            </h1>
+            @if (!string.IsNullOrEmpty(Model.Subtitle))
+            {
+                <p class="page-header-subtitle" style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
+                    @Model.Subtitle
+                </p>
+            }
+        </div>
+        @if (Model.Actions != null && Model.Actions.Any())
+        {
+            <div class="page-header-actions" style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end;">
+                @foreach (var action in Model.Actions)
+                {
+                    <a href="@action.Url" class="btn @action.CssClass" style="display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                        @if (!string.IsNullOrEmpty(action.IconClass))
+                        {
+                            <i class="@action.IconClass"></i>
+                        }
+                        @action.Label
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>

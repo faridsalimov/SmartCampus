@@ -1,43 +1,23 @@
 @page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Courses.DetailsModel
 @{
     ViewData["Title"] = "Course Details";
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = Model.Course?.Title ?? "Course",
+        Subtitle = Model.Course?.Code ?? "",
+        IconClass = "fas fa-book",
+        IconColor = "#5e5ce6",
+        GradientStart = "rgba(94, 92, 230, 0.05)",
+        GradientEnd = "rgba(0, 102, 255, 0.05)",
+        BorderColor = "rgba(94, 92, 230, 0.1)"
+    };
 }
 
+<partial name="_PageHeader" model="pageHeader" />
 
-<div style="background: linear-gradient(135deg, rgba(94, 92, 230, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(94, 92, 230, 0.1);">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-                <a asp-page="Index" class="text-decoration-none" style="color: #5e5ce6;">
-                    <i class="fas fa-arrow-left me-2"></i>Courses
-                </a>
-                <span style="color: #a1a1a6;">/</span>
-                <span style="color: #636366;">Details</span>
-            </div>
-            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
-                <i class="fas fa-book me-2" style="color: #5e5ce6;"></i>@Model.Course?.Title
-            </h1>
-            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
-                <i class="fas fa-code me-1"></i>@Model.Course?.Code
-            </p>
-        </div>
-        <div>
-            @if (Model.Course?.IsActive == true)
-            {
-                <span style="display: inline-block; background: rgba(52, 199, 89, 0.1); color: #34c759; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 0.875rem;">
-                    <i class="fas fa-check-circle me-1"></i>Active
-                </span>
-            }
-            else
-            {
-                <span style="display: inline-block; background: rgba(162, 162, 170, 0.1); color: #a2a2aa; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 0.875rem;">
-                    <i class="fas fa-times-circle me-1"></i>Inactive
-                </span>
-            }
-        </div>
-    </div>
-</div>
 
 <div class="row">
     
@@ -128,7 +108,7 @@
                     </a>
                     @if (User.IsInRole("Admin"))
                     {
-                        <button type="button" class="btn btn-danger btn-sm" style="border-radius: 8px;" data-bs-toggle="modal" data-bs-target="#confirmModal" data-delete-url="@Url.Page(null, new { handler = "Delete", id = Model.Course?.Id })" data-delete-entity="@Model.Course?.Id" data-delete-message="Delete this course and related data?">
+                        <button type="button" class="btn btn-danger btn-sm" style="border-radius: 8px;" data-bs-toggle="modal" data-bs-target="#alertModal" data-alert-action="@Url.Page(null, new { handler = "Delete", id = Model.Course?.Id })" data-alert-message="Are you sure you want to delete this course and all related data? This action cannot be undone.">
                             <i class="fas fa-trash me-1"></i>Delete Course
                         </button>
                     }
@@ -281,48 +261,3 @@
         </div>
     </div>
 </div>
-
-
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmModalLabel">Confirm Deletion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p class="mb-0" id="confirmModalMessage">Are you sure you want to delete this item?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteForm" method="post">
-                    <input type="hidden" name="id" id="deleteEntityId" value="" />
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash me-1"></i>Delete
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <script>
-        // Populate and show the confirm delete modal
-        var confirmModal = document.getElementById('confirmModal');
-        confirmModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var deleteUrl = button.getAttribute('data-delete-url');
-            var deleteEntity = button.getAttribute('data-delete-entity');
-            var deleteMessage = button.getAttribute('data-delete-message');
-
-            var modalMessage = confirmModal.querySelector('#confirmModalMessage');
-            modalMessage.textContent = deleteMessage;
-
-            var deleteForm = confirmModal.querySelector('#deleteForm');
-            var deleteEntityId = confirmModal.querySelector('#deleteEntityId');
-            deleteEntityId.value = deleteEntity;
-            deleteForm.setAttribute('action', deleteUrl);
-        });
-    </script>
-}

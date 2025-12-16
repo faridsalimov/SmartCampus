@@ -1,38 +1,34 @@
 @page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Homework.IndexModel
 @{
     ViewData["Title"] = "Homework";
     var isTeacher = User.IsInRole("Teacher");
     var canCreate = User.IsInRole("Admin") || User.IsInRole("Teacher");
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = "Homework & Assignments",
+        Subtitle = isTeacher ? "Manage your homework assignments and track submissions" : "Track and submit your homework",
+        IconClass = "fas fa-tasks",
+        IconColor = "#ff9500",
+        GradientStart = "rgba(255, 149, 0, 0.05)",
+        GradientEnd = "rgba(52, 199, 89, 0.05)",
+        BorderColor = "rgba(255, 149, 0, 0.1)",
+        Actions = canCreate ? new()
+        {
+            new PageHeaderAction
+            {
+                Label = "New Homework",
+                Url = Url.Page("Create"),
+                CssClass = "btn-warning",
+                IconClass = "fas fa-plus"
+            }
+        } : new()
+    };
 }
 
-
-<div style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.05) 0%, rgba(52, 199, 89, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(255, 149, 0, 0.1);">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
-                <i class="fas fa-tasks me-2" style="color: #ff9500;"></i>Homework & Homeworks
-            </h1>
-            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
-                <i class="fas fa-briefcase me-1"></i>
-                @if (isTeacher)
-                {
-                    <span>Manage your homework homeworks and track submissions</span>
-                }
-                else
-                {
-                    <span>Track and submit your homeworks</span>
-                }
-            </p>
-        </div>
-        @if (canCreate)
-        {
-            <a asp-page="Create" class="btn btn-warning" style="display:inline-flex; align-items:center; gap:8px;">
-                <i class="fas fa-plus"></i> New Homework
-            </a>
-        }
-    </div>
-</div>
+<partial name="_PageHeader" model="pageHeader" />
 
 
 <div style="display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; align-items: center;">

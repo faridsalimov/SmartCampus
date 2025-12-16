@@ -7,6 +7,7 @@ namespace SmartCampus.Core.DTOs
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
+        public string? ApplicationUserId { get; set; }
         public string? Department { get; set; }
         public string? Specialization { get; set; }
         public bool IsActive { get; set; }

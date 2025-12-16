@@ -1,5 +1,6 @@
 @page
 @using Microsoft.AspNetCore.Authorization
+@using SmartCampus.Web.Pages.Shared
 @attribute [Authorize(Roles = "Admin,Teacher")]
 @model SmartCampus.Web.Pages.Courses.IndexModel
 @{
@@ -7,28 +8,30 @@
     var canCreate = User.IsInRole("Admin");
     var canEdit = User.IsInRole("Admin");
     var canDelete = User.IsInRole("Admin");
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = "Courses",
+        Subtitle = "Manage your courses and learning materials",
+        IconClass = "fas fa-book",
+        IconColor = "#0066ff",
+        GradientStart = "rgba(0, 102, 255, 0.05)",
+        GradientEnd = "rgba(94, 92, 230, 0.05)",
+        BorderColor = "rgba(0, 102, 255, 0.1)",
+        Actions = canCreate ? new()
+        {
+            new PageHeaderAction
+            {
+                Label = "New Course",
+                Url = Url.Page("Create"),
+                CssClass = "btn-primary",
+                IconClass = "fas fa-plus"
+            }
+        } : new()
+    };
 }
 
-
-<div style="background: linear-gradient(135deg, rgba(0, 102, 255, 0.05) 0%, rgba(94, 92, 230, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(0, 102, 255, 0.1);">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
-                <i class="fas fa-book me-2" style="color: #0066ff;"></i>Courses
-            </h1>
-            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
-                <i class="fas fa-graduation-cap me-1"></i>
-                Manage your courses and learning materials
-            </p>
-        </div>
-        @if (canCreate)
-        {
-            <a asp-page="Create" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:8px;">
-                <i class="fas fa-plus"></i> New Course
-            </a>
-        }
-    </div>
-</div>
+<partial name="_PageHeader" model="pageHeader" />
 
 
 <div class="row mb-4">

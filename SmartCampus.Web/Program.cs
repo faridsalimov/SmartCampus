@@ -59,6 +59,10 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddRazorPages();
 
+builder.Services.AddControllers();
+
+builder.Services.AddSignalR();
+
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -97,6 +101,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+app.MapHub<SmartCampus.Web.Hubs.MessagesHub>("/hubs/messages");
 
 _ = app.Services.CreateScope().ServiceProvider.GetRequiredService<SmartCampusDbContext>()
     .Database.MigrateAsync()

@@ -6,6 +6,7 @@ namespace SmartCampus.Services.Interfaces
     {
         Task<IEnumerable<AnnouncementDto>> GetAllAnnouncementsAsync();
         Task<AnnouncementDto?> GetAnnouncementByIdAsync(Guid id);
+        Task<AnnouncementDto?> GetAnnouncementByIdAsNoTrackingAsync(Guid id);
         Task<IEnumerable<AnnouncementDto>> GetAnnouncementsByTeacherAsync(Guid teacherId);
         Task<IEnumerable<AnnouncementDto>> GetAnnouncementsByCourseAsync(Guid courseId);
         Task<IEnumerable<AnnouncementDto>> GetPublishedAnnouncementsAsync();

@@ -35,11 +35,9 @@ namespace SmartCampus.Web.Pages.Attendance
 
         public IList<AttendanceDto> AttendanceRecords { get; set; } = new List<AttendanceDto>();
         public IList<StudentDto> Students { get; set; } = new List<StudentDto>();
-        public Guid? FilterStudentId { get; set; }
-        public string? SearchTerm { get; set; }
         public string? UserRole { get; set; }
 
-        public async Task OnGetAsync(string? searchTerm = null, Guid? filterStudentId = null)
+        public async Task OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -47,8 +45,6 @@ namespace SmartCampus.Web.Pages.Attendance
 
             var userRoles = await _userManager.GetRolesAsync(user);
             UserRole = userRoles.FirstOrDefault();
-            SearchTerm = searchTerm;
-            FilterStudentId = filterStudentId;
 
             IEnumerable<AttendanceDto> records = new List<AttendanceDto>();
 
@@ -91,20 +87,6 @@ namespace SmartCampus.Web.Pages.Attendance
 
                 records = await _attendanceService.GetAllAttendanceAsync();
                 Students = (await _studentService.GetAllStudentsAsync()).ToList();
-            }
-
-
-            if (filterStudentId.HasValue && filterStudentId != Guid.Empty)
-            {
-                records = records.Where(r => r.StudentId == filterStudentId).ToList();
-            }
-
-
-            if (!string.IsNullOrEmpty(searchTerm))
-            {
-                records = records.Where(r =>
-                    (r.StudentName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
-                ).ToList();
             }
 
             AttendanceRecords = records.ToList();

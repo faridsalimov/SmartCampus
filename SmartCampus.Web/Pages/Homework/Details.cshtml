@@ -1,38 +1,22 @@
 @page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Homework.DetailsModel
 @{
     ViewData["Title"] = "Homework Details";
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = Model.Homework?.Title ?? "Homework",
+        Subtitle = Model.Homework?.CourseName ?? "",
+        IconClass = "fas fa-tasks",
+        IconColor = "#ff9500",
+        GradientStart = "rgba(255, 149, 0, 0.05)",
+        GradientEnd = "rgba(52, 199, 89, 0.05)",
+        BorderColor = "rgba(255, 149, 0, 0.1)"
+    };
 }
 
-
-<div style="background: linear-gradient(135deg, #ff9500 0%, #ff6b35 100%); border-radius: 20px; padding: 35px 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(255, 149, 0, 0.15); position: relative; overflow: hidden;">
-    <div style="position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; background: rgba(255, 255, 255, 0.1); border-radius: 50%;"></div>
-    <div style="position: relative; z-index: 1;">
-        <div class="d-flex justify-content-between align-items-start">
-            <div>
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                    <a asp-page="Index" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; font-size: 0.95rem;">
-                        <i class="fas fa-arrow-left me-1"></i>Back
-                    </a>
-                    <span style="color: rgba(255, 255, 255, 0.6);">/</span>
-                    <span style="color: rgba(255, 255, 255, 0.8);">Details</span>
-                </div>
-                <h1 style="font-size: 2.5rem; font-weight: 800; color: white; margin: 0;">
-                    @Model.Homework?.Title
-                </h1>
-                <p style="color: rgba(255, 255, 255, 0.9); margin: 8px 0 0 0; font-size: 1rem;">
-                    <i class="fas fa-users me-1"></i>@Model.Homework?.CourseName
-                </p>
-            </div>
-            @if (Model.IsOwner)
-            {
-                <div style="background: rgba(255, 255, 255, 0.2); padding: 8px 14px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.3); color: white; font-weight: 600; font-size: 0.85rem;">
-                    <i class="fas fa-shield-alt me-1"></i>Your Homework
-                </div>
-            }
-        </div>
-    </div>
-</div>
+<partial name="_PageHeader" model="pageHeader" />
 
 
 <div class="row">
@@ -115,29 +99,31 @@
             </div>
 
             
-            <div style="background: #f9f9fb; border-top: 1px solid #e5e5ea; padding: 18px 20px; border-radius: 0 0 14px 14px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <a asp-page="Index" class="btn" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500;">
-                    <i class="fas fa-arrow-left me-1"></i>Back to List
-                </a>
-
-                @if (Model.IsStudent && !Model.IsCompleted)
-                {
-                    <form method="post" asp-page-handler="Complete" style="margin-left: auto;">
-                        <button type="submit" class="btn" style="background: #34c759; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 500;">
-                            <i class="fas fa-check-circle me-1"></i>Mark as Completed
-                        </button>
-                    </form>
-                }
-
-                @if (Model.IsOwner)
-                {
-                    <a asp-page="Edit" asp-route-id="@Model.Homework?.Id" class="btn" style="background: #0066ff; color: white; border: none; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; margin-left: auto;">
-                        <i class="fas fa-edit me-1"></i>Edit
+            <div class="card-footer bg-light border-top">
+                <div class="d-flex gap-2 justify-content-end">
+                    <a asp-page="Index" class="btn" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500;">
+                        <i class="fas fa-arrow-left me-1"></i>Back to List
                     </a>
-                    <button type="button" class="btn" style="background: #ff3b30; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 500;" data-bs-toggle="modal" data-bs-target="#confirmModal" data-delete-url="@Url.Page(null, new { handler = "Delete", id = Model.Homework?.Id })" data-delete-entity="@Model.Homework?.Id">
-                        <i class="fas fa-trash me-1"></i>Delete
-                    </button>
-                }
+
+                    @if (Model.IsStudent && !Model.IsCompleted)
+                    {
+                        <form method="post" asp-page-handler="Complete" style="margin-left: auto;">
+                            <button type="submit" class="btn" style="background: #34c759; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 500;">
+                                <i class="fas fa-check-circle me-1"></i>Mark as Completed
+                            </button>
+                        </form>
+                    }
+
+                    @if (Model.IsOwner)
+                    {
+                        <a asp-page="Edit" asp-route-id="@Model.Homework?.Id" class="btn" style="background: #0066ff; color: white; border: none; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; margin-left: auto;">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                        <button type="button" class="btn" style="background: #ff3b30; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 500;" data-bs-toggle="modal" data-bs-target="#alertModal" data-alert-action="@Url.Page(null, new { handler = "Delete", id = Model.Homework?.Id })" data-alert-message="Are you sure you want to delete this homework? This action cannot be undone.">
+                            <i class="fas fa-trash me-1"></i>Delete
+                        </button>
+                    }
+                </div>
             </div>
         </div>
 
@@ -368,7 +354,7 @@
                                 @if (!string.IsNullOrWhiteSpace(Model.StudentSubmission.Grade.Feedback))
                                 {
                                     <div>
-                                        <small style="color: #a1a1a6; font-weight: 700; display: block; margin-bottom: 12px, text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">
+                                        <small style="color: #a1a1a6; font-weight: 700, display: block; margin-bottom: 12px, text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">
                                             <i class="fas fa-comment me-2" style="color: #ff9500;"></i>Teacher's Feedback
                                         </small>
                                         <div style="background: #fffbf0; padding: 16px; border-radius: 10px; border-left: 4px solid #ff9500; color: #636366; line-height: 1.8; font-size: 0.95rem;">
@@ -416,13 +402,13 @@
                             <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #0066ff;">@submittedCount</p>
                         </div>
                         <div style="text-align: center; border-left: 1px solid #e5e5ea; border-right: 1px solid #e5e5ea;">
-                            <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 8px;">
+                            <small style="color: #a1a1a6; font-weight: 600, display: block, margin-bottom: 8px;">
                                 <i class="fas fa-star me-1" style="color: #34c759;"></i>Graded
                             </small>
                             <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #34c759;">@gradedCount</p>
                         </div>
                         <div style="text-align: center;">
-                            <small style="color: #a1a1a6; font-weight: 600; display: block; margin-bottom: 8px;">
+                            <small style="color: #a1a1a6; font-weight: 600; display: block, margin-bottom: 8px;">
                                 <i class="fas fa-ban me-1" style="color: #ff9500;"></i>Rejected
                             </small>
                             <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #ff9500;">@rejectedCount</p>
@@ -520,22 +506,24 @@
                                     @if (submission.Status != "Rejected")
                                     {
                                         <button type="button" class="btn" style="background: #0066ff; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer;" 
-                                                data-bs-toggle="modal" data-bs-target="#gradeModal" 
-                                                data-submission-id="@submission.Id" 
-                                                data-student-name="@submission.StudentName">
+                                                data-bs-toggle="modal" data-bs-target="#alertModal"
+                                                data-alert-action="@Url.Page(null, new { handler = "GradeSubmission", id = Model.Homework?.Id, submissionId = submission.Id })"
+                                                data-alert-title="Grade Submission"
+                                                data-alert-message="Grading feature coming soon. Submissions will be graded through the admin panel.">
                                             <i class="fas fa-star me-1"></i>Grade
                                         </button>
                                         <button type="button" class="btn" style="background: #ff9500; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer;" 
-                                                data-bs-toggle="modal" data-bs-target="#rejectModal" 
-                                                data-submission-id="@submission.Id" 
-                                                data-student-name="@submission.StudentName">
+                                                data-bs-toggle="modal" data-bs-target="#alertModal"
+                                                data-alert-action="@Url.Page(null, new { handler = "RejectSubmission", id = Model.Homework?.Id, submissionId = submission.Id })"
+                                                data-alert-title="Reject Submission"
+                                                data-alert-message="Are you sure you want to reject this submission? The student will be notified.">
                                             <i class="fas fa-ban me-1"></i>Reject
                                         </button>
                                     }
                                     <button type="button" class="btn" style="background: #ff3b30; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer;" 
-                                            data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" 
-                                            data-submission-id="@submission.Id" 
-                                            data-student-name="@submission.StudentName">
+                                            data-bs-toggle="modal" data-bs-target="#alertModal"
+                                            data-alert-action="@Url.Page(null, new { handler = "DeleteSubmission", id = Model.Homework?.Id, submissionId = submission.Id })"
+                                            data-alert-message="Are you sure you want to delete this submission? This action cannot be undone.">
                                         <i class="fas fa-trash me-1"></i>Delete
                                     </button>
                                 </div>
@@ -632,166 +620,3 @@
         </div>
     </div>
 </div>
-
-
-<div class="modal fade" id="gradeModal" tabindex="-1" aria-labelledby="gradeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content" style="border-radius: 14px; border: none;">
-            <div style="background: linear-gradient(135deg, #0066ff, #0052cc); padding: 20px; border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center;">
-                <h5 class="modal-title" id="gradeModalLabel" style="color: white; font-weight: 700; margin: 0;">
-                    <i class="fas fa-star me-2"></i>Grade Submission
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="post" asp-page-handler="GradeSubmission">
-                <input type="hidden" id="homeworkId" name="id" />
-                <input type="hidden" id="gradeSubmissionId" name="submissionId" />
-                
-                <div class="modal-body" style="padding: 24px;">
-                    <div style="margin-bottom: 20px;">
-                        <label style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 8px;">
-                            Student Name
-                        </label>
-                        <p id="studentNameDisplay" style="margin: 0; color: #636366;"></p>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <label for="gradeScore" style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 8px;">
-                            Score (Out of 10)
-                            <span style="color: #ff3b30;">*</span>
-                        </label>
-                        <input type="number" id="gradeScore" name="gradeScore" min="0" max="10" step="0.1" required style="width: 100%; padding: 10px; border: 2px solid #e5e5ea; border-radius: 8px; font-size: 0.95rem;" />
-                        <small style="color: #a1a1a6; display: block; margin-top: 6px;">Enter a score between 0 and 10</small>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <label for="gradeFeedback" style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 8px;">
-                            Feedback (Optional)
-                        </label>
-                        <textarea id="gradeFeedback" name="gradeFeedback" style="width: 100%; padding: 10px; border: 2px solid #e5e5ea; border-radius: 8px; font-size: 0.95rem; resize: vertical; min-height: 100px;"></textarea>
-                        <small style="color: #a1a1a6; display: block; margin-top: 6px;">Provide constructive feedback for the student</small>
-                    </div>
-                </div>
-                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e5e5ea;">
-                    <button type="button" class="btn" data-bs-dismiss="modal" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 500;">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn" style="background: #0066ff; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 500;">
-                        <i class="fas fa-check me-1"></i>Submit Grade
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-
-<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content" style="border-radius: 14px; border: none;">
-            <div style="background: linear-gradient(135deg, #ff9500, #ff8c00); padding: 20px; border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center;">
-                <h5 class="modal-title" id="rejectModalLabel" style="color: white; font-weight: 700; margin: 0;">
-                    <i class="fas fa-ban me-2"></i>Reject Submission
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="post" asp-page-handler="RejectSubmission">
-                <input type="hidden" id="rejectHomeworkId" name="id" />
-                <input type="hidden" id="rejectSubmissionId" name="submissionId" />
-                
-                <div class="modal-body" style="padding: 24px;">
-                    <div style="margin-bottom: 20px;">
-                        <label style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 8px;">
-                            Student Name
-                        </label>
-                        <p id="rejectStudentNameDisplay" style="margin: 0; color: #636366;"></p>
-                    </div>
-
-                    <div style="background: #fff3e0; border-left: 4px solid #ff9500; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
-                        <small style="color: #e65100; font-weight: 600;">
-                            <i class="fas fa-exclamation-circle me-1"></i>This action will mark the submission as rejected.
-                        </small>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <label for="rejectionReason" style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 8px;">
-                            Rejection Reason (Optional)
-                        </label>
-                        <textarea id="rejectionReason" name="rejectionReason" placeholder="Explain why the submission is being rejected..." style="width: 100%; padding: 10px; border: 2px solid #e5e5ea; border-radius: 8px; font-size: 0.95rem; resize: vertical; min-height: 100px;"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e5e5ea;">
-                    <button type="button" class="btn" data-bs-dismiss="modal" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 500;">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn" style="background: #ff9500; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 500;">
-                        <i class="fas fa-ban me-1"></i>Reject Submission
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-
-<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content" style="border-radius: 14px; border: none;">
-            <div style="background: linear-gradient(135deg, #ff3b30, #e63026); padding: 20px; border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center;">
-                <h5 class="modal-title" id="deleteConfirmLabel" style="color: white; font-weight: 700; margin: 0;">
-                    <i class="fas fa-trash me-2"></i>Delete Submission
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="post" asp-page-handler="DeleteSubmission">
-                <input type="hidden" id="deleteHomeworkId" name="id" />
-                <input type="hidden" id="deleteSubmissionId" name="submissionId" />
-                
-                <div class="modal-body" style="padding: 24px;">
-                    <div style="margin-bottom: 20px;">
-                        <label style="font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 8px;">
-                            Student Name
-                        </label>
-                        <p id="deleteStudentNameDisplay" style="margin: 0; color: #636366;"></p>
-                    </div>
-
-                    <div style="background: #ffebee; border-left: 4px solid #ff3b30; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
-                        <small style="color: #c62828; font-weight: 600;">
-                            <i class="fas fa-exclamation-circle me-1"></i>This action cannot be undone. The submission will be permanently deleted.
-                        </small>
-                    </div>
-                </div>
-                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e5e5ea;">
-                    <button type="button" class="btn" data-bs-dismiss="modal" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 500;">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn" style="background: #ff3b30; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 500;">
-                        <i class="fas fa-check me-1"></i>Yes, Delete
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-    // Grade Modal
-    document.addEventListener('show.bs.modal', function (e) {
-        if (e.target.id === 'gradeModal' && e.relatedTarget) {
-            document.getElementById('gradeSubmissionId').value = e.relatedTarget.getAttribute('data-submission-id');
-            document.getElementById('studentNameDisplay').textContent = e.relatedTarget.getAttribute('data-student-name');
-            const urlParams = new URLSearchParams(window.location.search);
-            document.getElementById('homeworkId').value = urlParams.get('id') || '';
-        }
-        if (e.target.id === 'rejectModal' && e.relatedTarget) {
-            document.getElementById('rejectSubmissionId').value = e.relatedTarget.getAttribute('data-submission-id');
-            document.getElementById('rejectStudentNameDisplay').textContent = e.relatedTarget.getAttribute('data-student-name');
-            document.getElementById('rejectHomeworkId').value = new URLSearchParams(window.location.search).get('id') || '';
-        }
-        if (e.target.id === 'deleteConfirmModal' && e.relatedTarget) {
-            document.getElementById('deleteSubmissionId').value = e.relatedTarget.getAttribute('data-submission-id');
-            document.getElementById('deleteStudentNameDisplay').textContent = e.relatedTarget.getAttribute('data-student-name');
-            document.getElementById('deleteHomeworkId').value = new URLSearchParams(window.location.search).get('id') || '';
-        }
-    });
-</script>

@@ -82,24 +82,28 @@ namespace SmartCampus.Web.Pages.Announcements
             try
             {
                 var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+
                 var userRoles = await _userManager.GetRolesAsync(user);
 
+                // Only Admin can delete
                 if (!userRoles.Contains("Admin"))
                 {
-                    var announcement = await _announcementService.GetAnnouncementByIdAsync(id);
-                    if (announcement?.TeacherId.ToString() != user?.Id)
-                        return Unauthorized();
+                    return Unauthorized();
                 }
 
                 await _announcementService.DeleteAnnouncementAsync(id);
                 ToastHelper.ShowSuccess(this, "Announcement deleted successfully.");
+                return RedirectToPage();
             }
             catch (Exception ex)
             {
                 ToastHelper.ShowError(this, $"Error deleting announcement: {ex.Message}");
+                return RedirectToPage();
             }
-
-            return RedirectToPage();
         }
     }
 }

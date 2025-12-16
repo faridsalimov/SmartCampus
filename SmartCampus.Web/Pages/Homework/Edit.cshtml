@@ -1,32 +1,22 @@
 @page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Homework.EditModel
 @{
     ViewData["Title"] = "Edit Homework";
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = "Edit Homework",
+        Subtitle = "Update homework details",
+        IconClass = "fas fa-tasks",
+        IconColor = "#ff9500",
+        GradientStart = "rgba(255, 149, 0, 0.05)",
+        GradientEnd = "rgba(52, 199, 89, 0.05)",
+        BorderColor = "rgba(255, 149, 0, 0.1)"
+    };
 }
 
-
-<div style="background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%); border-radius: 20px; padding: 35px 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0, 102, 255, 0.15); position: relative; overflow: hidden;">
-    <div style="position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; background: rgba(255, 255, 255, 0.1); border-radius: 50%;"></div>
-    <div style="position: relative; z-index: 1;">
-        <div class="d-flex justify-content-between align-items-start">
-            <div>
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                    <a asp-page="Index" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; font-size: 0.95rem;">
-                        <i class="fas fa-arrow-left me-1"></i>Back
-                    </a>
-                    <span style="color: rgba(255, 255, 255, 0.6);">/</span>
-                    <span style="color: rgba(255, 255, 255, 0.8);">Edit</span>
-                </div>
-                <h1 style="font-size: 2.5rem; font-weight: 800; color: white; margin: 0;">
-                    <i class="fas fa-edit me-2"></i>Edit Homework
-                </h1>
-                <p style="color: rgba(255, 255, 255, 0.9); margin: 8px 0 0 0; font-size: 1rem;">
-                    <i class="fas fa-pen-fancy me-1"></i>Update homework details
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_PageHeader" model="pageHeader" />
 
 
 <div class="row">

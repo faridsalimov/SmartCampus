@@ -1,121 +1,867 @@
-@page
+﻿@page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Messages.IndexModel
 @{
     ViewData["Title"] = "Messages";
-    var canCreate = (User?.IsInRole("Admin") ?? false) || (User?.IsInRole("Teacher") ?? false) || (User?.IsInRole("Student") ?? false);
 }
 
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-<div style="background: linear-gradient(135deg, rgba(0, 102, 255, 0.05) 0%, rgba(94, 92, 230, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(0, 102, 255, 0.1);">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
-                <i class="fas fa-envelope me-2" style="color: #0066ff;"></i>Messages
-            </h1>
-            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
-                <i class="fas fa-inbox me-1"></i>
-                You have @(Model.Messages?.Count(m => m.IsRead == false) ?? 0) new messages
-            </p>
-        </div>
-        @if (canCreate)
-        {
-            <a asp-page="Create" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:8px;">
-                <i class="fas fa-plus"></i> New Message
-            </a>
+    .messages-container {
+        display: flex;
+        height: calc(100vh - 100px);
+        gap: 0;
+        border-radius: 0;
+        overflow: hidden;
+        box-shadow: none;
+        background: white;
+        border: 1px solid #e5e5ea;
+        border-radius: 10px;
+    }
+
+    /* ===== CONVERSATIONS LIST (LEFT SIDE) ===== */
+    .conversations-list {
+        width: 360px;
+        border-right: 1px solid #e5e5ea;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        flex-shrink: 0;
+    }
+
+    .conversations-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e5e5ea;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #ffffff;
+    }
+
+    .conversations-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #1d1d1f;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .header-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f0f0f0;
+        border: none;
+        color: #0066ff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
+
+    .header-btn:hover {
+        background: #e5e5ea;
+        transform: scale(1.05);
+    }
+
+    .search-box {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e5e5ea;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 16px;
+        border: 1px solid #e5e5ea;
+        border-radius: 24px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        transition: all 0.3s;
+        background: #f0f0f0;
+    }
+
+    .search-box input:focus {
+        outline: none;
+        background: white;
+        border-color: #0066ff;
+    }
+
+    .search-box input::placeholder {
+        color: #a1a1a6;
+    }
+
+    .conversations-scroll {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .conversation-item {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f5f5f7;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        gap: 12px;
+        text-decoration: none;
+        color: inherit;
+        align-items: center;
+    }
+
+    .conversation-item:hover {
+        background: #f5f5f7;
+    }
+
+    .conversation-item.active {
+        background: #f0f0f0;
+    }
+
+    .conversation-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+        background: #e5e5ea;
+    }
+
+    .conversation-content {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .conversation-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+        gap: 8px;
+    }
+
+    .conversation-name {
+        font-weight: 600;
+        color: #1d1d1f;
+        font-size: 0.95rem;
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .conversation-time {
+        font-size: 0.7rem;
+        color: #636366;
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    .conversation-preview {
+        font-size: 0.85rem;
+        color: #636366;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+    }
+
+    .conversation-preview.unread {
+        color: #1d1d1f;
+        font-weight: 500;
+    }
+
+    .conversation-unread-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        background: #ff3b30;
+        color: white;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .empty-conversations {
+        padding: 40px 20px;
+        text-align: center;
+        color: #a1a1a6;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-conversations i {
+        font-size: 2.5rem;
+        opacity: 0.3;
+        margin-bottom: 12px;
+    }
+
+    /* ===== CHAT VIEW (RIGHT SIDE) ===== */
+    .chat-view {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: white;
+    }
+
+    .chat-header {
+        padding: 16px 24px;
+        border-bottom: 1px solid #e5e5ea;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+    }
+
+    .chat-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .chat-header-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #e5e5ea;
+    }
+
+    .chat-info h4 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1d1d1f;
+    }
+
+    .chat-info p {
+        margin: 2px 0 0 0;
+        font-size: 0.8rem;
+        color: #a1a1a6;
+    }
+
+    .messages-area {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background: #ffffff;
+    }
+
+    .messages-date-separator {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 16px 0;
+        opacity: 0.5;
+    }
+
+    .messages-date-separator::before,
+    .messages-date-separator::after {
+        flex: 1;
+        height: 1px;
+        background: #e5e5ea;
+        content: '';
+    }
+
+    .messages-date-separator span {
+        font-size: 0.8rem;
+        color: #a1a1a6;
+        padding: 0 12px;
+        white-space: nowrap;
+    }
+
+    .message-bubble {
+        display: flex;
+        margin-bottom: 2px;
+        animation: fadeInMsg 0.3s ease;
+        align-items: flex-end;
+        gap: 8px;
+    }
+
+    @@keyframes fadeInMsg {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
         }
-    </div>
-</div>
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
+    .message-bubble.received {
+        justify-content: flex-start;
+    }
 
-<div class="mb-4">
-    <form method="get" class="d-flex gap-2">
-        <div style="flex: 1; position: relative;">
-            <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #a1a1a6;"></i>
-            <input type="text" name="search" placeholder="Search messages..." class="form-control" 
-                   style="border: 1.5px solid #e5e5ea; border-radius: 10px; padding: 10px 14px 10px 40px;" />
+    .message-bubble.sent {
+        justify-content: flex-end;
+    }
+
+    .message-bubble-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    /* Hide all message bubble avatars */
+    .message-bubble-avatar {
+        display: none;
+    }
+
+    /* Hide avatars in sent messages */
+    .message-bubble.sent .message-bubble-avatar {
+        display: none;
+    }
+
+    .message-bubble-content {
+        max-width: 55%;
+        word-wrap: break-word;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .message-bubble.sent .message-bubble-content {
+        align-items: flex-end;
+    }
+
+    .message-bubble.received .message-bubble-content {
+        align-items: flex-start;
+    }
+
+    .message-bubble.sent {
+        padding-left: 40px;
+    }
+
+    .message-bubble.received {
+        gap: 8px;
+    }
+
+    .message-text {
+        padding: 12px 16px;
+        border-radius: 18px;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+    }
+
+    .message-bubble.received .message-text {
+        background: #e5e5ea;
+        color: #1d1d1f;
+        border-bottom-left-radius: 4px;
+    }
+
+    .message-bubble.sent .message-text {
+        background: #0066ff;
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .message-time {
+        font-size: 0.75rem;
+        color: #a1a1a6;
+    }
+
+    .message-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .message-status {
+        font-size: 0.75rem;
+        color: #0066ff;
+        font-weight: 600;
+    }
+
+    .message-bubble.received .message-status {
+        display: none;
+    }
+
+    /* ===== INPUT AREA ===== */
+    .chat-input-area {
+        padding: 16px 24px;
+        border-top: 1px solid #e5e5ea;
+        background: white;
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+    }
+
+    .input-form {
+        display: flex;
+        gap: 12px;
+        flex: 1;
+        align-items: flex-end;
+    }
+
+    .message-input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1.5px solid #e5e5ea;
+        border-radius: 24px;
+        font-size: 0.95rem;
+        font-family: inherit;
+        transition: all 0.3s;
+        resize: none;
+        max-height: 100px;
+        min-height: 44px;
+    }
+
+    .message-input:focus {
+        outline: none;
+        border-color: #0066ff;
+        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+    }
+
+    .message-input::placeholder {
+        color: #a1a1a6;
+    }
+
+    .send-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: none;
+        background: #0066ff;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+        font-size: 1rem;
+    }
+
+    .send-btn:hover:not(:disabled) {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+    }
+
+    .send-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-chat {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 40px;
+        text-align: center;
+        background: #f9f9fb;
+    }
+
+    .empty-chat-icon {
+        font-size: 4rem;
+        color: #0066ff;
+        opacity: 0.3;
+        margin-bottom: 20px;
+    }
+
+    .empty-chat-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1d1d1f;
+        margin-bottom: 8px;
+    }
+
+    .empty-chat-text {
+        color: #636366;
+        margin-bottom: 24px;
+        font-size: 0.95rem;
+    }
+
+    /* ===== SCROLLBAR STYLING ===== */
+    .conversations-scroll::-webkit-scrollbar,
+    .messages-area::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .conversations-scroll::-webkit-scrollbar-track,
+    .messages-area::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .conversations-scroll::-webkit-scrollbar-thumb,
+    .messages-area::-webkit-scrollbar-thumb {
+        background: #e5e5ea;
+        border-radius: 3px;
+    }
+
+    .conversations-scroll::-webkit-scrollbar-thumb:hover,
+    .messages-area::-webkit-scrollbar-thumb:hover {
+        background: #d1d1d6;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @@media (max-width: 992px) {
+        .messages-container {
+            flex-direction: column;
+        }
+
+        .conversations-list {
+            width: 100%;
+            max-height: 40vh;
+            border-right: none;
+            border-bottom: 1px solid #e5e5ea;
+        }
+
+        .chat-view {
+            max-height: 60vh;
+        }
+
+        .message-bubble-content {
+            max-width: 75%;
+        }
+    }
+</style>
+
+<div class="messages-container">
+    
+    <div class="conversations-list">
+        <div class="conversations-header">
+            <h2>Messages</h2>
+            <div class="header-actions">
+                <button type="button" class="header-btn" onclick="showNewChatModal()" title="New chat">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary" style="border-radius: 10px; padding: 10px 20px;">
-            Search
-        </button>
-    </form>
-</div>
 
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search conversations..." />
+        </div>
 
-<div class="row g-3">
-    @if (Model.Messages != null && Model.Messages.Count > 0)
+        <div class="conversations-scroll">
+            @if (Model.Conversations != null && Model.Conversations.Count > 0)
+            {
+                @foreach (var kvp in Model.Conversations.OrderByDescending(x => x.Value.LastMessageDate))
+                {
+                    var contactId = kvp.Key;
+                    var (contactName, lastMessageDate, hasUnread, messages, contactPhoto) = kvp.Value;
+                    var isActive = Model.SelectedContactId == contactId;
+                    var lastMessage = messages.FirstOrDefault();
+                    var previewText = lastMessage?.Content?.Length > 50 
+                        ? lastMessage.Content.Substring(0, 50) + "..." 
+                        : lastMessage?.Content ?? "";
+
+                    <a href="?contactId=@contactId" class="conversation-item @(isActive ? "active" : "")" data-contact-id="@contactId">
+                        <img src="@GetAvatarUrl(contactName, contactPhoto)" 
+                             alt="@contactName"
+                             class="conversation-avatar" />
+                        <div class="conversation-content">
+                            <div class="conversation-header-row">
+                                <span class="conversation-name">@contactName</span>
+                                <span class="conversation-time">@GetTimeDisplay(lastMessageDate)</span>
+                                @{
+                                    var unreadCount = messages.Count(m => m.ReceiverId == Model.CurrentUserId && !m.IsRead);
+                                }
+                                @if (unreadCount > 0)
+                                {
+                                    <span class="conversation-unread-badge" data-unread-count="@unreadCount">@(unreadCount > 99 ? "99+" : unreadCount)</span>
+                                }
+                            </div>
+                            <div class="conversation-preview @(hasUnread ? "unread" : "")">
+                                @if (lastMessage?.SenderId == Model.CurrentUserId)
+                                {
+                                    <span>You: </span>
+                                }
+                                @previewText
+                            </div>
+                        </div>
+                    </a>
+                }
+            }
+            else
+            {
+                <div class="empty-conversations">
+                    <i class="fas fa-comments"></i>
+                    <p>No conversations yet</p>
+                    <small style="color: #a1a1a6; margin-top: 8px;">Start a new chat to begin messaging</small>
+                </div>
+            }
+        </div>
+    </div>
+
+    
+    @if (Model.SelectedConversation != null && !string.IsNullOrEmpty(Model.SelectedContactId))
     {
-        @foreach (var message in Model.Messages.OrderByDescending(m => m.SentDate))
-        {
-            <div class="col-12">
-                <a asp-page="Details" asp-route-id="@message.Id" style="text-decoration: none; color: inherit;">
-                    <div class="card" style="border: @(message.IsRead == false ? "2px solid #0066ff" : "1px solid #e5e5ea"); overflow: hidden; cursor: pointer; transition: all 0.3s ease; @(message.IsRead == false ? "" : "opacity: 0.85;")">
-                        <div class="card-body p-0">
-                            <div style="display: flex; align-items: center; gap: 16px; padding: 16px; @(message.IsRead == false ? "" : "background: #f5f5f7;")">
-                                
-                                <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #0066ff, #5e5ce6); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.125rem; flex-shrink: 0;">
-                                    @(string.Join("", message.SenderName?.Split(' ').Select(n => n[0]) ?? new char[] { 'U' }))
-                                </div>
+        <div class="chat-view">
+            
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <img src="@GetAvatarUrl(Model.SelectedContactName ?? "User", Model.SelectedContactPhoto)" 
+                         alt="@Model.SelectedContactName"
+                         class="chat-header-avatar" />
+                    <div class="chat-info">
+                        <h4>@Model.SelectedContactName</h4>
+                        @{
+                            var lastMessageInConversation = Model.SelectedConversation?.OrderByDescending(m => m.SentDate).FirstOrDefault();
+                            var lastMessageTime = lastMessageInConversation?.SentDate;
+                        }
+                        <p id="chatHeaderTime">
+                            @if (lastMessageTime.HasValue)
+                            {
+                                var now = DateTime.Now;
+                                if (lastMessageTime.Value.Date == now.Date)
+                                {
+                                    <text>@lastMessageTime.Value.ToString("HH:mm")</text>
+                                }
+                                else if (lastMessageTime.Value.Date == now.AddDays(-1).Date)
+                                {
+                                    <text>Yesterday @lastMessageTime.Value.ToString("HH:mm")</text>
+                                }
+                                else
+                                {
+                                    <text>@lastMessageTime.Value.ToString("MMM d, HH:mm")</text>
+                                }
+                            }
+                            else
+                            {
+                                <text>Active now</text>
+                            }
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-                                
-                                <div style="flex: 1; min-width: 0;">
-                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;">
-                                        <h5 style="font-weight: @(message.IsRead == false ? "700" : "600"); color: @(message.IsRead == false ? "#1d1d1f" : "#636366"); margin: 0;">@message.SenderName</h5>
-                                        <span style="font-size: 0.875rem; color: #a1a1a6; flex-shrink: 0;">@message.SentDate.ToString("MMM dd, yyyy h:mm tt")</span>
-                                    </div>
-                                    <p style="color: #636366; font-size: 0.875rem; margin: 0; margin-bottom: 4px;">
-                                        <strong>Subject:</strong> Message
-                                    </p>
-                                    <p style="color: @(message.IsRead == false ? "#636366" : "#a1a1a6"); font-size: 0.875rem; margin: 0; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">
-                                        @message.Content
-                                    </p>
-                                </div>
+            
+            <div class="messages-area" id="messagesArea">
+                @{
+                    DateTime? lastDisplayedDate = null;
+                }
+                @foreach (var msg in Model.SelectedConversation.OrderBy(m => m.SentDate))
+                {
+                    var messageDate = msg.SentDate.Date;
+                    if (lastDisplayedDate != messageDate)
+                    {
+                        <div class="messages-date-separator">
+                            <span>@msg.SentDate.ToString("ddd, MMM d")</span>
+                        </div>
+                        lastDisplayedDate = messageDate;
+                    }
 
-                                
-                                <div style="flex-shrink: 0;">
-                                    @if (message.IsRead == false)
+                    var isReceived = msg.SenderId != Model.CurrentUserId;
+                    var senderPhoto = isReceived ? msg.SenderProfilePhoto : Model.CurrentUser?.ProfilePhoto;
+                    
+                    <div class="message-bubble @(isReceived ? "received" : "sent")" data-message-id="@msg.Id" data-sender-id="@msg.SenderId">
+                        @if (isReceived)
+                        {
+                            <img src="@GetAvatarUrl(msg.SenderName ?? "User", senderPhoto)" 
+                                 alt="@msg.SenderName"
+                                 class="message-bubble-avatar" />
+                        }
+                        <div class="message-bubble-content">
+                            <div class="message-text">@msg.Content</div>
+                            <div class="message-footer">
+                                <div class="message-time">@msg.SentDate.ToString("HH:mm")</div>
+                                <span class="message-status">
+                                    @if (msg.IsRead)
                                     {
-                                        <span style="display: inline-block; background: #0066ff; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
-                                            New
-                                        </span>
+                                        <i class="fas fa-check-double"></i>
                                     }
-                                </div>
+                                    else
+                                    {
+                                        <i class="fas fa-check"></i>
+                                    }
+                                </span>
                             </div>
                         </div>
                     </div>
-                </a>
+                }
             </div>
-        }
+
+            
+            <div class="chat-input-area">
+                <form class="input-form" id="messageForm" onsubmit="handleMessageSubmit(event)">
+                    <input type="hidden" id="receiverId" value="@Model.SelectedContactId" />
+                    <textarea class="message-input" id="messageInput" placeholder="Aa" rows="1"></textarea>
+                    <button type="submit" class="send-btn" id="sendBtn" title="Send">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
     }
     else
     {
-        <div class="col-12" style="padding: 40px; text-align: center; color: #a1a1a6;">
-            <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
-            <p>No messages found.</p>
+        <div class="empty-chat">
+            <div class="empty-chat-icon">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h3 class="empty-chat-title">Select a conversation</h3>
+            <p class="empty-chat-text">Choose a conversation from the list or start a new chat</p>
+            <button type="button" class="btn" onclick="showNewChatModal()" 
+                    style="background: #0066ff; color: white; border: none; border-radius: 8px; padding: 10px 24px; font-weight: 600; cursor: pointer;">
+                <i class="fas fa-pencil-alt me-2"></i>Start New Chat
+            </button>
         </div>
     }
 </div>
 
 
-<nav aria-label="Page navigation" style="margin-top: 30px;">
-    <ul class="pagination justify-content-center" style="gap: 4px;">
-        <li class="page-item">
-            <a class="page-link" href="#" style="color: #0066ff; border: 1px solid #e5e5ea; border-radius: 8px; padding: 8px 12px;">
-                <i class="fas fa-chevron-left"></i>
-            </a>
-        </li>
-        <li class="page-item">
-            <a class="page-link active" href="#" style="background: #0066ff; border: 1px solid #0066ff; color: white; border-radius: 8px; padding: 8px 12px;">1</a>
-        </li>
-        <li class="page-item">
-            <a class="page-link" href="#" style="color: #0066ff; border: 1px solid #e5e5ea; border-radius: 8px; padding: 8px 12px;">2</a>
-        </li>
-        <li class="page-item">
-            <a class="page-link" href="#" style="color: #0066ff; border: 1px solid #e5e5ea; border-radius: 8px; padding: 8px 12px;">3</a>
-        </li>
-        <li class="page-item">
-            <a class="page-link" href="#" style="color: #0066ff; border: 1px solid #e5e5ea; border-radius: 8px; padding: 8px 12px;">
-                <i class="fas fa-chevron-right"></i>
-            </a>
-        </li>
-    </ul>
-</nav>
+<div id="newChatModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 12px; padding: 32px; max-width: 400px; width: 90%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);">
+        <h3 style="margin: 0 0 20px 0; font-size: 1.25rem; font-weight: 700; color: #1d1d1f;">Start New Chat</h3>
+        <select id="newChatContact" style="width: 100%; padding: 12px 16px; border: 1.5px solid #e5e5ea; border-radius: 8px; font-size: 0.95rem; font-family: inherit; cursor: pointer; margin-bottom: 24px;">
+            <option value="">-- Select a contact --</option>
+            @if (Model.AvailableContacts != null)
+            {
+                @foreach (var (id, name, type) in Model.AvailableContacts)
+                {
+                    <option value="@id">@name</option>
+                }
+            }
+        </select>
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button type="button" onclick="hideNewChatModal()" style="padding: 10px 20px; border: none; border-radius: 8px; background: #f5f5f7; color: #636366; font-weight: 600; cursor: pointer;">
+                Cancel
+            </button>
+            <button type="button" onclick="startNewChat()" style="padding: 10px 20px; border: none; border-radius: 8px; background: #0066ff; color: white; font-weight: 600; cursor: pointer;">
+                Start Chat
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/messages.js" asp-append-version="true"></script>
+    <script>
+        function showNewChatModal() {
+            document.getElementById('newChatModal').style.display = 'flex';
+        }
+
+        function hideNewChatModal() {
+            document.getElementById('newChatModal').style.display = 'none';
+            document.getElementById('newChatContact').value = '';
+        }
+
+        function startNewChat() {
+            const contactId = document.getElementById('newChatContact').value;
+            if (contactId) {
+                window.location.href = '?contactId=' + contactId;
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('newChatModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideNewChatModal();
+            }
+        });
+
+        // Search conversations
+        document.getElementById('searchInput')?.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            document.querySelectorAll('.conversation-item').forEach(item => {
+                const name = item.querySelector('.conversation-name').textContent.toLowerCase();
+                item.style.display = name.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Handle textarea auto-resize
+        const textarea = document.getElementById('messageInput');
+        if (textarea) {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+            });
+
+            textarea.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('messageForm').dispatchEvent(new Event('submit'));
+                }
+            });
+        }
+
+        function handleMessageSubmit(event) {
+            event.preventDefault();
+            const content = document.getElementById('messageInput').value.trim();
+            if (content && window.messagesHub) {
+                window.messagesHub.sendMessage(content);
+                document.getElementById('messageInput').value = '';
+                document.getElementById('messageInput').style.height = 'auto';
+            }
+        }
+
+        // Mark as read when conversation is loaded
+        const selectedContactId = document.querySelector('[data-contact-id].active')?.getAttribute('data-contact-id');
+        if (selectedContactId && window.messagesHub && window.messagesHub.connection) {
+            const connection = window.messagesHub.connection;
+            if (connection.state === signalR.HubConnectionState.Connected) {
+                connection.invoke('MarkAsRead', selectedContactId)
+                    .then(() => {
+                        console.log('Messages marked as read on page load');
+                        // Update badge after marking as read
+                        if (window.updateUnreadBadge) {
+                            window.updateUnreadBadge();
+                        }
+                    })
+                    .catch(err => console.error('Error marking as read:', err));
+            }
+        }
+
+        // Scroll to bottom of messages when page loads
+        const messagesArea = document.getElementById('messagesArea');
+        if (messagesArea) {
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+            console.log('Scrolled to bottom of messages');
+        }
+    </script>
+}
+
+@functions {
+    private string GetAvatarUrl(string? name, string? profilePhoto)
+    {
+        if (!string.IsNullOrEmpty(profilePhoto))
+        {
+            return profilePhoto;
+        }
+        var encodedName = System.Net.WebUtility.UrlEncode(name ?? "User");
+        return $"https://ui-avatars.com/api/?name={encodedName}&background=random&color=fff";
+    }
+
+    private string GetTimeDisplay(DateTime date)
+    {
+        var now = DateTime.Now;
+        if (date.Date == now.Date)
+            return date.ToString("HH:mm");
+        else if (date.Date == now.AddDays(-1).Date)
+            return "Yesterday";
+        else if (date > now.AddDays(-7))
+            return date.ToString("ddd");
+        else
+            return date.ToString("MMM d");
+    }
+}

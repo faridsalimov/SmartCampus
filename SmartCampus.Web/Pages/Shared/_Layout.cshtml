@@ -84,6 +84,9 @@
     </div>
 
     @await Html.PartialAsync("_ConfirmModal")
+    
+    
+    @await Html.PartialAsync("_AlertModal")
 
     @await Html.PartialAsync("_Toast")
 
@@ -93,8 +96,10 @@
     
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
-    
     <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 
     <script>
         (function () {
@@ -107,80 +112,6 @@
                     window.Toast.show(toastMessage, toastType);
                 }
             });
-
-            // Handle clicks on delete action buttons to populate confirm modal
-            document.addEventListener('click', function (e) {
-                var btn = e.target.closest && e.target.closest('[data-delete-url]');
-                if (!btn) return;
- 
-                var url = btn.getAttribute('data-delete-url');
-                var entityId = btn.getAttribute('data-delete-entity');
-                var message = btn.getAttribute('data-delete-message') || 'Are you sure you want to delete this item?';
- 
-                var modal = document.getElementById('confirmModal');
-                if (!modal) return;
- 
-                var msgEl = modal.querySelector('#confirmModalMessage');
-                if (msgEl) msgEl.textContent = message;
- 
-                var form = modal.querySelector('#confirmModalForm');
-                if (form) {
-                     form.action = url || '#';
- 
-                     // add hidden input for entity id if provided
-                     var existing = form.querySelector('input[name="id"]');
-                     if (existing) existing.value = entityId || '';
-                     else if (entityId) {
-                         var input = document.createElement('input');
-                         input.type = 'hidden';
-                         input.name = 'id';
-                         input.value = entityId;
-                         form.appendChild(input);
-                     }
-                 }
-             }, false);
-
-             // Intercept confirm modal form submit to perform AJAX request
-             document.addEventListener('submit', function (e) {
-                 var form = e.target;
-                 if (form && form.id === 'confirmModalForm') {
-                     e.preventDefault();
-
-                     var action = form.action || '#';
-                     var formData = new FormData(form);
-
-                     // Extract antiforgery token value
-                     var tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
-                     var headers = {};
-                     if (tokenInput) headers['RequestVerificationToken'] = tokenInput.value;
-
-                     fetch(action, {
-                         method: 'POST',
-                         headers: headers,
-                         body: formData,
-                         credentials: 'same-origin'
-                     })
-                     .then(function (response) {
-                         // close modal
-                         var modalEl = document.getElementById('confirmModal');
-                         var modalInstance = bootstrap.Modal.getInstance(modalEl);
-                         if (modalInstance) modalInstance.hide();
-
-                         if (response.ok) {
-                             // show success toast and reload
-                             window.Toast.success('Deleted successfully.');
-                             setTimeout(function () { window.location.reload(); }, 900);
-                         } else {
-                             response.text().then(function (text) {
-                                 window.Toast.error('Error: ' + (text || response.statusText));
-                             });
-                         }
-                     })
-                     .catch(function (err) {
-                         window.Toast.error('Request failed: ' + err);
-                     });
-                 }
-             }, false);
          })();
      </script>
     

@@ -1,29 +1,23 @@
 @page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Groups.DetailsModel
 @{
     ViewData["Title"] = "Group Details";
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = Model.Group?.GroupName ?? "Group",
+        Subtitle = Model.Group?.GroupCode ?? "",
+        IconClass = "fas fa-users",
+        IconColor = "#5e5ce6",
+        GradientStart = "rgba(94, 92, 230, 0.05)",
+        GradientEnd = "rgba(0, 102, 255, 0.05)",
+        BorderColor = "rgba(94, 92, 230, 0.1)"
+    };
 }
 
+<partial name="_PageHeader" model="pageHeader" />
 
-<div style="background: linear-gradient(135deg, rgba(94, 92, 230, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(94, 92, 230, 0.1);">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-                <a asp-page="Index" class="text-decoration-none" style="color: #5e5ce6;">
-                    <i class="fas fa-arrow-left me-2"></i>Groups
-                </a>
-                <span style="color: #a1a1a6;">/</span>
-                <span style="color: #636366;">Details</span>
-            </div>
-            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
-                <i class="fas fa-users me-2" style="color: #5e5ce6;"></i>@(Model.Group?.GroupName ?? "N/A")
-            </h1>
-            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
-                <i class="fas fa-code me-1"></i>@(Model.Group?.GroupCode ?? "N/A")
-            </p>
-        </div>
-    </div>
-</div>
 
 <div class="row">
     
@@ -131,7 +125,7 @@
                                 <tr class="align-middle">
                                     <td>
                                         <div style="display: flex; align-items: center; gap: 8px;">
-                                            <img src="@(string.IsNullOrEmpty(User.FindFirst("ProfilePhoto")?.Value) ? $"https://ui-avatars.com/api/?name={System.Net.WebUtility.UrlEncode(@student.FullName ?? "User")}&background=0066ff&color=fff&size=36&bold=true" : User.FindFirst("ProfilePhoto")?.Value)"
+                                            <img src="@(string.IsNullOrEmpty(User.FindFirst("ProfilePhoto")?.Value) ? $"https://ui-avatars.com/api/?name={System.Net.WebUtility.UrlEncode(@student.FullName ?? "User")}&background=random&color=fff" : User.FindFirst("ProfilePhoto")?.Value)"
                                                  alt="@(student.FullName ?? "Student")"
                                                  style="width: 32px; height: 32px; border-radius: 50%; display: block; object-fit: cover;">
                                             <span>@student.FullName</span>

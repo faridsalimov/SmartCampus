@@ -1,131 +1,281 @@
 @page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Schedule.IndexModel
 @{
     ViewData["Title"] = "Schedule";
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = "Schedule",
+        Subtitle = "Your class schedule and lessons",
+        IconClass = "fas fa-calendar-week",
+        IconColor = "#5e5ce6",
+        GradientStart = "rgba(94, 92, 230, 0.05)",
+        GradientEnd = "rgba(0, 102, 255, 0.05)",
+        BorderColor = "rgba(94, 92, 230, 0.1)"
+    };
+
+    // Prepare calendar data using the CurrentMonth from the model
+    var currentMonth = Model.CurrentMonth;
+    var today = Model.Today;
+    var firstDayOfMonth = new DateTime(currentMonth.Year, currentMonth.Month, 1);
+    var daysInMonth = DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month);
+    var startDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
+
+    // Create list of all days to display (including previous/next month days)
+    var daysToDisplay = new List<DateTime>();
+    
+    // Add previous month days
+    if (startDayOfWeek > 0)
+    {
+        var prevMonthStartDate = firstDayOfMonth.AddDays(-startDayOfWeek);
+        for (int i = 0; i < startDayOfWeek; i++)
+        {
+            daysToDisplay.Add(prevMonthStartDate.AddDays(i));
+        }
+    }
+    
+    // Add current month days
+    for (int i = 1; i <= daysInMonth; i++)
+    {
+        daysToDisplay.Add(new DateTime(currentMonth.Year, currentMonth.Month, i));
+    }
+    
+    // Add next month days to fill grid
+    var remainingDays = 42 - daysToDisplay.Count;
+    for (int i = 1; i <= remainingDays; i++)
+    {
+        daysToDisplay.Add(firstDayOfMonth.AddMonths(1).AddDays(i - 1));
+    }
+
+    // Function to get lessons for a specific day
+    Func<DateTime, List<SmartCampus.Web.Pages.Schedule.IndexModel.LessonVM>> getLessonsForDay = (date) =>
+    {
+        if (Model.GroupedLessons.TryGetValue(date.Date, out var lessons))
+        {
+            return lessons.ToList();
+        }
+        return new List<SmartCampus.Web.Pages.Schedule.IndexModel.LessonVM>();
+    };
+
+    var prevMonth = currentMonth.AddMonths(-1);
+    var nextMonth = currentMonth.AddMonths(1);
 }
 
+<partial name="_PageHeader" model="pageHeader" />
 
-<div style="background: linear-gradient(135deg, #5e5ce6 0%, #0066ff 100%); border-radius: 16px; padding: 40px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(94, 92, 230, 0.2);">
-    <div style="position: relative; z-index: 1;">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1 style="font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 12px; margin: 0 0 12px 0;">
-                    <i class="fas fa-calendar-week me-3"></i>Schedule
-                </h1>
-                <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 1.05rem;">
-                    <i class="fas fa-info-circle me-2"></i>Your class schedule and lessons
-                </p>
+<div class="row">
+    <div class="col-lg-8">
+        
+        <div class="card border-0 mb-4" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); overflow: hidden;">
+            
+            <div style="background: linear-gradient(135deg, #5e5ce6, #0066ff); padding: 32px 24px; color: white; text-align: center;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <a href="@Url.Page("Index", new { year = prevMonth.Year, month = prevMonth.Month })" class="btn" style="background: rgba(255,255,255,0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; transition: all 0.3s; text-decoration: none;">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    <div>
+                        <h2 style="margin: 0; font-weight: 700; font-size: 1.8rem;">@currentMonth.ToString("MMMM yyyy")</h2>
+                    </div>
+                    <a href="@Url.Page("Index", new { year = nextMonth.Year, month = nextMonth.Month })" class="btn" style="background: rgba(255,255,255,0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; transition: all 0.3s; text-decoration: none;">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
             </div>
-            <div style="background: rgba(255, 255, 255, 0.2); padding: 16px 24px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.3); color: white; font-weight: 600;">
-                <i class="fas fa-calendar-alt me-2"></i>@DateTime.Now.ToString("MMM dd, yyyy")
+
+            
+            <div style="padding: 24px;">
+                
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 16px;">
+                    @foreach (var dayName in new[] { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" })
+                    {
+                        <div style="text-align: center; font-weight: 700; color: #636366; font-size: 0.85rem; padding: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+                            @dayName
+                        </div>
+                    }
+                </div>
+
+                
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;">
+                    @foreach (var day in daysToDisplay)
+                    {
+                        var dayLessons = getLessonsForDay(day);
+                        var isCurrentMonth = day.Month == currentMonth.Month;
+                        var isToday = day.Date == today.Date;
+                        var hasLessons = dayLessons.Any();
+                        var backgroundColor = isCurrentMonth ? "#ffffff" : "#f9f9fb";
+                        var borderColor = hasLessons ? "#5e5ce6" : (isCurrentMonth ? "#e5e5ea" : "#f0f0f0");
+                        var borderWidth = hasLessons ? "3px" : "1px";
+
+                        <div class="calendar-day" style="
+                            background: @backgroundColor;
+                            border: @borderWidth solid @borderColor;
+                            border-radius: 12px;
+                            padding: 12px 8px;
+                            min-height: 100px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            position: relative;
+                            @(isToday ? "box-shadow: 0 0 0 2px #5e5ce6;" : "")
+                            @(isToday ? "background: linear-gradient(135deg, rgba(94,92,230,0.05), rgba(0,102,255,0.05));" : "")
+                            opacity: @(isCurrentMonth ? "1" : "0.5");
+                        ">
+                            
+                            <div style="
+                                font-weight: 700;
+                                font-size: 1.1rem;
+                                color: @(isToday ? "#5e5ce6" : (isCurrentMonth ? "#1d1d1f" : "#a1a1a6"));
+                                margin-bottom: 8px;
+                                text-align: center;
+                                @(isToday ? "background: #5e5ce6; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;" : "")
+                            ">
+                                @day.Day
+                            </div>
+
+                            
+                            @if (hasLessons)
+                            {
+                                <div style="padding: 8px 0; border-top: 1px solid #e5e5ea;">
+                                    @foreach (var lesson in dayLessons.Take(2))
+                                    {
+                                        <div style="
+                                            font-size: 0.75rem;
+                                            background: linear-gradient(135deg, #5e5ce6, #0066ff);
+                                            color: white;
+                                            padding: 4px 6px;
+                                            border-radius: 4px;
+                                            margin-bottom: 4px;
+                                            white-space: nowrap;
+                                            overflow: hidden;
+                                            text-overflow: ellipsis;
+                                            font-weight: 600;
+                                        " title="@lesson.Title">
+                                            @lesson.LessonDate.ToString("HH:mm") - @lesson.Title
+                                        </div>
+                                    }
+                                    @if (dayLessons.Count > 2)
+                                    {
+                                        <div style="
+                                            font-size: 0.75rem;
+                                            color: #636366;
+                                            padding: 4px 6px;
+                                            text-align: center;
+                                            font-weight: 600;
+                                        ">
+                                            +@(dayLessons.Count - 2) more
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                
+                <div style="display: flex; gap: 24px; margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e5ea; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 20px; height: 20px; border: 3px solid #5e5ce6; border-radius: 4px;"></div>
+                        <span style="font-size: 0.85rem; color: #636366;">Days with classes</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 28px; height: 28px; background: #5e5ce6; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">@today.Day</div>
+                        <span style="font-size: 0.85rem; color: #636366;">Today</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="col-lg-4">
+        <div class="card border-0" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); overflow: hidden;">
+            <div style="background: linear-gradient(135deg, #5e5ce6, #0066ff); padding: 20px; color: white;">
+                <h5 style="margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px; color: white;">
+                    <i class="fas fa-list" style="color: white;"></i>Upcoming Lessons
+                </h5>
+            </div>
+            <div style="padding: 20px;">
+                @if (Model.GroupedLessons != null && Model.GroupedLessons.Any())
+                {
+                    @foreach (var dayGroup in Model.GroupedLessons.OrderBy(x => x.Key).Take(10))
+                    {
+                        @foreach (var lesson in dayGroup.Value)
+                        {
+                            <div style="
+                                padding: 16px;
+                                background: #f9f9fb;
+                                border-left: 4px solid #5e5ce6;
+                                border-radius: 8px;
+                                margin-bottom: 12px;
+                                transition: all 0.3s;
+                            " class="lesson-card-sidebar">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                    <h6 style="margin: 0; font-weight: 700; color: #1d1d1f; font-size: 0.95rem;">
+                                        @lesson.Title
+                                    </h6>
+                                </div>
+                                <div style="font-size: 0.85rem; color: #636366; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                    <i class="fas fa-calendar" style="color: #5e5ce6;"></i>
+                                    <span>@lesson.LessonDate.ToString("MMM dd, yyyy")</span>
+                                </div>
+                                <div style="font-size: 0.85rem; color: #636366; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                    <i class="fas fa-clock" style="color: #5e5ce6;"></i>
+                                    <span>@lesson.LessonDate.ToString("HH:mm")</span>
+                                </div>
+                                <div style="font-size: 0.85rem; color: #636366; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-map-marker" style="color: #ff9500;"></i>
+                                    <span>@lesson.Location</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+                else
+                {
+                    <div style="padding: 24px; text-align: center; color: #a1a1a6;">
+                        <i class="fas fa-calendar-check" style="font-size: 1.8rem; margin-bottom: 8px; opacity: 0.5;"></i>
+                        <p style="margin: 0; font-weight: 600; font-size: 0.9rem;">No lessons in this month</p>
+                    </div>
+                }
             </div>
         </div>
     </div>
 </div>
 
-
-@if (Model.GroupedLessons != null && Model.GroupedLessons.Any())
-{
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 40px;">
-        @foreach (var dayGroup in Model.GroupedLessons)
-        {
-            <div class="schedule-day-card" style="background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); overflow: hidden; transition: all 0.3s;">
-                
-                <div style="background: linear-gradient(135deg, #5e5ce6, #0066ff); padding: 20px; color: white;">
-                    <h3 style="margin: 0 0 6px 0; font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-calendar-day"></i>
-                        @dayGroup.Key.ToString("dddd")
-                    </h3>
-                    <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">
-                        @dayGroup.Key.ToString("MMM dd, yyyy")
-                    </p>
-                </div>
-
-                
-                <div style="padding: 20px; display: flex; flex-direction: column; gap: 12px;">
-                    @if (dayGroup.Value.Any())
-                    {
-                        @foreach (var lesson in dayGroup.Value.OrderBy(l => l.LessonDate.TimeOfDay))
-                        {
-                            <div class="lesson-card" style="background: #f5f5f7; padding: 14px; border-radius: 10px; border-left: 4px solid #5e5ce6; transition: all 0.3s; display: flex; gap: 12px; align-items: flex-start;">
-                                
-                                <div style="background: linear-gradient(135deg, #5e5ce6, #0066ff); color: white; padding: 8px 12px; border-radius: 8px; text-align: center; min-width: 65px; flex-shrink: 0;">
-                                    <div style="font-weight: 700; font-size: 1rem;">@lesson.LessonDate.ToString("HH:mm")</div>
-                                </div>
-
-                                
-                                <div style="flex: 1; min-width: 0;">
-                                    
-                                    <h5 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 700; color: #1d1d1f; word-break: break-word;">
-                                        @lesson.Title
-                                    </h5>
-
-                                    
-                                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-size: 0.85rem; color: #636366;">
-                                        <i class="fas fa-book" style="color: #5e5ce6; width: 14px; flex-shrink: 0;"></i>
-                                        <span style="font-weight: 600;">@lesson.CourseName</span>
-                                    </div>
-
-                                    
-                                    <div style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #636366;">
-                                        <i class="fas fa-map-pin" style="color: #ff9500; width: 14px; flex-shrink: 0;"></i>
-                                        <span>@lesson.Location</span>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <div style="padding: 24px 16px; text-align: center; color: #a1a1a6;">
-                            <i class="fas fa-calendar-check" style="font-size: 1.8rem; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
-                            <p style="margin: 0; font-weight: 600; font-size: 0.9rem;">No classes</p>
-                        </div>
-                    }
-                </div>
-            </div>
-        }
-    </div>
-}
-else
-{
-    
-    <div style="background: white; border-radius: 14px; padding: 60px 40px; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
-        <div style="width: 100px; height: 100px; border-radius: 50%; background: #f5f5f7; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-            <i class="fas fa-calendar-times" style="font-size: 2.5rem; color: #ccc;"></i>
-        </div>
-        <h2 style="font-size: 1.3rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
-            No Schedule Available
-        </h2>
-        <p style="color: #a1a1a6; font-size: 0.95rem; margin: 0;">
-            There are no lessons scheduled for you at this time.
-        </p>
-    </div>
-}
-
 <style>
-    .schedule-day-card {
-        animation: slideUpSchedule 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        opacity: 0;
+    .calendar-day {
+        display: flex;
+        flex-direction: column;
     }
 
-    .schedule-day-card:nth-child(1) { animation-delay: 0s; }
-    .schedule-day-card:nth-child(2) { animation-delay: 0.1s; }
-    .schedule-day-card:nth-child(3) { animation-delay: 0.2s; }
-    .schedule-day-card:nth-child(4) { animation-delay: 0.3s; }
-    .schedule-day-card:nth-child(5) { animation-delay: 0.4s; }
-    .schedule-day-card:nth-child(6) { animation-delay: 0.5s; }
-    .schedule-day-card:nth-child(7) { animation-delay: 0.6s; }
-
-    .schedule-day-card:hover {
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    .calendar-day:hover {
+        box-shadow: 0 8px 24px rgba(94, 92, 230, 0.15) !important;
         transform: translateY(-4px);
     }
 
-    @@keyframes slideUpSchedule {
+    .lesson-card-sidebar:hover {
+        background: white;
+        box-shadow: 0 4px 12px rgba(94, 92, 230, 0.1);
+        transform: translateY(-2px);
+    }
+
+    @@media (max-width: 768px) {
+        div[style*="grid-template-columns: repeat(7"] {
+            grid-template-columns: repeat(7, 1fr) !important;
+            gap: 4px !important;
+        }
+        
+        .calendar-day {
+            min-height: 70px;
+            padding: 8px 4px;
+            font-size: 0.8rem;
+        }
+    }
+
+    @@keyframes fadeInCalendar {
         from {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(10px);
         }
         to {
             opacity: 1;
@@ -133,37 +283,7 @@ else
         }
     }
 
-    .lesson-card {
-        animation: slideInLeft 0.4s ease-out forwards;
-        opacity: 0;
-    }
-
-    .lesson-card:nth-child(1) { animation-delay: 0.1s; }
-    .lesson-card:nth-child(2) { animation-delay: 0.2s; }
-    .lesson-card:nth-child(3) { animation-delay: 0.3s; }
-    .lesson-card:nth-child(4) { animation-delay: 0.4s; }
-    .lesson-card:nth-child(5) { animation-delay: 0.5s; }
-
-    @@keyframes slideInLeft {
-        from {
-            opacity: 0;
-            transform: translateX(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    .lesson-card:hover {
-        background: white;
-        box-shadow: 0 4px 12px rgba(94, 92, 230, 0.1);
-        transform: translateY(-2px);
-    }
-
-    @@media (max-width: 768px) {
-        div[style*="grid-template-columns: repeat(auto-fit"] {
-            grid-template-columns: 1fr !important;
-        }
+    .calendar-day {
+        animation: fadeInCalendar 0.4s ease-out;
     }
 </style>

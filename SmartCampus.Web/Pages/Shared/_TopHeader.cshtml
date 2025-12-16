@@ -21,7 +21,7 @@
                     var userFullName = User.FindFirst("FullName")?.Value ?? User?.Identity?.Name ?? "User";
                     var userProfilePhoto = User.FindFirst("ProfilePhoto")?.Value;
                     var avatarUrl = string.IsNullOrEmpty(userProfilePhoto) 
-                        ? $"https://ui-avatars.com/api/?name={System.Net.WebUtility.UrlEncode(userFullName)}&background=5e5ce6&color=fff&bold=true&size=40"
+                        ? $"https://ui-avatars.com/api/?name={System.Net.WebUtility.UrlEncode(userFullName)}&background=random&color=fff"
                         : userProfilePhoto;
                 }
                 

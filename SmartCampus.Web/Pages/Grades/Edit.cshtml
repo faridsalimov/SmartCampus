@@ -1,8 +1,22 @@
 @page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Grades.EditModel
 @{
     ViewData["Title"] = "Edit Grade";
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = "Edit Grade",
+        Subtitle = "Update student grade and feedback",
+        IconClass = "fas fa-star",
+        IconColor = "#ff9500",
+        GradientStart = "rgba(255, 149, 0, 0.05)",
+        GradientEnd = "rgba(52, 199, 89, 0.05)",
+        BorderColor = "rgba(255, 149, 0, 0.1)"
+    };
 }
+
+<partial name="_PageHeader" model="pageHeader" />
 
 <div class="row">
     <div class="col-md-8">

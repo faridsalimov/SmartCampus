@@ -1,39 +1,41 @@
 @page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Announcements.IndexModel
 @{
     ViewData["Title"] = "Announcements";
-    var canCreate = User.IsInRole("Admin") || User.IsInRole("Teacher");
-    var canEdit = User.IsInRole("Admin") || User.IsInRole("Teacher");
-    var canDelete = User.IsInRole("Admin") || User.IsInRole("Teacher");
+    var canCreate = User.IsInRole("Admin");
+    var canEdit = User.IsInRole("Admin");
+    var canDelete = User.IsInRole("Admin");
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = "Announcements",
+        Subtitle = "Stay updated with the latest news and updates",
+        IconClass = "fas fa-bullhorn",
+        IconColor = "#ff3b30",
+        GradientStart = "rgba(255, 59, 48, 0.05)",
+        GradientEnd = "rgba(255, 149, 0, 0.05)",
+        BorderColor = "rgba(255, 59, 48, 0.1)",
+        Actions = canCreate ? new()
+        {
+            new PageHeaderAction
+            {
+                Label = "New Announcement",
+                Url = Url.Page("Create"),
+                CssClass = "btn-danger",
+                IconClass = "fas fa-plus"
+            }
+        } : new()
+    };
 }
 
-
-<div style="background: linear-gradient(135deg, rgba(255, 59, 48, 0.05) 0%, rgba(255, 149, 0, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(255, 59, 48, 0.1);">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
-                <i class="fas fa-bullhorn me-2" style="color: #ff3b30;"></i>Announcements
-            </h1>
-            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
-                <i class="fas fa-bell me-1"></i>
-                Stay updated with the latest news and updates
-            </p>
-        </div>
-
-        @if (canCreate)
-        {
-            <a asp-page="Create" class="btn btn-danger" style="display:inline-flex; align-items:center; gap:8px;">
-                <i class="fas fa-plus"></i> New Announcement
-            </a>
-        }
-    </div>
-</div>
+<partial name="_PageHeader" model="pageHeader" />
 
 
 <div style="display: grid; gap: 16px;">
     @if (Model.Announcements != null && Model.Announcements.Count > 0)
     {
-        @foreach (var announcement in Model.Announcements.OrderByDescending(a => a.PublishedDate))
+        @foreach (var announcement in Model.Announcements.OrderByDescending(a => a.IsPinned).ThenByDescending(a => a.PublishedDate))
         {
             <div class="card" style="border-left: 4px solid @(announcement.IsPinned == true ? "#ff3b30" : "#0066ff"); overflow: hidden; transition: all 0.3s ease;">
                 <div class="card-body">
@@ -41,15 +43,9 @@
                         <div>
                             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                                 <h4 style="font-weight: 700; color: #1d1d1f; margin: 0;">@announcement.Title</h4>
-                                @if (announcement.IsPinned == true)
-                                {
-                                    <span style="display: inline-block; background: #ff3b30; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase;">
-                                        Pinned
-                                    </span>
-                                }
                             </div>
                             <p style="color: #636366; font-size: 0.875rem; margin: 0;">
-                                Posted by <strong>@announcement.TeacherName</strong>   @announcement.PublishedDate.ToString("MMM dd, yyyy 'at' h:mm tt")
+                                Posted by <strong>@announcement.TeacherName</strong> on @announcement.PublishedDate.ToString("MMM dd, yyyy 'at' h:mm tt")
                             </p>
                         </div>
                         <div style="display: flex; gap: 8px;">
@@ -59,17 +55,14 @@
                     <p style="color: #636366; margin-bottom: 12px; line-height: 1.6;">
                         @announcement.Content
                     </p>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        @if (announcement.IsPinned == true)
-                        {
+                    @if (announcement.IsPinned == true)
+                    {
+                        <div style="display: flex; gap: 8px; align-items: center;">
                             <span style="display: inline-block; background: rgba(255, 59, 48, 0.1); color: #ff3b30; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
                                 <i class="fas fa-thumbtack me-1"></i>Pinned
                             </span>
-                        }
-                        <span style="display: inline-block; background: rgba(0, 102, 255, 0.1); color: #0066ff; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
-                            <i class="fas fa-users me-1"></i>All Students
-                        </span>
-                    </div>
+                        </div>
+                    }
                 </div>
             </div>
         }
@@ -82,14 +75,3 @@
         </div>
     }
 </div>
-
-
-<nav aria-label="Page navigation" style="margin-top: 30px;">
-    <ul class="pagination justify-content-center" style="gap: 4px;">
-        <li class="page-item"><a class="page-link" href="#" style="color: #0066ff; border: 1px solid #e5e5ea; border-radius: 8px; padding: 8px 12px;"><i class="fas fa-chevron-left"></i></a></li>
-        <li class="page-item"><a class="page-link active" href="#" style="background: #0066ff; border: 1px solid #0066ff; color: white; border-radius: 8px; padding: 8px 12px;">1</a></li>
-        <li class="page-item"><a class="page-link" href="#" style="color: #0066ff; border: 1px solid #e5e5ea; border-radius: 8px; padding: 8px 12px;">2</a></li>
-        <li class="page-item"><a class="page-link" href="#" style="color: #0066ff; border: 1px solid #e5e5ea; border-radius: 8px; padding: 8px 12px;">3</a></li>
-        <li class="page-item"><a class="page-link" href="#" style="color: #0066ff; border: 1px solid #e5e5ea; border-radius: 8px; padding: 8px 12px;"><i class="fas fa-chevron-right"></i></a></li>
-    </ul>
-</nav>

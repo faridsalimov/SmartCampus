@@ -30,6 +30,12 @@ namespace SmartCampus.Services.Implementations
             return _mapper.Map<AnnouncementDto>(announcement);
         }
 
+        public async Task<AnnouncementDto?> GetAnnouncementByIdAsNoTrackingAsync(Guid id)
+        {
+            var announcement = await _unitOfWork.AnnouncementRepository.GetByIdAsNoTrackingAsync(id);
+            return _mapper.Map<AnnouncementDto>(announcement);
+        }
+
         public async Task<IEnumerable<AnnouncementDto>> GetAnnouncementsByTeacherAsync(Guid teacherId)
         {
             var announcements = await _unitOfWork.AnnouncementRepository.GetByTeacherIdAsync(teacherId);

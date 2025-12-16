@@ -1,8 +1,22 @@
 @page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Grades.DetailsModel
 @{
     ViewData["Title"] = "Grade Details";
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = Model.Grade?.StudentName ?? "Grade",
+        Subtitle = $"Score: {Model.Grade?.Score}",
+        IconClass = "fas fa-star",
+        IconColor = "#ff9500",
+        GradientStart = "rgba(255, 149, 0, 0.05)",
+        GradientEnd = "rgba(52, 199, 89, 0.05)",
+        BorderColor = "rgba(255, 149, 0, 0.1)"
+    };
 }
+
+<partial name="_PageHeader" model="pageHeader" />
 
 
 <div style="background: linear-gradient(135deg, rgba(94, 92, 230, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(94, 92, 230, 0.1);">
@@ -116,8 +130,7 @@
                         <a asp-page="Edit" asp-route-id="@Model.Grade.Id" class="btn btn-primary" style="border-radius: 8px; background: #5e5ce6; border: none;">
                             <i class="fas fa-edit me-1"></i>Edit
                         </a>
-
-                        <button type="button" class="btn btn-danger" style="border-radius: 8px;" data-bs-toggle="modal" data-bs-target="#confirmModal" data-delete-url="@Url.Page(null, new { handler = "Delete", id = Model.Grade.Id })" data-delete-entity="@Model.Grade.Id">
+                        <button type="button" class="btn btn-danger" style="border-radius: 8px;" data-bs-toggle="modal" data-bs-target="#alertModal" data-alert-action="@Url.Page(null, new { handler = "Delete", id = Model.Grade.Id })" data-alert-message="Are you sure you want to delete this grade? This action cannot be undone.">
                             <i class="fas fa-trash me-1"></i>Delete
                         </button>
                     }

@@ -1,0 +1,99 @@
+
+
+<div class="modal fade" id="@(ViewBag.ModalId ?? "alertModal")" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border: none; border-radius: var(--radius-lg); overflow: hidden;">
+            
+            @{
+                var headerBg = ViewBag.Intent switch
+                {
+                    "warning" => "linear-gradient(135deg, #ff9500, #ff8c00)",
+                    "info" => "linear-gradient(135deg, #0066ff, #0052cc)",
+                    _ => "linear-gradient(135deg, #ff3b30, #e63026)"
+                };
+                var headerColor = ViewBag.Intent switch
+                {
+                    "warning" => "#ff9500",
+                    "info" => "#0066ff",
+                    _ => "#ff3b30"
+                };
+                var iconClass = ViewBag.Intent switch
+                {
+                    "warning" => "fa-exclamation-circle",
+                    "info" => "fa-info-circle",
+                    _ => "fa-trash"
+                };
+            }
+            
+            <div style="background: @headerBg; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <h5 class="modal-title" style="color: white; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas @iconClass"></i>@(ViewBag.Title ?? "Confirm Action")
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            
+            <div class="modal-body" style="padding: 24px;">
+                @if (!string.IsNullOrEmpty(ViewBag.Message))
+                {
+                    <p id="alertMessage" style="margin: 0; color: #636366; line-height: 1.6;">
+                        @Html.Raw(ViewBag.Message)
+                    </p>
+                }
+                else
+                {
+                    <p id="alertMessage" style="margin: 0; color: #636366;">Are you sure you want to perform this action?</p>
+                }
+            </div>
+
+            
+            <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; gap: 8px;">
+                <button type="button" class="btn" data-bs-dismiss="modal" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 8px 16px; border-radius: var(--radius-md); font-weight: 500; cursor: pointer;">
+                    <i class="fas fa-times me-1"></i>@(ViewBag.CancelText ?? "Cancel")
+                </button>
+                <form id="alertForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn" style="background: @headerColor; color: white; border: none; padding: 8px 16px; border-radius: var(--radius-md); font-weight: 500; cursor: pointer;">
+                        <i class="fas fa-check me-1"></i>@(ViewBag.ConfirmText ?? "Confirm")
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const modalId = '@(ViewBag.ModalId ?? "alertModal")';
+        const modal = document.getElementById(modalId);
+        
+        if (modal) {
+            modal.addEventListener('show.bs.modal', function(event) {
+                const trigger = event.relatedTarget;
+                if (!trigger) return;
+
+                // Get data attributes
+                const message = trigger.getAttribute('data-alert-message');
+                const actionUrl = trigger.getAttribute('data-alert-action');
+                const title = trigger.getAttribute('data-alert-title');
+
+                // Update modal content
+                if (message) {
+                    const messageEl = modal.querySelector('#alertMessage');
+                    if (messageEl) messageEl.textContent = message;
+                }
+
+                if (title) {
+                    const titleEl = modal.querySelector('.modal-title');
+                    if (titleEl) titleEl.textContent = title;
+                }
+
+                // Update form action
+                const form = modal.querySelector('#alertForm');
+                if (form && actionUrl) {
+                    form.action = actionUrl;
+                }
+            });
+        }
+    })();
+</script>

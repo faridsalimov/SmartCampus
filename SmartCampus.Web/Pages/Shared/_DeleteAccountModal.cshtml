@@ -1,0 +1,140 @@
+
+
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border: none; border-radius: 14px; overflow: hidden;">
+            
+            <div style="background: linear-gradient(135deg, #ff3b30, #e63026); padding: 24px; display: flex; justify-content: space-between; align-items: center;">
+                <h5 class="modal-title" style="color: white; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 12px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem;"></i>Delete Account
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            
+            <div class="modal-body" style="padding: 28px;">
+                
+                <div style="background: linear-gradient(135deg, rgba(255, 59, 48, 0.05), rgba(255, 107, 99, 0.05)); border-left: 4px solid #ff3b30; padding: 16px; border-radius: 10px; margin-bottom: 24px;">
+                    <h6 style="color: #ff3b30; font-weight: 700; margin: 0 0 8px 0;">
+                        <i class="fas fa-exclamation-circle me-2"></i>This is a permanent action
+                    </h6>
+                    <p style="color: #d70015; margin: 0; font-size: 0.9rem; line-height: 1.6;">
+                        Once you delete your account, there is no going back. Please be certain. All your data including lessons, grades, announcements, and personal information will be permanently removed from our servers.
+                    </p>
+                </div>
+
+                
+                <div style="background: #f5f5f7; padding: 16px; border-radius: 10px; margin-bottom: 24px;">
+                    <h6 style="color: #1d1d1f; font-weight: 700; margin: 0 0 12px 0;">
+                        <i class="fas fa-shield-alt me-2" style="color: #0066ff;"></i>Security Verification
+                    </h6>
+                    <p style="color: #636366; margin: 0 0 12px 0; font-size: 0.9rem;">
+                        To confirm deletion, please type <strong>DELETE MY ACCOUNT</strong> in the box below:
+                    </p>
+                    <input type="text" id="deleteConfirmationInput" placeholder="Type here..." class="form-control" style="border: 2px solid #e5e5ea; border-radius: 8px; padding: 10px 12px;" />
+                    <small style="color: #a1a1a6; display: block; margin-top: 8px;">
+                        <i class="fas fa-info-circle me-1"></i>This text is case-sensitive
+                    </small>
+                </div>
+
+                
+                <div style="background: rgba(255, 149, 0, 0.05); border-left: 4px solid #ff9500; padding: 14px; border-radius: 8px; margin-bottom: 0;">
+                    <p style="color: #ff9500; margin: 0; font-size: 0.875rem;">
+                        <i class="fas fa-lightbulb me-1"></i>
+                        <strong>Tip:</strong> If you're having issues with your account, please contact support first. We may be able to help.
+                    </p>
+                </div>
+            </div>
+
+            
+            <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e5e5ea; display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border: 1.5px solid #e5e5ea; color: #636366; padding: 8px 18px; border-radius: 8px; font-weight: 600; background: white;">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <form id="deleteAccountForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" id="deleteAccountConfirmBtn" disabled class="btn" style="background: linear-gradient(135deg, #ff3b30, #e63026); color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 600; cursor: not-allowed; opacity: 0.6;">
+                        <i class="fas fa-trash-alt me-1"></i>Delete My Account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const modal = document.getElementById('deleteAccountModal');
+        const confirmInput = document.getElementById('deleteConfirmationInput');
+        const confirmBtn = document.getElementById('deleteAccountConfirmBtn');
+        const deleteForm = document.getElementById('deleteAccountForm');
+        const requiredText = 'DELETE MY ACCOUNT';
+
+        if (modal && confirmInput && confirmBtn) {
+            // Enable/disable button based on input
+            confirmInput.addEventListener('input', function() {
+                const isValid = confirmInput.value === requiredText;
+                confirmBtn.disabled = !isValid;
+                
+                if (isValid) {
+                    confirmBtn.style.opacity = '1';
+                    confirmBtn.style.cursor = 'pointer';
+                } else {
+                    confirmBtn.style.opacity = '0.6';
+                    confirmBtn.style.cursor = 'not-allowed';
+                }
+            });
+
+            // Clear input when modal is closed
+            modal.addEventListener('hidden.bs.modal', function() {
+                confirmInput.value = '';
+                confirmBtn.disabled = true;
+                confirmBtn.style.opacity = '0.6';
+                confirmBtn.style.cursor = 'not-allowed';
+            });
+
+            // Set form action from trigger button
+            modal.addEventListener('show.bs.modal', function(event) {
+                const trigger = event.relatedTarget;
+                if (trigger && deleteForm) {
+                    const action = trigger.getAttribute('data-delete-action');
+                    if (action) {
+                        deleteForm.action = action;
+                    }
+                }
+            });
+
+            // Prevent form submission if confirmation is not complete
+            deleteForm.addEventListener('submit', function(e) {
+                if (confirmInput.value !== requiredText) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        }
+    })();
+</script>
+
+<style>
+    #deleteConfirmationInput {
+        transition: all 0.3s ease;
+    }
+
+    #deleteConfirmationInput:focus {
+        border-color: #ff3b30 !important;
+        box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.1) !important;
+    }
+
+    #deleteAccountConfirmBtn {
+        transition: all 0.3s ease;
+    }
+
+    #deleteAccountConfirmBtn:not(:disabled):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 59, 48, 0.4);
+    }
+
+    #deleteAccountConfirmBtn:disabled {
+        pointer-events: none;
+    }
+</style>

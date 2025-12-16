@@ -30,9 +30,10 @@ namespace SmartCampus.Web.Pages.Schedule
             _userManager = userManager;
         }
 
-
         public IDictionary<DateTime, List<LessonVM>> GroupedLessons { get; set; } = new Dictionary<DateTime, List<LessonVM>>();
         public string? UserRole { get; set; }
+        public DateTime CurrentMonth { get; set; }
+        public DateTime Today { get; set; } = DateTime.Now;
 
         public class LessonVM
         {
@@ -44,8 +45,21 @@ namespace SmartCampus.Web.Pages.Schedule
             public string TeacherName { get; set; } = string.Empty;
         }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int? year = null, int? month = null)
         {
+            // Set current month based on parameters
+            var now = DateTime.Now;
+            int selectedYear = year ?? now.Year;
+            int selectedMonth = month ?? now.Month;
+
+            // Validate month
+            if (selectedMonth < 1) selectedMonth = 1;
+            if (selectedMonth > 12) selectedMonth = 12;
+            if (selectedYear < 2000) selectedYear = 2000;
+            if (selectedYear > 2100) selectedYear = 2100;
+
+            CurrentMonth = new DateTime(selectedYear, selectedMonth, 1);
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
                 return;
@@ -82,39 +96,19 @@ namespace SmartCampus.Web.Pages.Schedule
                     lessons = await _lessonService.GetAllLessonsAsync();
                 }
 
+                // Get all lessons for the selected month
+                var monthStart = new DateTime(selectedYear, selectedMonth, 1);
+                var monthEnd = monthStart.AddMonths(1).AddDays(-1);
 
-
-                var futuresLessons = lessons
-                    .Where(l => l.LessonDate >= DateTime.Now.Date)
+                var monthLessons = lessons
+                    .Where(l => l.LessonDate.Date >= monthStart && l.LessonDate.Date <= monthEnd)
                     .OrderBy(l => l.LessonDate)
                     .ToList();
 
-
-                if (!futuresLessons.Any())
-                {
-                    var sevenDaysAgo = DateTime.Now.AddDays(-7).Date;
-                    futuresLessons = lessons
-                        .Where(l => l.LessonDate >= sevenDaysAgo)
-                        .OrderBy(l => l.LessonDate)
-                        .Take(14)
-                        .ToList();
-                }
-
-
-                if (!futuresLessons.Any())
-                {
-                    futuresLessons = lessons
-                        .OrderByDescending(l => l.LessonDate)
-                        .Take(14)
-                        .OrderBy(l => l.LessonDate)
-                        .ToList();
-                }
-
-
-                var groupedByDay = futuresLessons
+                // Group by day
+                var groupedByDay = monthLessons
                     .GroupBy(l => l.LessonDate.Date)
-                    .OrderBy(g => g.Key)
-                    .Take(7);
+                    .OrderBy(g => g.Key);
 
                 foreach (var dayGroup in groupedByDay)
                 {

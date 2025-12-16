@@ -647,7 +647,6 @@ namespace SmartCampus.Web.Pages
                 new() { Label = "Create Teacher", Icon = "fas fa-chalkboard-user", Url = "/Teachers/Create", Color = "warning" },
                 new() { Label = "Create Course", Icon = "fas fa-book", Url = "/Courses/Create", Color = "info" },
                 new() { Label = "Manage Groups", Icon = "fas fa-users", Url = "/Groups", Color = "primary" },
-                new() { Label = "View Reports", Icon = "fas fa-chart-bar", Url = "/Reports", Color = "danger" }
             };
         }
 

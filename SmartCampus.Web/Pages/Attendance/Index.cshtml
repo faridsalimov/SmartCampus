@@ -1,51 +1,35 @@
 @page
+@using SmartCampus.Web.Pages.Shared
 @model SmartCampus.Web.Pages.Attendance.IndexModel
 @{
     ViewData["Title"] = "Attendance";
     var canCreate = User.IsInRole("Admin") || User.IsInRole("Teacher");
     var canEdit = User.IsInRole("Admin") || User.IsInRole("Teacher");
     var canDelete = User.IsInRole("Admin") || User.IsInRole("Teacher");
+
+    var pageHeader = new PageHeaderModel
+    {
+        Title = "Attendance",
+        Subtitle = "Track your class attendance and participation",
+        IconClass = "fas fa-clipboard-check",
+        IconColor = "#34c759",
+        GradientStart = "rgba(52, 199, 89, 0.05)",
+        GradientEnd = "rgba(94, 92, 230, 0.05)",
+        BorderColor = "rgba(52, 199, 89, 0.1)",
+        Actions = canCreate ? new()
+        {
+            new PageHeaderAction
+            {
+                Label = "Mark Attendance",
+                Url = Url.Page("Create"),
+                CssClass = "btn-success",
+                IconClass = "fas fa-plus"
+            }
+        } : new()
+    };
 }
 
-
-<div style="background: linear-gradient(135deg, rgba(52, 199, 89, 0.05) 0%, rgba(94, 92, 230, 0.05) 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(52, 199, 89, 0.1);">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 style="font-size: 2rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">
-                <i class="fas fa-clipboard-check me-2" style="color: #34c759;"></i>Attendance
-            </h1>
-            <p style="color: #636366; margin-bottom: 0; font-size: 0.95rem;">
-                <i class="fas fa-calendar-alt me-1"></i>
-                Track your class attendance and participation
-            </p>
-        </div>
-        @if (canCreate)
-        {
-            <a asp-page="Create" class="btn btn-success" style="display:inline-flex; align-items:center; gap:8px;">
-                <i class="fas fa-plus"></i> Mark Attendance
-            </a>
-        }
-    </div>
-</div>
-
-
-<div class="row mb-4">
-    <div class="col-12">
-        <form method="get" class="d-flex gap-2 flex-wrap align-items-end">
-            <div>
-                <label class="form-label">From Date</label>
-                <input type="date" name="fromDate" class="form-control" style="border: 1.5px solid #e5e5ea; border-radius: 10px; padding: 10px 14px;" />
-            </div>
-            <div>
-                <label class="form-label">To Date</label>
-                <input type="date" name="toDate" class="form-control" style="border: 1.5px solid #e5e5ea; border-radius: 10px; padding: 10px 14px;" />
-            </div>
-            <button type="submit" class="btn btn-primary" style="border-radius: 10px; padding: 10px 20px;">
-                <i class="fas fa-filter me-2"></i>Filter
-            </button>
-        </form>
-    </div>
-</div>
+<partial name="_PageHeader" model="pageHeader" />
 
 
 <div class="row g-3 mb-4">

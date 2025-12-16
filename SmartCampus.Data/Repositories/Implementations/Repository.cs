@@ -30,6 +30,11 @@ namespace SmartCampus.Data.Repositories.Implementations
             return await DbSet.FindAsync(id);
         }
 
+        public virtual async Task<TEntity?> GetByIdAsNoTrackingAsync(Guid id)
+        {
+            return await DbSet.AsNoTracking().FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id);
+        }
+
         public virtual async Task<IEnumerable<TEntity>> FindAsync(Func<TEntity, bool> predicate)
         {
 
