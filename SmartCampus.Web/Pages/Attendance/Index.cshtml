@@ -1,11 +1,10 @@
 @page
+@using Microsoft.AspNetCore.Authorization
 @using SmartCampus.Web.Pages.Shared
+@attribute [Authorize(Roles = "Student")]
 @model SmartCampus.Web.Pages.Attendance.IndexModel
 @{
     ViewData["Title"] = "Attendance";
-    var canCreate = User.IsInRole("Admin") || User.IsInRole("Teacher");
-    var canEdit = User.IsInRole("Admin") || User.IsInRole("Teacher");
-    var canDelete = User.IsInRole("Admin") || User.IsInRole("Teacher");
 
     var pageHeader = new PageHeaderModel
     {
@@ -16,16 +15,6 @@
         GradientStart = "rgba(52, 199, 89, 0.05)",
         GradientEnd = "rgba(94, 92, 230, 0.05)",
         BorderColor = "rgba(52, 199, 89, 0.1)",
-        Actions = canCreate ? new()
-        {
-            new PageHeaderAction
-            {
-                Label = "Mark Attendance",
-                Url = Url.Page("Create"),
-                CssClass = "btn-success",
-                IconClass = "fas fa-plus"
-            }
-        } : new()
     };
 }
 
@@ -109,18 +98,17 @@
             <table class="table table-hover" style="margin-bottom: 0;">
                 <thead style="background: #f5f5f7; border-bottom: 2px solid #e5e5ea;">
                     <tr>
-                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Student</th>
+                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Teacher</th>
                         <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Lesson</th>
                         <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Status</th>
                         <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Date</th>
-                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var record in Model.AttendanceRecords.OrderByDescending(r => r.AttendanceDate))
                     {
                         <tr style="border-bottom: 1px solid #e5e5ea;">
-                            <td style="padding: 16px; color: #1d1d1f;">@record.StudentName</td>
+                            <td style="padding: 16px; color: #1d1d1f;">@record.TeacherName</td>
                             <td style="padding: 16px; color: #1d1d1f;">@record.LessonTitle</td>
                             <td style="padding: 16px;">
                                 @if (record.Status == "Present")
@@ -149,11 +137,6 @@
                                 }
                             </td>
                             <td style="padding: 16px; color: #636366;">@record.AttendanceDate.ToString("dd MMM yyyy")</td>
-                            <td style="padding: 16px;">
-                                <div style="display: flex; gap: 8px;">
-                                    @await Html.PartialAsync("_ActionButtons", new { CanView = false, CanEdit = canEdit, CanDelete = canDelete, ViewUrl = "", EditUrl = Url.Page("Edit", new { id = record.Id }), DeleteUrl = Url.Page("Index", new { handler = "Delete", id = record.Id }), EntityId = record.Id })
-                                </div>
-                            </td>
                         </tr>
                     }
                 </tbody>
@@ -163,7 +146,7 @@
     else
     {
         <div style="padding: 40px; text-align: center; color: #a1a1a6;">
-            <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+            <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px;"></i>
             <p>No attendance records found.</p>
         </div>
     }

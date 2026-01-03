@@ -3,9 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmartCampus.Data.Entities
 {
-
-
-
     public class Lesson
     {
         [Key]
@@ -39,11 +36,17 @@ namespace SmartCampus.Data.Entities
 
         public bool IsCompleted { get; set; } = false;
 
+        public bool IsActive { get; set; } = false;
+
+        public DateTime? SessionStartTime { get; set; }
+
+        public DateTime? SessionEndTime { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
 
-
         public virtual ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
         public virtual ICollection<AttendanceRecord> AttendanceRecords { get; set; } = new List<AttendanceRecord>();
+        public virtual ICollection<Grade> Grades { get; set; } = new List<Grade>();
     }
 }

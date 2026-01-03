@@ -30,14 +30,11 @@ namespace SmartCampus.Web.Hubs
 
             try
             {
-                // Send message via service
                 var messageDto = await _messageService.SendMessageAsync(senderId, receiverId, content);
 
-                // Get sender and receiver info
                 var sender = await _userManager.FindByIdAsync(senderId);
                 var receiver = await _userManager.FindByIdAsync(receiverId);
 
-                // Message object for both clients
                 var messageObj = new
                 {
                     messageDto.Id,
@@ -49,20 +46,15 @@ namespace SmartCampus.Web.Hubs
                     messageDto.IsRead
                 };
 
-                // Send to receiver
                 await Clients.User(receiverId).SendAsync("ReceiveMessage", messageObj);
 
-                // Confirm to sender
                 await Clients.Caller.SendAsync("MessageSent", messageObj);
 
-                // Broadcast conversation update to both users
                 var now = DateTime.Now;
                 var preview = content.Length > 50 ? content.Substring(0, 50) + "..." : content;
 
-                // Get unread count for receiver
                 var unreadCountReceiver = await _messageService.GetUnreadMessageCountAsync(receiverId);
 
-                // Update receiver's conversation list
                 await Clients.User(receiverId).SendAsync("UpdateConversation", new
                 {
                     contactId = senderId,
@@ -75,7 +67,15 @@ namespace SmartCampus.Web.Hubs
                     unreadCount = unreadCountReceiver
                 });
 
-                // Update sender's conversation list
+                await Clients.User(receiverId).SendAsync("NewMessageNotification", new
+                {
+                    senderId = senderId,
+                    senderName = sender?.FullName ?? "Unknown",
+                    senderProfilePhoto = sender?.ProfilePhoto,
+                    messagePreview = preview,
+                    totalUnreadCount = unreadCountReceiver
+                });
+
                 await Clients.Caller.SendAsync("UpdateConversation", new
                 {
                     contactId = receiverId,
@@ -102,7 +102,6 @@ namespace SmartCampus.Web.Hubs
 
             try
             {
-                // Mark all messages as read
                 var messages = await _messageService.GetConversationAsync(userId, senderId);
                 var messagesToMark = messages.Where(m => m.ReceiverId == userId && !m.IsRead).ToList();
                 
@@ -111,10 +110,8 @@ namespace SmartCampus.Web.Hubs
                     await _messageService.MarkAsReadAsync(msg.Id);
                 }
 
-                // Get updated unread count for both users
                 var totalUnreadCount = await _messageService.GetUnreadMessageCountAsync(userId);
 
-                // Notify sender that messages are read with message IDs
                 var messageIds = messagesToMark.Select(m => m.Id).ToList();
                 await Clients.User(senderId).SendAsync("MessagesRead", new
                 {
@@ -124,16 +121,40 @@ namespace SmartCampus.Web.Hubs
                     totalUnreadCount = totalUnreadCount
                 });
 
-                // Update conversation UI for current user
                 await Clients.Caller.SendAsync("UpdateConversationUnreadCount", new
                 {
                     contactId = senderId,
                     unreadCount = 0
                 });
+
+                await Clients.User(userId).SendAsync("UnreadCountUpdated", new
+                {
+                    totalUnreadCount = totalUnreadCount
+                });
             }
             catch (Exception ex)
             {
                 await Clients.Caller.SendAsync("Error", $"Error marking messages as read: {ex.Message}");
+            }
+        }
+
+        public async Task GetUnreadCount()
+        {
+            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return;
+
+            try
+            {
+                var totalUnreadCount = await _messageService.GetUnreadMessageCountAsync(userId);
+                await Clients.Caller.SendAsync("UnreadCountUpdated", new
+                {
+                    totalUnreadCount = totalUnreadCount
+                });
+            }
+            catch (Exception ex)
+            {
+                await Clients.Caller.SendAsync("Error", $"Error getting unread count: {ex.Message}");
             }
         }
 
@@ -143,8 +164,14 @@ namespace SmartCampus.Web.Hubs
             if (!string.IsNullOrEmpty(userId))
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"user-{userId}");
-                // Notify others that user is online
                 await Clients.All.SendAsync("UserOnline", userId);
+
+                var totalUnreadCount = await _messageService.GetUnreadMessageCountAsync(userId);
+
+                await Clients.Caller.SendAsync("UnreadCountUpdated", new
+                {
+                    totalUnreadCount = totalUnreadCount
+                });
             }
             await base.OnConnectedAsync();
         }
@@ -154,7 +181,6 @@ namespace SmartCampus.Web.Hubs
             var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrEmpty(userId))
             {
-                // Notify others that user is offline
                 await Clients.All.SendAsync("UserOffline", userId);
             }
             await base.OnDisconnectedAsync(exception);

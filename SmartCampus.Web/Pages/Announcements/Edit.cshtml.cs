@@ -86,7 +86,6 @@ namespace SmartCampus.Web.Pages.Announcements
                     return Page();
                 }
 
-                // Verify the announcement exists (use untracked to avoid conflicts)
                 var existingAnnouncement = await _announcementService.GetAnnouncementByIdAsNoTrackingAsync(Announcement.Id);
                 if (existingAnnouncement == null)
                 {
@@ -94,7 +93,6 @@ namespace SmartCampus.Web.Pages.Announcements
                     return NotFound();
                 }
 
-                // Preserve certain fields that shouldn't change
                 Announcement.PublishedDate = existingAnnouncement.PublishedDate;
                 Announcement.IsPublished = existingAnnouncement.IsPublished;
                 Announcement.TeacherId = existingAnnouncement.TeacherId;

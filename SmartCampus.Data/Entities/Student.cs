@@ -12,10 +12,6 @@ namespace SmartCampus.Data.Entities
         public Guid Id { get; set; }
 
         [Required]
-        [StringLength(100)]
-        public string StudentId { get; set; } = string.Empty;
-
-        [Required]
         public string ApplicationUserId { get; set; } = string.Empty;
 
         [ForeignKey(nameof(ApplicationUserId))]

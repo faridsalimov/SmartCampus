@@ -71,7 +71,6 @@
         const requiredText = 'DELETE MY ACCOUNT';
 
         if (modal && confirmInput && confirmBtn) {
-            // Enable/disable button based on input
             confirmInput.addEventListener('input', function() {
                 const isValid = confirmInput.value === requiredText;
                 confirmBtn.disabled = !isValid;
@@ -85,7 +84,6 @@
                 }
             });
 
-            // Clear input when modal is closed
             modal.addEventListener('hidden.bs.modal', function() {
                 confirmInput.value = '';
                 confirmBtn.disabled = true;
@@ -93,7 +91,6 @@
                 confirmBtn.style.cursor = 'not-allowed';
             });
 
-            // Set form action from trigger button
             modal.addEventListener('show.bs.modal', function(event) {
                 const trigger = event.relatedTarget;
                 if (trigger && deleteForm) {
@@ -104,7 +101,6 @@
                 }
             });
 
-            // Prevent form submission if confirmation is not complete
             deleteForm.addEventListener('submit', function(e) {
                 if (confirmInput.value !== requiredText) {
                     e.preventDefault();

@@ -72,12 +72,10 @@
                 const trigger = event.relatedTarget;
                 if (!trigger) return;
 
-                // Get data attributes
                 const message = trigger.getAttribute('data-alert-message');
                 const actionUrl = trigger.getAttribute('data-alert-action');
                 const title = trigger.getAttribute('data-alert-title');
 
-                // Update modal content
                 if (message) {
                     const messageEl = modal.querySelector('#alertMessage');
                     if (messageEl) messageEl.textContent = message;
@@ -88,7 +86,6 @@
                     if (titleEl) titleEl.textContent = title;
                 }
 
-                // Update form action
                 const form = modal.querySelector('#alertForm');
                 if (form && actionUrl) {
                     form.action = actionUrl;

@@ -31,22 +31,21 @@ namespace SmartCampus.Web.Pages.Messages
             _userManager = userManager;
         }
 
-        // Conversations grouped by contact
-        public Dictionary<string, (string ContactName, DateTime LastMessageDate, bool HasUnread, List<MessageDto> Messages, string? ContactProfilePhoto)> Conversations { get; set; }
+        public Dictionary<string, (string ContactName, DateTime LastMessageDate, bool HasUnread, int UnreadCount, List<MessageDto> Messages, string? ContactProfilePhoto)> Conversations { get; set; }
             = new();
 
-        // Current chat
         public string? SelectedContactId { get; set; }
         public string? SelectedContactName { get; set; }
         public string? SelectedContactPhoto { get; set; }
         public List<MessageDto>? SelectedConversation { get; set; }
 
-        // Available contacts for new messages
         public IList<(string Id, string Name, string Type)> AvailableContacts { get; set; }
             = new List<(string, string, string)>();
 
         public string? CurrentUserId { get; set; }
         public ApplicationUser? CurrentUser { get; set; }
+        public int TotalUnreadCount { get; set; }
+        public Dictionary<string, int> UnreadCountsByContact { get; set; } = new();
 
         public async Task OnGetAsync(string? contactId = null)
         {
@@ -57,16 +56,16 @@ namespace SmartCampus.Web.Pages.Messages
             CurrentUserId = user.Id;
             CurrentUser = user;
 
-            // Load available contacts
             await LoadAvailableContacts();
 
-            // Load all messages for this user
+            UnreadCountsByContact = await _messageService.GetUnreadCountsByContactAsync(CurrentUserId);
+            TotalUnreadCount = UnreadCountsByContact.Values.Sum();
+
             var allMessages = await _messageService.GetAllMessagesAsync();
             var userMessages = allMessages
-                .Where(m => m.SenderId == CurrentUserId || m.ReceiverId == CurrentUserId)
+                .Where(m => (m.SenderId == CurrentUserId || m.ReceiverId == CurrentUserId) && !m.IsDeleted)
                 .ToList();
 
-            // Group conversations by contact
             var conversationGroups = userMessages
                 .GroupBy(m => m.SenderId == CurrentUserId ? m.ReceiverId : m.SenderId)
                 .ToDictionary(
@@ -74,38 +73,35 @@ namespace SmartCampus.Web.Pages.Messages
                     g => g.OrderByDescending(m => m.SentDate).ToList()
                 );
 
-            // Build conversations dictionary
             foreach (var contactIdKey in conversationGroups.Keys)
             {
                 var messages = conversationGroups[contactIdKey];
                 var lastMessage = messages.First();
                 var contactName = lastMessage.SenderId == CurrentUserId ? lastMessage.ReceiverName : lastMessage.SenderName;
                 var contactPhoto = lastMessage.SenderId == CurrentUserId ? lastMessage.ReceiverProfilePhoto : lastMessage.SenderProfilePhoto;
-                var hasUnread = messages.Any(m => m.ReceiverId == CurrentUserId && !m.IsRead);
+                var unreadCount = UnreadCountsByContact.ContainsKey(contactIdKey) ? UnreadCountsByContact[contactIdKey] : 0;
+                var hasUnread = unreadCount > 0;
 
-                Conversations[contactIdKey] = (contactName, lastMessage.SentDate, hasUnread, messages, contactPhoto);
+                Conversations[contactIdKey] = (contactName, lastMessage.SentDate, hasUnread, unreadCount, messages, contactPhoto);
             }
 
-            // Load selected conversation
             if (!string.IsNullOrEmpty(contactId))
             {
                 if (Conversations.ContainsKey(contactId))
                 {
                     SelectedContactId = contactId;
-                    var (name, _, _, messages, photo) = Conversations[contactId];
+                    var (name, _, _, unreadCount, messages, photo) = Conversations[contactId];
                     SelectedContactName = name;
                     SelectedContactPhoto = photo;
                     SelectedConversation = messages.OrderBy(m => m.SentDate).ToList();
 
-                    // Mark as read
-                    foreach (var msg in messages.Where(m => m.ReceiverId == CurrentUserId && !m.IsRead))
-                    {
-                        await _messageService.MarkAsReadAsync(msg.Id);
-                    }
+                    await _messageService.MarkConversationAsReadAsync(CurrentUserId, contactId);
+                    
+                    UnreadCountsByContact[contactId] = 0;
+                    TotalUnreadCount -= unreadCount;
                 }
                 else
                 {
-                    // New conversation
                     var contact = AvailableContacts.FirstOrDefault(c => c.Id == contactId);
                     if (contact != default)
                     {
@@ -144,6 +140,43 @@ namespace SmartCampus.Web.Pages.Messages
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading contacts: {ex.Message}");
+            }
+        }
+
+        public async Task<IActionResult> OnPostSendMessageAsync(string receiverId, string content)
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                    return Unauthorized();
+
+                if (string.IsNullOrWhiteSpace(content))
+                    return new JsonResult(new { success = false, message = "Message content cannot be empty." });
+
+                var messageDto = await _messageService.SendMessageAsync(user.Id, receiverId, content);
+                return new JsonResult(new { success = true, message = messageDto });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { success = false, message = ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> OnGetUnreadCountAsync()
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                    return Unauthorized();
+
+                var unreadCount = await _messageService.GetUnreadMessageCountAsync(user.Id);
+                return new JsonResult(new { unreadCount });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { error = ex.Message });
             }
         }
     }

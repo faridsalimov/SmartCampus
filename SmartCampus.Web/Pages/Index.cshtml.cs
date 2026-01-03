@@ -330,8 +330,7 @@ namespace SmartCampus.Web.Pages
                         .Select(s => new StudentSummaryVM
                         {
                             StudentId = s.Id,
-                            FullName = s.FullName,
-                            StudentId_Number = s.StudentId
+                            FullName = s.FullName
                         })
                         .ToList();
                 }

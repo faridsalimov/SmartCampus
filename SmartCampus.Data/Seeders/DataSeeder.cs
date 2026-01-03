@@ -123,24 +123,20 @@ namespace SmartCampus.Data.Seeders
 
             var teacherEmails = new[]
             {
-                ("james.smith@smartcampus.com", "James Smith", "T001", "Computer Science", "Software Engineering"),
-                ("robert.johnson@smartcampus.com", "Robert Johnson", "T002", "Mathematics", "Calculus & Linear Algebra"),
-                ("sarah.williams@smartcampus.com", "Sarah Williams", "T003", "English", "English Literature"),
-                ("michael.brown@smartcampus.com", "Michael Brown", "T004", "Physics", "Modern Physics"),
-                ("emma.davis@smartcampus.com", "Emma Davis", "T005", "Chemistry", "Organic Chemistry"),
-                ("david.wilson@smartcampus.com", "David Wilson", "T006", "History", "World History"),
-                ("jessica.taylor@smartcampus.com", "Jessica Taylor", "T007", "Art", "Contemporary Art"),
-                ("christopher.anderson@smartcampus.com", "Christopher Anderson", "T008", "Physical Education", "Sports Science"),
+                ("james.smith@smartcampus.com", "James Smith", "Computer Science", "Software Engineering"),
+                ("robert.johnson@smartcampus.com", "Robert Johnson", "Mathematics", "Calculus & Linear Algebra"),
+                ("sarah.williams@smartcampus.com", "Sarah Williams", "English", "English Literature"),
+                ("michael.brown@smartcampus.com", "Michael Brown", "Physics", "Modern Physics"),
+                ("emma.davis@smartcampus.com", "Emma Davis", "Chemistry", "Organic Chemistry"),
+                ("david.wilson@smartcampus.com", "David Wilson", "History", "World History"),
+                ("jessica.taylor@smartcampus.com", "Jessica Taylor", "Art", "Contemporary Art"),
+                ("christopher.anderson@smartcampus.com", "Christopher Anderson", "Physical Education", "Sports Science"),
             };
 
             var teachersToAdd = new List<Teacher>();
 
-            foreach (var (email, fullName, teacherId, department, specialization) in teacherEmails)
+            foreach (var (email, fullName, department, specialization) in teacherEmails)
             {
-                var teacherIdExists = await _context.Teachers.AnyAsync(t => t.TeacherId == teacherId);
-                if (teacherIdExists)
-                    continue;
-
                 var teacherUser = await _userManager.FindByEmailAsync(email);
                 if (teacherUser == null)
                 {
@@ -164,7 +160,6 @@ namespace SmartCampus.Data.Seeders
                         var teacherEntity = new Teacher
                         {
                             Id = Guid.NewGuid(),
-                            TeacherId = teacherId,
                             ApplicationUserId = teacher.Id,
                             Department = department,
                             Specialization = specialization,
@@ -182,7 +177,6 @@ namespace SmartCampus.Data.Seeders
                         var teacherEntity = new Teacher
                         {
                             Id = Guid.NewGuid(),
-                            TeacherId = teacherId,
                             ApplicationUserId = teacherUser.Id,
                             Department = department,
                             Specialization = specialization,
@@ -203,25 +197,25 @@ namespace SmartCampus.Data.Seeders
 
             var studentEmails = new[]
             {
-                ("john.davis@smartcampus.com", "John Davis", "S001"),
-                ("emma.miller@smartcampus.com", "Emma Miller", "S002"),
-                ("oliver.wilson@smartcampus.com", "Oliver Wilson", "S003"),
-                ("sophia.moore@smartcampus.com", "Sophia Moore", "S004"),
-                ("liam.taylor@smartcampus.com", "Liam Taylor", "S005"),
-                ("ava.anderson@smartcampus.com", "Ava Anderson", "S006"),
-                ("noah.thomas@smartcampus.com", "Noah Thomas", "S007"),
-                ("isabella.jackson@smartcampus.com", "Isabella Jackson", "S008"),
-                ("lucas.white@smartcampus.com", "Lucas White", "S009"),
-                ("mia.harris@smartcampus.com", "Mia Harris", "S010"),
-                ("mason.martin@smartcampus.com", "Mason Martin", "S011"),
-                ("charlotte.garcia@smartcampus.com", "Charlotte Garcia", "S012"),
-                ("ethan.rodriguez@smartcampus.com", "Ethan Rodriguez", "S013"),
-                ("amelia.lee@smartcampus.com", "Amelia Lee", "S014"),
-                ("logan.perez@smartcampus.com", "Logan Perez", "S015"),
-                ("harper.thompson@smartcampus.com", "Harper Thompson", "S016"),
+                ("john.davis@smartcampus.com", "John Davis"),
+                ("emma.miller@smartcampus.com", "Emma Miller"),
+                ("oliver.wilson@smartcampus.com", "Oliver Wilson"),
+                ("sophia.moore@smartcampus.com", "Sophia Moore"),
+                ("liam.taylor@smartcampus.com", "Liam Taylor"),
+                ("ava.anderson@smartcampus.com", "Ava Anderson"),
+                ("noah.thomas@smartcampus.com", "Noah Thomas"),
+                ("isabella.jackson@smartcampus.com", "Isabella Jackson"),
+                ("lucas.white@smartcampus.com", "Lucas White"),
+                ("mia.harris@smartcampus.com", "Mia Harris"),
+                ("mason.martin@smartcampus.com", "Mason Martin"),
+                ("charlotte.garcia@smartcampus.com", "Charlotte Garcia"),
+                ("ethan.rodriguez@smartcampus.com", "Ethan Rodriguez"),
+                ("amelia.lee@smartcampus.com", "Amelia Lee"),
+                ("logan.perez@smartcampus.com", "Logan Perez"),
+                ("harper.thompson@smartcampus.com", "Harper Thompson"),
             };
 
-            foreach (var (email, fullName, studentId) in studentEmails)
+            foreach (var (email, fullName) in studentEmails)
             {
                 var studentUser = await _userManager.FindByEmailAsync(email);
                 if (studentUser == null)
@@ -311,7 +305,6 @@ namespace SmartCampus.Data.Seeders
                     var student = new Student
                     {
                         Id = Guid.NewGuid(),
-                        StudentId = studentId,
                         ApplicationUserId = user.Id,
                         GroupId = groups[groupIndex % groups.Count].Id,
                         EnrollmentYear = 2024,
@@ -634,6 +627,7 @@ namespace SmartCampus.Data.Seeders
                         Id = Guid.NewGuid(),
                         StudentId = students[j].Id,
                         LessonId = lessons[i].Id,
+                        TeacherId = lessons[i].TeacherId,
                         AttendanceDate = lessons[i].LessonDate,
                         Status = statuses[(i + j) % statuses.Length],
                         Remarks = (i + j) % statuses.Length == 2 ? "Arrived 10 minutes late" : null,
@@ -654,42 +648,32 @@ namespace SmartCampus.Data.Seeders
                 return;
 
             var students = await _context.Students.ToListAsync();
-            var courses = await _context.Courses.ToListAsync();
+            var lessons = await _context.Lessons.ToListAsync();
 
-            if (students.Count == 0 || courses.Count == 0)
+            if (students.Count == 0 || lessons.Count == 0)
                 return;
 
             var grades = new List<Grade>();
-            var gradeTypes = new[] { "Homework", "Midterm", "Final", "Project" };
             var random = new Random();
 
-
-            for (int i = 0; i < students.Count; i++)
+            foreach (var lesson in lessons.Take(6))
             {
-                for (int j = 0; j < courses.Count; j++)
+                var groupStudents = students.Where(s => s.GroupId == lesson.GroupId).ToList();
+                
+                foreach (var student in groupStudents)
                 {
-
-                    if (courses[j].GroupId == students[i].GroupId)
+                    var score = random.Next(60, 101);
+                    grades.Add(new Grade
                     {
-                        int gradeCount = random.Next(2, 4);
-                        for (int k = 0; k < gradeCount; k++)
-                        {
-                            var score = random.Next(60, 101);
-                            grades.Add(new Grade
-                            {
-                                Id = Guid.NewGuid(),
-                                StudentId = students[i].Id,
-                                CourseId = courses[j].Id,
-                                GroupId = students[i].GroupId,
-                                Score = score,
-                                LetterGrade = GetLetterGrade(score),
-                                Feedback = $"Good work on {gradeTypes[k % gradeTypes.Length].ToLower()}",
-                                GradeType = gradeTypes[k % gradeTypes.Length],
-                                GradedDate = DateTime.UtcNow.AddDays(-random.Next(1, 30)),
-                                UpdatedAt = null
-                            });
-                        }
-                    }
+                        Id = Guid.NewGuid(),
+                        StudentId = student.Id,
+                        LessonId = lesson.Id,
+                        GroupId = lesson.GroupId,
+                        Score = score,
+                        LetterGrade = GetLetterGrade(score),
+                        Feedback = "Good performance in this lesson",
+                        GradedDate = DateTime.UtcNow.AddDays(-random.Next(1, 30))
+                    });
                 }
             }
 

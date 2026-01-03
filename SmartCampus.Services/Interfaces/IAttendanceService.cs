@@ -13,7 +13,13 @@ namespace SmartCampus.Services.Interfaces
         Task<int> GetPresentCountForStudentAsync(Guid studentId);
         Task<int> GetAbsentCountForStudentAsync(Guid studentId);
         Task<AttendanceDto> RecordAttendanceAsync(Guid studentId, Guid lessonId, string status);
+        Task<IEnumerable<AttendanceDto>> CreateBulkAttendanceForLessonAsync(Guid lessonId);
         Task UpdateAttendanceAsync(AttendanceDto attendanceDto);
         Task DeleteAttendanceAsync(Guid id);
+        Task<LessonSessionDto> StartLessonSessionAsync(Guid lessonId, Guid teacherId);
+        Task EndLessonSessionAsync(Guid lessonId, Guid teacherId);
+        Task<LessonSessionDto> GetActiveLessonSessionAsync(Guid lessonId, Guid teacherId);
+        Task UpdateSessionAttendanceAsync(Guid lessonId, Guid studentId, string status, Guid teacherId);
+        Task<IEnumerable<AttendanceDto>> GetSessionAttendanceAsync(Guid lessonId);
     }
 }

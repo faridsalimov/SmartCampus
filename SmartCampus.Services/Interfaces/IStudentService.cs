@@ -7,7 +7,6 @@ namespace SmartCampus.Services.Interfaces
         Task<IEnumerable<StudentDto>> GetAllStudentsAsync();
         Task<StudentDto?> GetStudentByIdAsync(Guid id);
         Task<StudentDto?> GetStudentByApplicationUserIdAsync(string applicationUserId);
-        Task<StudentDto?> GetStudentByStudentIdAsync(string studentId);
         Task<IEnumerable<StudentDto>> GetStudentsByGroupAsync(Guid groupId);
         Task<StudentDto> CreateStudentAsync(StudentDto studentDto);
         Task UpdateStudentAsync(StudentDto studentDto);

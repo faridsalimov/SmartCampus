@@ -67,10 +67,8 @@ namespace SmartCampus.Web.Pages.Announcements
 
                 _logger.LogInformation("User found: {UserId}", user.Id);
 
-                // For Admin users, set announcement as published
                 Announcement.IsPublished = true;
 
-                // Get the teacher record for the admin user (if available)
                 var teacher = await _teacherService.GetTeacherByApplicationUserIdAsync(user.Id);
                 if (teacher != null)
                 {
@@ -78,7 +76,6 @@ namespace SmartCampus.Web.Pages.Announcements
                 }
                 else
                 {
-                    // If admin doesn't have a teacher record, use a system-wide ID or leave as default
                     _logger.LogInformation("No teacher record found for admin user: {UserId}", user.Id);
                 }
 

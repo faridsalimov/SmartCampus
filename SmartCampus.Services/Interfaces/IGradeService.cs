@@ -7,6 +7,7 @@ namespace SmartCampus.Services.Interfaces
         Task<IEnumerable<GradeDto>> GetAllGradesAsync();
         Task<GradeDto?> GetGradeByIdAsync(Guid id);
         Task<IEnumerable<GradeDto>> GetGradesByStudentAsync(Guid studentId);
+        Task<IEnumerable<GradeDto>> GetGradesByLessonAsync(Guid lessonId);
         Task<IEnumerable<GradeDto>> GetGradesByCourseAsync(Guid courseId);
         Task<IEnumerable<GradeDto>> GetGradesByGroupAsync(Guid groupId);
         Task<IEnumerable<GradeDto>> GetTeacherGradesAsync(Guid teacherId);

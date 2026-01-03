@@ -10,7 +10,7 @@ using SmartCampus.Web.Utilities;
 
 namespace SmartCampus.Web.Pages.Attendance
 {
-    [Authorize]
+    [Authorize(Roles = "Student")]
     public class IndexModel : PageModel
     {
         private readonly IAttendanceService _attendanceService;

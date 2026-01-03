@@ -19,104 +19,158 @@
 <partial name="_PageHeader" model="pageHeader" />
 
 <div class="row">
-    <div class="col-md-8">
-        <h1 class="h3 mb-4">Edit Grade</h1>
-
-        <form method="post">
+    <div class="col-lg-8">
+        <form method="post" class="needs-validation" novalidate>
             @Html.AntiForgeryToken()
-            <div class="card">
+            
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-light border-bottom">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2" style="color: #ff9500;"></i>Grade Details
+                    </h5>
+                </div>
                 <div class="card-body">
+                    
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show d-none" role="alert" id="validationSummary">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Please fix the following errors:</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
                     <input type="hidden" asp-for="Grade.Id" />
 
+                    
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Grade.StudentId" class="form-label">Student *</label>
-                            <select asp-for="Grade.StudentId" class="form-select" required>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Grade.StudentId" class="form-label">
+                                <i class="fas fa-user me-1"></i>Student <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="Grade.StudentId" class="form-select" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;" disabled>
                                 <option value="">-- Select Student --</option>
                                 @foreach (var student in Model.AvailableStudents)
                                 {
                                     <option value="@student.Id" selected="@(student.Id == Model.Grade.StudentId)">@student.FullName</option>
                                 }
                             </select>
-                            <span asp-validation-for="Grade.StudentId" class="text-danger"></span>
+                            <small class="form-text text-muted">Student (cannot be changed)</small>
+                            <span asp-validation-for="Grade.StudentId" class="text-danger small d-block mt-1"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Grade.GroupId" class="form-label">Group *</label>
-                            <select asp-for="Grade.GroupId" class="form-select" required>
-                                <option value="">-- Select Group --</option>
-                                @foreach (var group in Model.UserGroups)
-                                {
-                                    <option value="@group.Id" selected="@(group.Id == Model.Grade.GroupId)">@group.GroupName</option>
-                                }
-                            </select>
-                            <span asp-validation-for="Grade.GroupId" class="text-danger"></span>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Grade.LessonId" class="form-label">
+                                <i class="fas fa-chalkboard me-1"></i>Lesson <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" value="@Model.Grade.LessonTitle" disabled style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Lesson (cannot be changed)</small>
+                            <input type="hidden" asp-for="Grade.LessonId" />
                         </div>
                     </div>
 
+                    
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Grade.CourseId" class="form-label">Course</label>
-                            <select asp-for="Grade.CourseId" class="form-select">
-                                <option value="">-- Select Course --</option>
-                                @foreach (var course in Model.AvailableCourses)
-                                {
-                                    <option value="@course.Id" selected="@(course.Id == Model.Grade.CourseId)">@course.Title</option>
-                                }
-                            </select>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Grade.Score" class="form-label">
+                                <i class="fas fa-percentage me-1"></i>Score (0-100) <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Grade.Score" class="form-control" type="number" step="0.01" min="0" max="100" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Enter a score between 0 and 100</small>
+                            <span asp-validation-for="Grade.Score" class="text-danger small d-block mt-1"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Grade.Score" class="form-label">Score (0-100) *</label>
-                            <input asp-for="Grade.Score" class="form-control" type="number" step="0.01" min="0" max="100" required>
-                            <span asp-validation-for="Grade.Score" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Grade.LetterGrade" class="form-label">Letter Grade</label>
-                            <select asp-for="Grade.LetterGrade" class="form-select">
-                                <option value="">-- Select Letter Grade --</option>
-                                <option value="A" selected="@(Model.Grade.LetterGrade == "A")">A (90-100)</option>
-                                <option value="B" selected="@(Model.Grade.LetterGrade == "B")">B (80-89)</option>
-                                <option value="C" selected="@(Model.Grade.LetterGrade == "C")">C (70-79)</option>
-                                <option value="D" selected="@(Model.Grade.LetterGrade == "D")">D (60-69)</option>
-                                <option value="F" selected="@(Model.Grade.LetterGrade == "F")">F (Below 60)</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Grade.GradeType" class="form-label">Grade Type</label>
-                            <select asp-for="Grade.GradeType" class="form-select">
-                                <option value="">-- Select Type --</option>
-                                <option value="Midterm" selected="@(Model.Grade.GradeType == "Midterm")">Midterm</option>
-                                <option value="Final" selected="@(Model.Grade.GradeType == "Final")">Final</option>
-                                <option value="Homework" selected="@(Model.Grade.GradeType == "Homework")">Homework</option>
-                                <option value="Project" selected="@(Model.Grade.GradeType == "Project")">Project</option>
-                                <option value="Quiz" selected="@(Model.Grade.GradeType == "Quiz")">Quiz</option>
-                                <option value="Participation" selected="@(Model.Grade.GradeType == "Participation")">Participation</option>
-                            </select>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Grade.LetterGrade" class="form-label">
+                                <i class="fas fa-graduation-cap me-1"></i>Letter Grade
+                            </label>
+                            <input type="text" class="form-control" value="@Model.Grade.LetterGrade" disabled style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Automatically calculated</small>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Grade.Feedback" class="form-label">Feedback</label>
-                        <textarea asp-for="Grade.Feedback" class="form-control" rows="4" placeholder="Enter feedback for the student..."></textarea>
-                        <span asp-validation-for="Grade.Feedback" class="text-danger"></span>
+                    
+                    <div class="mb-4">
+                        <label asp-for="Grade.Feedback" class="form-label">
+                            <i class="fas fa-comment me-1"></i>Feedback
+                        </label>
+                        <textarea asp-for="Grade.Feedback" class="form-control" rows="4" placeholder="Enter feedback for the student..." style="border: 1.5px solid #e5e5ea; border-radius: 8px;"></textarea>
+                        <small class="form-text text-muted">Provide constructive feedback to help the student improve</small>
+                        <span asp-validation-for="Grade.Feedback" class="text-danger small d-block mt-1"></span>
                     </div>
                 </div>
 
-                <div class="card-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Update Grade
-                    </button>
-                    <a asp-page="Index" class="btn btn-secondary">
-                        <i class="fas fa-times me-2"></i>Cancel
-                    </a>
+                
+                <div class="card-footer bg-light border-top">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-page="Index" class="btn btn-outline-secondary" style="border-radius: 8px;">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary" style="border-radius: 8px; background: #ff9500; border: none;">
+                            <i class="fas fa-save me-1"></i>Update Grade
+                        </button>
+                    </div>
                 </div>
             </div>
         </form>
+    </div>
+
+    
+    <div class="col-lg-4">
+        <div class="card bg-light border-0">
+            <div class="card-header border-bottom">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2" style="color: #ff9500;"></i>Tips
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Score Range:</strong> Enter scores from 0 to 100.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Letter Grade:</strong> Automatically calculated based on score.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">
+                        <strong>Feedback:</strong> Provide constructive comments about the student's performance.
+                    </small>
+                </div>
+                <div class="alert alert-info small mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Fields marked with <span class="text-danger">*</span> are required.
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.querySelectorAll('.needs-validation');
+                Array.prototype.slice.call(forms).forEach(function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            document.getElementById('validationSummary').classList.remove('d-none');
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+
+        document.querySelector('[asp-for="Grade.Score"]').addEventListener('change', function() {
+            const score = parseFloat(this.value);
+            let letterGrade = 'F';
+            if (score >= 90) letterGrade = 'A';
+            else if (score >= 80) letterGrade = 'B';
+            else if (score >= 70) letterGrade = 'C';
+            else if (score >= 60) letterGrade = 'D';
+            document.querySelector('input[value="' + letterGrade + '"]')?.parentElement.querySelector('input').checked = true;
+        });
+    </script>
 }

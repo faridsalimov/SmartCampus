@@ -41,14 +41,6 @@
                     
                     <div class="row">
                         <div class="col-md-6 mb-4">
-                            <label asp-for="Student.StudentId" class="form-label">
-                                <i class="fas fa-id-card me-1"></i>Student ID <span class="text-danger">*</span>
-                            </label>
-                            <input asp-for="Student.StudentId" class="form-control" placeholder="e.g., STU2024001" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
-                            <small class="form-text text-muted">Unique student identifier</small>
-                            <span asp-validation-for="Student.StudentId" class="text-danger small d-block mt-1"></span>
-                        </div>
-                        <div class="col-md-6 mb-4">
                             <label asp-for="Student.FullName" class="form-label">
                                 <i class="fas fa-user me-1"></i>Full Name <span class="text-danger">*</span>
                             </label>
@@ -56,30 +48,26 @@
                             <small class="form-text text-muted">Student's complete name</small>
                             <span asp-validation-for="Student.FullName" class="text-danger small d-block mt-1"></span>
                         </div>
-                    </div>
-
-                    
-                    <div class="row">
                         <div class="col-md-6 mb-4">
                             <label asp-for="Student.Email" class="form-label">
                                 <i class="fas fa-envelope me-1"></i>Email <span class="text-danger">*</span>
                             </label>
                             <input asp-for="Student.Email" class="form-control" type="email" placeholder="student@university.edu" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
-                            <small class="form-text text-muted">Valid email address</small>
+                            <small class="form-text text-muted">Valid email address (used as username)</small>
                             <span asp-validation-for="Student.Email" class="text-danger small d-block mt-1"></span>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <label asp-for="Student.PhoneNumber" class="form-label">
-                                <i class="fas fa-phone me-1"></i>Phone Number
-                            </label>
-                            <input asp-for="Student.PhoneNumber" class="form-control" placeholder="+1 (555) 123-4567" style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
-                            <small class="form-text text-muted">Optional contact number</small>
-                            <span asp-validation-for="Student.PhoneNumber" class="text-danger small d-block mt-1"></span>
                         </div>
                     </div>
 
                     
                     <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Student.Password" class="form-label">
+                                <i class="fas fa-lock me-1"></i>Password <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Student.Password" class="form-control" type="password" placeholder="Enter password" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Minimum 6 characters</small>
+                            <span asp-validation-for="Student.Password" class="text-danger small d-block mt-1"></span>
+                        </div>
                         <div class="col-md-6 mb-4">
                             <label asp-for="Student.GroupId" class="form-label">
                                 <i class="fas fa-users me-1"></i>Group <span class="text-danger">*</span>
@@ -93,6 +81,18 @@
                             </select>
                             <small class="form-text text-muted">Student's group/class</small>
                             <span asp-validation-for="Student.GroupId" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Student.PhoneNumber" class="form-label">
+                                <i class="fas fa-phone me-1"></i>Phone Number
+                            </label>
+                            <input asp-for="Student.PhoneNumber" class="form-control" placeholder="+1 (555) 123-4567" style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Optional contact number</small>
+                            <span asp-validation-for="Student.PhoneNumber" class="text-danger small d-block mt-1"></span>
                         </div>
                         <div class="col-md-6 mb-4">
                             <label asp-for="Student.EnrollmentYear" class="form-label">
@@ -141,17 +141,17 @@
             <div class="card-body">
                 <div class="mb-3">
                     <small class="text-muted d-block mb-2">
-                        <strong>Student ID:</strong> Use a unique, standardized format.
+                        <strong>Email:</strong> This will be used as the student's login username.
                     </small>
                 </div>
                 <div class="mb-3">
                     <small class="text-muted d-block mb-2">
-                        <strong>Email:</strong> Ensure the email address is valid and active.
+                        <strong>Password:</strong> Must be at least 6 characters long.
                     </small>
                 </div>
                 <div class="mb-3">
                     <small class="text-muted d-block mb-2">
-                        <strong>Group Homework:</strong> Assign the student to the correct group/class.
+                        <strong>Group:</strong> Assign the student to the correct group/class.
                     </small>
                 </div>
                 <div class="alert alert-info small mb-0">
@@ -166,7 +166,6 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        // Bootstrap form validation
         (function() {
             'use strict';
             window.addEventListener('load', function() {

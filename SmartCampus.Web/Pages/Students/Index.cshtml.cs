@@ -80,8 +80,7 @@ namespace SmartCampus.Web.Pages.Students
             {
                 students = students.Where(s =>
                     (s.FullName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                    (s.Email?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                    (s.StudentId?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
+                    (s.Email?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
                 ).ToList();
             }
 

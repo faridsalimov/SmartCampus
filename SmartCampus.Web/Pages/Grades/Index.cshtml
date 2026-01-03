@@ -3,29 +3,18 @@
 @model SmartCampus.Web.Pages.Grades.IndexModel
 @{
     ViewData["Title"] = "Grades";
-    var canCreate = User.IsInRole("Admin") || User.IsInRole("Teacher");
     var canEdit = User.IsInRole("Admin") || User.IsInRole("Teacher");
     var canDelete = User.IsInRole("Admin") || User.IsInRole("Teacher");
 
     var pageHeader = new PageHeaderModel
     {
-        Title = "Your Grades",
-        Subtitle = "View and track your academic performance",
+        Title = "Grades",
+        Subtitle = "View and manage student grades from lessons",
         IconClass = "fas fa-star",
         IconColor = "#ff9500",
         GradientStart = "rgba(255, 149, 0, 0.05)",
         GradientEnd = "rgba(52, 199, 89, 0.05)",
-        BorderColor = "rgba(255, 149, 0, 0.1)",
-        Actions = canCreate ? new()
-        {
-            new PageHeaderAction
-            {
-                Label = "Add Grade",
-                Url = Url.Page("Create"),
-                CssClass = "btn-success",
-                IconClass = "fas fa-plus"
-            }
-        } : new()
+        BorderColor = "rgba(255, 149, 0, 0.1)"
     };
 }
 
@@ -39,19 +28,19 @@
             <table class="table table-hover" style="margin-bottom: 0;">
                 <thead style="background: #f5f5f7; border-bottom: 2px solid #e5e5ea;">
                     <tr>
-                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Student</th>
-                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Score</th>
-                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Grade</th>
-                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Type</th>
-                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Date</th>
-                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem;">Actions</th>
+                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem; text-align: left;">Student</th>
+                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem; text-align: center;">Score</th>
+                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem; text-align: center;">Grade</th>
+                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem; text-align: center;">Lesson</th>
+                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem; text-align: center;">Date</th>
+                        <th style="padding: 16px; font-weight: 600; color: #1d1d1f; font-size: 0.875rem; text-align: center;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var grade in Model.Grades)
                     {
                         <tr style="border-bottom: 1px solid #e5e5ea; transition: background 0.2s ease;">
-                            <td style="padding: 16px; color: #1d1d1f;">
+                            <td style="padding: 16px; color: #1d1d1f; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <img src="@(string.IsNullOrEmpty(User.FindFirst("ProfilePhoto")?.Value) ? $"https://ui-avatars.com/api/?name={System.Net.WebUtility.UrlEncode(grade.StudentName ?? "User")}&background=random&color=fff" : User.FindFirst("ProfilePhoto")?.Value)"
                                          alt="@(grade.StudentName ?? "Student")"
@@ -59,10 +48,10 @@
                                     <span>@(!string.IsNullOrEmpty(grade.StudentName) ? grade.StudentName : "N/A")</span>
                                 </div>
                             </td>
-                            <td style="padding: 16px;">
+                            <td style="padding: 16px; text-align: center;">
                                 <span style="font-weight: 600; font-size: 1.125rem; color: #0066ff;">@grade.Score</span>
                             </td>
-                            <td style="padding: 16px;">
+                            <td style="padding: 16px; text-align: center;">
                                 @if (!string.IsNullOrEmpty(grade.LetterGrade))
                                 {
                                     <span style="display: inline-block; background: rgba(52, 199, 89, 0.1); color: #34c759; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 0.875rem;">
@@ -74,12 +63,17 @@
                                     <span style="color: #a1a1a6;">N/A</span>
                                 }
                             </td>
-                            <td style="padding: 16px; color: #636366;">@(grade.GradeType ?? "N/A")</td>
-                            <td style="padding: 16px; color: #636366; font-size: 0.875rem;">
-                                @grade.GradedDate.ToString("dd MMM yyyy")
+                            <td style="padding: 16px; color: #636366; text-align: center;">@(grade.LessonTitle ?? "N/A")</td>
+                            <td style="padding: 16px; color: #636366; font-size: 0.875rem; text-align: center;">
+                                @{
+                                    var displayDate = grade.GradedDate != default(DateTime) 
+                                        ? grade.GradedDate.ToString("dd MMM yyyy") 
+                                        : "Not Set";
+                                }
+                                @displayDate
                             </td>
-                            <td style="padding: 16px;">
-                                <div style="display: flex; gap: 8px;">
+                            <td style="padding: 16px; text-align: center;">
+                                <div style="display: flex; gap: 8px; justify-content: center;">
                                     @await Html.PartialAsync("_ActionButtons", new { CanView = false, CanEdit = canEdit, CanDelete = canDelete, ViewUrl = "", EditUrl = Url.Page("Edit", new { id = grade.Id }), DeleteUrl = Url.Page("Index", new { handler = "Delete", id = grade.Id }), EntityId = grade.Id })
                                 </div>
                             </td>
@@ -97,6 +91,8 @@ else
             <i class="fas fa-inbox"></i>
         </div>
         <h4 style="color: #1d1d1f; font-weight: 600; margin-bottom: 8px;">No Grades Found</h4>
-        <p style="color: #636366; margin-bottom: 0;">Add your first grade to get started.</p>
+        <p style="color: #636366; margin-bottom: 0;">Grades are assigned when lessons are completed. Start a lesson to add grades.</p>
     </div>
 }
+
+<partial name="_ConfirmModal" />

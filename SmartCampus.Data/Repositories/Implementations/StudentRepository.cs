@@ -31,13 +31,6 @@ namespace SmartCampus.Data.Repositories.Implementations
                               .FirstOrDefaultAsync(s => s.ApplicationUserId == applicationUserId);
         }
 
-        public async Task<Student?> GetByStudentIdAsync(string studentId)
-        {
-            return await DbSet.Include(s => s.ApplicationUser)
-                              .Include(s => s.Group)
-                              .FirstOrDefaultAsync(s => s.StudentId == studentId);
-        }
-
         public async Task<IEnumerable<Student>> GetByGroupIdAsync(Guid groupId)
         {
             return await DbSet.Where(s => s.GroupId == groupId)

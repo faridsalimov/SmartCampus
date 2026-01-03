@@ -1,0 +1,592 @@
+﻿@page
+@using SmartCampus.Web.Pages.Shared
+@model SmartCampus.Web.Pages.Lessons.StartModel
+@{
+    ViewData["Title"] = "Start Lesson - Attendance & Grades";
+}
+
+@if (Model.SessionData != null)
+{
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 overflow-hidden" style="border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);">
+                <!-- Header Background -->
+                <div style="background: linear-gradient(135deg, #34c759 0%, #76d54d 100%); padding: 32px; color: white; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
+                    <div style="position: relative; z-index: 1;">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h3 style="margin: 0; font-weight: 700; font-size: 1.8rem;">
+                                    <i class="fas fa-book me-2"></i>@Model.SessionData.LessonTitle
+                                </h3>
+                                <p style="margin: 12px 0 0 0; opacity: 0.95; font-size: 1rem;">
+                                    <i class="fas fa-users me-2"></i>@Model.SessionData.GroupName
+                                </p>
+                            </div>
+                            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                                    <span style="opacity: 0.9; font-size: 0.9rem;">
+                                        <i class="fas fa-chalkboard-teacher me-2"></i>Teacher: <strong>@Model.SessionData.TeacherName</strong>
+                                    </span>
+                                    <span style="opacity: 0.9; font-size: 0.9rem;">
+                                        <i class="fas fa-clock me-2"></i>Started: <strong>@Model.SessionData.SessionStartTime?.ToString("hh:mm tt")</strong>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Attendance Summary -->
+                <div style="background: #f9f9fb; padding: 20px 32px; border-bottom: 1px solid #e5e5ea; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
+                    <div style="text-align: center; padding: 12px 0;">
+                        <div id="presentCount" style="font-size: 2rem; font-weight: 700; color: #34c759;">
+                            @Model.SessionData.Students.Count(s => s.CurrentStatus == "Present")
+                        </div>
+                        <div style="color: #636366; font-size: 0.85rem; font-weight: 500;">
+                            <i class="fas fa-check-circle me-1" style="color: #34c759;"></i>Present
+                        </div>
+                    </div>
+                    <div style="text-align: center; padding: 12px 0; border-left: 1px solid #e5e5ea;">
+                        <div id="absentCount" style="font-size: 2rem; font-weight: 700; color: #ff3b30;">
+                            @Model.SessionData.Students.Count(s => s.CurrentStatus == "Absent")
+                        </div>
+                        <div style="color: #636366; font-size: 0.85rem; font-weight: 500;">
+                            <i class="fas fa-times-circle me-1" style="color: #ff3b30;"></i>Absent
+                        </div>
+                    </div>
+                    <div style="text-align: center; padding: 12px 0; border-left: 1px solid #e5e5ea;">
+                        <div id="lateCount" style="font-size: 2rem; font-weight: 700; color: #ff9500;">
+                            @Model.SessionData.Students.Count(s => s.CurrentStatus == "Late")
+                        </div>
+                        <div style="color: #636366; font-size: 0.85rem; font-weight: 500;">
+                            <i class="fas fa-hourglass-end me-1" style="color: #ff9500;"></i>Late
+                        </div>
+                    </div>
+                    <div style="text-align: center; padding: 12px 0; border-left: 1px solid #e5e5ea;">
+                        <div id="totalCount" style="font-size: 2rem, font-weight: 700; color: #5e5ce6;">
+                            @Model.SessionData.Students.Count
+                        </div>
+                        <div style="color: #636366; font-size: 0.85rem; font-weight: 500;">
+                            <i class="fas fa-users me-1" style="color: #5e5ce6;"></i>Total
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Attendance & Grading Tabs -->
+    <ul class="nav nav-tabs" role="tablist" style="border-bottom: 2px solid #e5e5ea; margin-bottom: 24px;">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance-panel" type="button" role="tab" aria-controls="attendance-panel" aria-selected="true" style="color: #34c759; border: none; font-weight: 600; padding: 12px 24px;">
+                <i class="fas fa-clipboard-check me-2"></i>Attendance
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="grades-tab" data-bs-toggle="tab" data-bs-target="#grades-panel" type="button" role="tab" aria-controls="grades-panel" aria-selected="false" style="color: #ff9500; border: none; font-weight: 600; padding: 12px 24px;">
+                <i class="fas fa-star me-2"></i>Grades
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- Attendance Tab -->
+        <div class="tab-pane fade show active" id="attendance-panel" role="tabpanel" aria-labelledby="attendance-tab">
+            <div style="display: grid; gap: 12px;">
+                @foreach (var student in Model.SessionData.Students.OrderBy(s => s.StudentName))
+                {
+                    var statusColor = student.CurrentStatus == "Present" ? "#34c759" : 
+                                     student.CurrentStatus == "Absent" ? "#ff3b30" : "#ff9500";
+                    var statusBg = student.CurrentStatus == "Present" ? "rgba(52, 199, 89, 0.08)" : 
+                                  student.CurrentStatus == "Absent" ? "rgba(255, 59, 48, 0.08)" : "rgba(255, 149, 0, 0.08)";
+    
+                    <div class="card border-0" style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); padding: 20px; background: @statusBg; border-left: 4px solid @statusColor; transition: all 0.3s ease;" data-student-id="@student.StudentId" data-attendance-id="@student.AttendanceRecordId">
+                        <div class="row align-items-center">
+                            <!-- Student Info -->
+                            <div class="col-md-3">
+                                <div>
+                                    <div style="font-weight: 700; color: #1d1d1f; font-size: 1rem;">
+                                        @student.StudentName
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <!-- Attendance Status Radio Buttons -->
+                            <div class="col-md-7">
+                                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                                    <!-- Present Radio -->
+                                    <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; background: white; border: 2px solid #e5e5ea; transition: all 0.2s ease;" class="attendance-option" data-status="Present">
+                                        <input type="radio" name="status_@student.StudentId" value="Present" 
+                                               @(student.CurrentStatus == "Present" ? "checked" : "") 
+                                               style="cursor: pointer; width: 16px; height: 16px; accent-color: #34c759;"
+                                               onchange="updateAttendance('@student.StudentId', 'Present')">
+                                        <span style="font-weight: 500; color: #34c759; font-size: 0.9rem;">
+                                            <i class="fas fa-check-circle me-1"></i>Present
+                                        </span>
+                                    </label>
+    
+                                    <!-- Absent Radio -->
+                                    <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; background: white; border: 2px solid #e5e5ea; transition: all 0.2s ease;" class="attendance-option" data-status="Absent">
+                                        <input type="radio" name="status_@student.StudentId" value="Absent" 
+                                               @(student.CurrentStatus == "Absent" ? "checked" : "") 
+                                               style="cursor: pointer; width: 16px; height: 16px; accent-color: #ff3b30;"
+                                               onchange="updateAttendance('@student.StudentId', 'Absent')">
+                                        <span style="font-weight: 500; color: #ff3b30; font-size: 0.9rem;">
+                                            <i class="fas fa-times-circle me-1"></i>Absent
+                                        </span>
+                                    </label>
+    
+                                    <!-- Late Radio -->
+                                    <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; background: white; border: 2px solid #e5e5ea; transition: all 0.2s ease;" class="attendance-option" data-status="Late">
+                                        <input type="radio" name="status_@student.StudentId" value="Late" 
+                                               @(student.CurrentStatus == "Late" ? "checked" : "") 
+                                               style="cursor: pointer; width: 16px; height: 16px; accent-color: #ff9500;"
+                                               onchange="updateAttendance('@student.StudentId', 'Late')">
+                                        <span style="font-weight: 500; color: #ff9500; font-size: 0.9rem;">
+                                            <i class="fas fa-hourglass-end me-1"></i>Late
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+    
+                            <!-- Status Badge -->
+                            <div class="col-md-2 text-end">
+                                <span style="display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; background: @statusColor; color: white;">
+                                    @if (student.CurrentStatus == "Present")
+                                    {
+                                        <i class="fas fa-check me-1"></i><span>Recorded</span>
+                                    }
+                                    else if (student.CurrentStatus == "Absent")
+                                    {
+                                        <i class="fas fa-times me-1"></i><span>Marked</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-hourglass-end me-1"></i><span>Late</span>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Grades Tab -->
+        <div class="tab-pane fade" id="grades-panel" role="tabpanel" aria-labelledby="grades-tab">
+            <div style="display: grid; gap: 12px;">
+                @foreach (var student in Model.SessionData.Students.OrderBy(s => s.StudentName))
+                {
+                    <div class="card border-0" style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); padding: 20px; border-left: 4px solid #ff9500; transition: all 0.3s ease;" data-student-id="@student.StudentId">
+                        <div class="row align-items-center">
+                            <!-- Student Info -->
+                            <div class="col-md-2">
+                                <div style="font-weight: 700; color: #1d1d1f; font-size: 1rem;">
+                                    @student.StudentName
+                                </div>
+                            </div>
+
+                            <!-- Grade Input -->
+                            <div class="col-md-3">
+                                <label style="font-size: 0.85rem; color: #636366; font-weight: 500; display: block; margin-bottom: 6px;">
+                                    <i class="fas fa-percentage me-1"></i>Score (0-100)
+                                </label>
+                                <input type="number" class="form-control grade-input" min="0" max="100" step="0.5" 
+                                       placeholder="Enter score" data-student-id="@student.StudentId"
+                                       style="border: 1.5px solid #e5e5ea; border-radius: 8px; padding: 10px;" />
+                            </div>
+
+                            <!-- Letter Grade Display -->
+                            <div class="col-md-2">
+                                <label style="font-size: 0.85rem; color: #636366; font-weight: 500; display: block; margin-bottom: 6px;">
+                                    <i class="fas fa-graduation-cap me-1"></i>Grade
+                                </label>
+                                <div class="letter-grade-display" data-student-id="@student.StudentId" 
+                                     style="font-weight: 700; font-size: 1.2rem; color: #34c759; padding: 10px; text-align: center; background: rgba(52, 199, 89, 0.1); border-radius: 8px;">
+                                    -
+                                </div>
+                            </div>
+
+                            <!-- Feedback -->
+                            <div class="col-md-5">
+                                <label style="font-size: 0.85rem; color: #636366; font-weight: 500; display: block; margin-bottom: 6px;">
+                                    <i class="fas fa-comment me-1"></i>Feedback (Optional)
+                                </label>
+                                <input type="text" class="form-control feedback-input" placeholder="e.g., Great performance" 
+                                       data-student-id="@student.StudentId"
+                                       style="border: 1.5px solid #e5e5ea; border-radius: 8px; padding: 10px;" />
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div style="display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap;">
+                <a asp-page="Index" class="btn" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: all 0.3s ease; cursor: pointer;">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Lessons
+                </a>
+                <button type="button" class="btn" onclick="showEndLessonConfirm()" 
+                        style="background: linear-gradient(135deg, #34c759, #76d54d); color: white; border: none; padding: 12px 32px; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; cursor: pointer; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);">
+                    <i class="fas fa-check-circle me-2"></i>End Lesson & Finalize
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- End Session Modal Form -->
+    <form method="post" id="endSessionForm" style="display: contents;">
+        <input type="hidden" name="lessonId" value="@Model.SessionData.LessonId" />
+        <div id="gradesContainer"></div>
+    </form>
+}
+
+<!-- Custom End Lesson Modal (Green) -->
+<div class="modal fade" id="endLessonModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 14px; overflow: hidden;">
+            <!-- Green Header for Completion Action -->
+            <div style="background: linear-gradient(135deg, #34c759, #76d54d); padding: 24px; display: flex; justify-content: space-between; align-items: center;">
+                <h5 class="modal-title" style="color: white; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.1rem;">
+                    <i class="fas fa-check-circle"></i>End Lesson Session
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="modal-body" style="padding: 28px;">
+                <h6 style="color: #1d1d1f; font-weight: 600; margin-bottom: 16px;">
+                    Finalize attendance and grades for this session?
+                </h6>
+                
+                <div style="background: #f9f9fb; padding: 16px; border-radius: 10px; margin-bottom: 16px;">
+                    <p style="color: #636366; font-size: 0.9rem; font-weight: 500; margin: 0 0 12px 0;">
+                        <strong>Attendance Summary:</strong>
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                        <div>
+                            <span style="color: #34c759; font-weight: 600;">
+                                <i class="fas fa-check-circle me-1"></i>Present:
+                            </span>
+                            <span id="modalPresentCount" style="color: #1d1d1f; font-weight: 700; margin-left: 4px;">0</span>
+                        </div>
+                        <div>
+                            <span style="color: #ff3b30; font-weight: 600;">
+                                <i class="fas fa-times-circle me-1"></i>Absent:
+                            </span>
+                            <span id="modalAbsentCount" style="color: #1d1d1f; font-weight: 700; margin-left: 4px;">0</span>
+                        </div>
+                        <div>
+                            <span style="color: #ff9500; font-weight: 600;">
+                                <i class="fas fa-hourglass-end me-1"></i>Late:
+                            </span>
+                            <span id="modalLateCount" style="color: #1d1d1f; font-weight: 700; margin-left: 4px;">0</span>
+                        </div>
+                        <div>
+                            <span style="color: #5e5ce6; font-weight: 600;">
+                                <i class="fas fa-users me-1"></i>Total:
+                            </span>
+                            <span id="modalTotalCount" style="color: #1d1d1f; font-weight: 700; margin-left: 4px;">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #fff3cd; padding: 12px; border-radius: 8px; border-left: 4px solid #ff9500; margin-bottom: 16px;">
+                    <small style="color: #856404;">
+                        <i class="fas fa-info-circle me-1"></i>Grades will be saved for all students with scores entered.
+                    </small>
+                </div>
+                
+                <p style="color: #636366; font-size: 0.85rem; font-style: italic; margin: 0;">
+                    <i class="fas fa-info-circle me-1" style="color: #a1a1a6;"></i>This action cannot be undone.
+                </p>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer" style="padding: 16px 28px; border-top: 1px solid #e5e5ea; display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="btn" data-bs-dismiss="modal" style="background: #f5f5f7; color: #1d1d1f; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 500; transition: all 0.2s ease;">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn" onclick="submitEndLessonForm()" style="background: linear-gradient(135deg, #34c759, #76d54d); color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 500; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);">
+                    <i class="fas fa-check me-1"></i>Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const lessonId = '@Model.SessionData?.LessonId';
+    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+    document.querySelectorAll('.grade-input').forEach(input => {
+        input.addEventListener('input', function() {
+            const score = parseFloat(this.value);
+            const studentId = this.getAttribute('data-student-id');
+            const letterGradeDisplay = document.querySelector(`.letter-grade-display[data-student-id="${studentId}"]`);
+            
+            if (!isNaN(score) && score >= 0 && score <= 100) {
+                let letterGrade = 'F';
+                if (score >= 90) letterGrade = 'A';
+                else if (score >= 80) letterGrade = 'B';
+                else if (score >= 70) letterGrade = 'C';
+                else if (score >= 60) letterGrade = 'D';
+                
+                letterGradeDisplay.textContent = letterGrade;
+            } else {
+                letterGradeDisplay.textContent = '-';
+            }
+        });
+    });
+
+    function updateAttendance(studentId, status) {
+        const studentCard = document.querySelector(`[data-student-id="${studentId}"][data-attendance-id]`);
+        const statusColor = status === 'Present' ? '#34c759' : status === 'Absent' ? '#ff3b30' : '#ff9500';
+        const statusBg = status === 'Present' ? 'rgba(52, 199, 89, 0.08)' : status === 'Absent' ? 'rgba(255, 59, 48, 0.08)' : 'rgba(255, 149, 0, 0.08)';
+
+        studentCard.style.background = statusBg;
+        studentCard.style.borderLeftColor = statusColor;
+
+        const labels = studentCard.querySelectorAll('.attendance-option');
+        labels.forEach(label => {
+            const input = label.querySelector('input');
+            if (input.checked) {
+                label.style.background = statusColor + '15';
+                label.style.borderColor = statusColor;
+            } else {
+                label.style.background = 'white';
+                label.style.borderColor = '#e5e5ea';
+            }
+        });
+
+        fetch(`?handler=UpdateAttendance&lessonId=${lessonId}&studentId=${studentId}&status=${status}`, {
+            method: 'POST',
+            headers: {
+                'RequestVerificationToken': token,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    studentCard.style.animation = 'successPulse 0.6s ease';
+                    setTimeout(() => {
+                        studentCard.style.animation = '';
+                    }, 600);
+                    updateHeaderCounters();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to update attendance'));
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating attendance');
+            });
+    }
+
+    function updateHeaderCounters() {
+        const presentCount = document.querySelectorAll('input[value="Present"]:checked').length;
+        const absentCount = document.querySelectorAll('input[value="Absent"]:checked').length;
+        const lateCount = document.querySelectorAll('input[value="Late"]:checked').length;
+        const totalCount = presentCount + absentCount + lateCount;
+
+        updateCounterElement('presentCount', presentCount);
+        updateCounterElement('absentCount', absentCount);
+        updateCounterElement('lateCount', lateCount);
+        updateCounterElement('totalCount', totalCount);
+    }
+
+    function updateCounterElement(elementId, newValue) {
+        const element = document.getElementById(elementId);
+        if (element && element.textContent !== String(newValue)) {
+            element.textContent = newValue;
+            element.style.animation = 'counterPulse 0.4s ease';
+            setTimeout(() => {
+                element.style.animation = '';
+            }, 400);
+        }
+    }
+
+    function showEndLessonConfirm() {
+        const presentCount = document.querySelectorAll('input[value="Present"]:checked').length;
+        const absentCount = document.querySelectorAll('input[value="Absent"]:checked').length;
+        const lateCount = document.querySelectorAll('input[value="Late"]:checked').length;
+        const totalCount = presentCount + absentCount + lateCount;
+
+        document.getElementById('modalPresentCount').textContent = presentCount;
+        document.getElementById('modalAbsentCount').textContent = absentCount;
+        document.getElementById('modalLateCount').textContent = lateCount;
+        document.getElementById('modalTotalCount').textContent = totalCount;
+        
+        const endLessonModal = new bootstrap.Modal(document.getElementById('endLessonModal'));
+        endLessonModal.show();
+    }
+
+    function submitEndLessonForm() {
+        const gradesData = [];
+        document.querySelectorAll('.grade-input').forEach(input => {
+            const score = parseFloat(input.value);
+            if (!isNaN(score) && score >= 0 && score <= 100) {
+                const studentId = input.getAttribute('data-student-id');
+                const feedbackInput = document.querySelector(`.feedback-input[data-student-id="${studentId}"]`);
+                const feedback = feedbackInput ? feedbackInput.value : '';
+                
+                gradesData.push({
+                    studentId: studentId,
+                    score: score,
+                    feedback: feedback
+                });
+            }
+        });
+
+        const gradesContainer = document.getElementById('gradesContainer');
+        gradesContainer.innerHTML = '';
+        
+        gradesData.forEach((grade, index) => {
+            const studentIdInput = document.createElement('input');
+            studentIdInput.type = 'hidden';
+            studentIdInput.name = `grades[${index}].studentId`;
+            studentIdInput.value = grade.studentId;
+            gradesContainer.appendChild(studentIdInput);
+
+            const scoreInput = document.createElement('input');
+            scoreInput.type = 'hidden';
+            scoreInput.name = `grades[${index}].score`;
+            scoreInput.value = grade.score;
+            gradesContainer.appendChild(scoreInput);
+
+            const feedbackInput = document.createElement('input');
+            feedbackInput.type = 'hidden';
+            feedbackInput.name = `grades[${index}].feedback`;
+            feedbackInput.value = grade.feedback;
+            gradesContainer.appendChild(feedbackInput);
+        });
+
+        document.getElementById('endSessionForm').action = `?handler=EndSession`;
+        document.getElementById('endSessionForm').submit();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.attendance-option').forEach(label => {
+            const input = label.querySelector('input');
+            if (input.checked) {
+                const statusColor = input.value === 'Present' ? '#34c759' : input.value === 'Absent' ? '#ff3b30' : '#ff9500';
+                label.style.background = statusColor + '15';
+                label.style.borderColor = statusColor;
+            }
+        });
+    });
+
+    setInterval(() => {
+        fetch(`?handler=SessionData&lessonId=${lessonId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Session data refreshed');
+            })
+            .catch(error => console.log('Auto-refresh failed:', error));
+    }, 30000);
+</script>
+
+<style>
+    .attendance-option {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .attendance-option:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .attendance-option input[type="radio"] {
+        accent-color: #34c759;
+    }
+
+    .card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    @@keyframes successPulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.02);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    @@keyframes counterPulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.15);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .nav-tabs {
+        background: white;
+    }
+
+    .nav-link {
+        color: #636366 !important;
+        border: none !important;
+        border-bottom: 3px solid transparent !important;
+    }
+
+    .nav-link.active {
+        border-bottom-color: currentColor !important;
+        background: transparent !important;
+    }
+
+    .nav-link:hover {
+        color: inherit !important;
+    }
+
+    @@media (max-width: 768px) {
+        .card {
+            padding: 16px !important;
+        }
+
+        .col-md-3, .col-md-2, .col-md-5 {
+            padding: 8px;
+        }
+    }
+</style>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -43,16 +43,6 @@
                     
                     <div class="row">
                         <div class="col-md-6 mb-4">
-                            <label asp-for="Student.StudentId" class="form-label">
-                                <i class="fas fa-id-card me-1" style="color: #34c759;"></i>Student ID
-                                <span class="text-danger">*</span>
-                            </label>
-                            <input asp-for="Student.StudentId" class="form-control" 
-                                   style="border: 1.5px solid #e5e5ea; border-radius: 8px;" required />
-                            <small class="form-text text-muted">Unique student identifier</small>
-                            <span asp-validation-for="Student.StudentId" class="text-danger small d-block mt-1"></span>
-                        </div>
-                        <div class="col-md-6 mb-4">
                             <label asp-for="Student.FullName" class="form-label">
                                 <i class="fas fa-user me-1" style="color: #34c759;"></i>Full Name
                                 <span class="text-danger">*</span>
@@ -62,10 +52,6 @@
                             <small class="form-text text-muted">Complete legal name</small>
                             <span asp-validation-for="Student.FullName" class="text-danger small d-block mt-1"></span>
                         </div>
-                    </div>
-
-                    
-                    <div class="row">
                         <div class="col-md-6 mb-4">
                             <label asp-for="Student.Email" class="form-label">
                                 <i class="fas fa-envelope me-1" style="color: #34c759;"></i>Email
@@ -76,6 +62,10 @@
                             <small class="form-text text-muted">Student email address</small>
                             <span asp-validation-for="Student.Email" class="text-danger small d-block mt-1"></span>
                         </div>
+                    </div>
+
+                    
+                    <div class="row">
                         <div class="col-md-6 mb-4">
                             <label asp-for="Student.PhoneNumber" class="form-label">
                                 <i class="fas fa-phone me-1" style="color: #34c759;"></i>Phone Number
@@ -85,10 +75,6 @@
                             <small class="form-text text-muted">Contact phone number</small>
                             <span asp-validation-for="Student.PhoneNumber" class="text-danger small d-block mt-1"></span>
                         </div>
-                    </div>
-
-                    
-                    <div class="row">
                         <div class="col-md-6 mb-4">
                             <label asp-for="Student.GroupId" class="form-label">
                                 <i class="fas fa-users me-1" style="color: #34c759;"></i>Group
@@ -105,6 +91,10 @@
                             <small class="form-text text-muted">Assigned student group</small>
                             <span asp-validation-for="Student.GroupId" class="text-danger small d-block mt-1"></span>
                         </div>
+                    </div>
+
+                    
+                    <div class="row">
                         <div class="col-md-6 mb-4">
                             <label asp-for="Student.EnrollmentYear" class="form-label">
                                 <i class="fas fa-calendar me-1" style="color: #34c759;"></i>Enrollment Year
@@ -164,7 +154,7 @@
             <div class="card-body">
                 <div class="mb-3">
                     <small class="text-muted d-block mb-2">
-                        <strong>Student ID:</strong> Must be unique across all students. Cannot be modified once set.
+                        <strong>Full Name:</strong> Ensure the student's complete legal name is entered.
                     </small>
                 </div>
                 <div class="mb-3">
@@ -174,7 +164,7 @@
                 </div>
                 <div class="mb-3">
                     <small class="text-muted d-block mb-2">
-                        <strong>Group Homework:</strong> Ensure the student is assigned to the correct group based on their program.
+                        <strong>Group:</strong> Ensure the student is assigned to the correct group based on their program.
                     </small>
                 </div>
                 <div class="alert alert-info small mb-0">

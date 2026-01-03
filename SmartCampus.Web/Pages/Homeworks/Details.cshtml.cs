@@ -272,7 +272,6 @@ namespace SmartCampus.Web.Pages.Homework
                     return Unauthorized();
                 }
 
-                // For now, redirect with message - full grading UI can be implemented later
                 ToastHelper.ShowInfo(this, "Grading feature coming soon. Please use the admin panel for detailed grading.");
                 return RedirectToPage(new { id = id });
             }

@@ -28,12 +28,6 @@ namespace SmartCampus.Data.Repositories.Implementations
                               .FirstOrDefaultAsync(t => t.ApplicationUserId == applicationUserId);
         }
 
-        public async Task<Teacher?> GetByTeacherIdAsync(string teacherId)
-        {
-            return await DbSet.Include(t => t.ApplicationUser)
-                              .FirstOrDefaultAsync(t => t.TeacherId == teacherId);
-        }
-
         public async Task<IEnumerable<Teacher>> GetByDepartmentAsync(string department)
         {
             return await DbSet.Where(t => t.Department == department && t.IsActive)

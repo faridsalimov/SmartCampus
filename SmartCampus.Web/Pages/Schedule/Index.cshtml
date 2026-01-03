@@ -15,17 +15,14 @@
         BorderColor = "rgba(94, 92, 230, 0.1)"
     };
 
-    // Prepare calendar data using the CurrentMonth from the model
     var currentMonth = Model.CurrentMonth;
     var today = Model.Today;
     var firstDayOfMonth = new DateTime(currentMonth.Year, currentMonth.Month, 1);
     var daysInMonth = DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month);
     var startDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
 
-    // Create list of all days to display (including previous/next month days)
     var daysToDisplay = new List<DateTime>();
     
-    // Add previous month days
     if (startDayOfWeek > 0)
     {
         var prevMonthStartDate = firstDayOfMonth.AddDays(-startDayOfWeek);
@@ -35,20 +32,17 @@
         }
     }
     
-    // Add current month days
     for (int i = 1; i <= daysInMonth; i++)
     {
         daysToDisplay.Add(new DateTime(currentMonth.Year, currentMonth.Month, i));
     }
     
-    // Add next month days to fill grid
     var remainingDays = 42 - daysToDisplay.Count;
     for (int i = 1; i <= remainingDays; i++)
     {
         daysToDisplay.Add(firstDayOfMonth.AddMonths(1).AddDays(i - 1));
     }
 
-    // Function to get lessons for a specific day
     Func<DateTime, List<SmartCampus.Web.Pages.Schedule.IndexModel.LessonVM>> getLessonsForDay = (date) =>
     {
         if (Model.GroupedLessons.TryGetValue(date.Date, out var lessons))

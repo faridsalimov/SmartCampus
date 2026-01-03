@@ -33,27 +33,6 @@
 
 <partial name="_PageHeader" model="pageHeader" />
 
-
-<div class="row mb-4">
-    <div class="col-12">
-        <form method="get" class="d-flex gap-2 flex-wrap">
-            <div style="flex: 1; min-width: 250px;">
-                <input type="text" name="searchTerm" class="form-control" style="border: 1.5px solid #e5eea; border-radius: 10px; padding: 10px 14px;" placeholder="Search groups..." value="@Model.SearchTerm">
-            </div>
-            <button type="submit" class="btn btn-primary" style="border-radius: 10px; padding: 10px 20px;">
-                <i class="fas fa-search me-2"></i>Search
-            </button>
-            @if (!string.IsNullOrEmpty(Model.SearchTerm))
-            {
-                <a asp-page="Index" class="btn btn-outline-secondary" style="border-radius: 10px; padding: 10px 20px;">
-                    <i class="fas fa-times me-2"></i>Clear
-                </a>
-            }
-        </form>
-    </div>
-</div>
-
-
 @if (Model.Groups?.Count > 0)
 {
     <div class="card" style="border: 1px solid #e5e5ea; overflow: hidden;">

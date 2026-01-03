@@ -319,7 +319,6 @@
         --background: #f5f5f7;
     }
 
-    /* ========== ANIMATIONS ========== */
     @@keyframes slideUp {
         from {
             opacity: 0;
@@ -368,7 +367,6 @@
         opacity: 0;
     }
 
-    /* ========== METRICS GRID (Top) ========== */
     .metrics-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -445,7 +443,6 @@
         font-weight: 600;
     }
 
-    /* ========== MAIN DASHBOARD GRID ========== */
     .teacher-dashboard-grid {
         display: grid;
         grid-template-columns: 1.2fr 1.3fr 1fr;
@@ -460,7 +457,6 @@
         gap: 24px;
     }
 
-    /* ========== CARD STYLES ========== */
     .card-modern {
         background: white;
         border-radius: 16px;
@@ -525,7 +521,6 @@
         padding: 24px;
     }
 
-    /* ========== CALENDAR SCHEDULE STYLES ========== */
     .calendar-schedule {
         padding: 0;
     }
@@ -776,7 +771,6 @@
         color: #ccc;
     }
 
-    /* ========== ASSIGNED GROUPS STYLES ========== */
     .groups-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -836,7 +830,6 @@
         font-size: 0.95rem;
     }
 
-    /* ========== HOMEWORK/PENDING GRADE STYLES ========== */
     .homework-list {
         padding: 0;
     }
@@ -905,7 +898,6 @@
         margin-top: 4px;
     }
 
-    /* ========== STATISTICS STYLES ========== */
     .stats-list {
         padding: 0;
     }
@@ -946,7 +938,6 @@
         color: var(--info);
     }
 
-    /* ========== GROUP PERFORMANCE STYLES ========== */
     .performance-list {
         padding: 0;
     }
@@ -1007,7 +998,6 @@
         transition: width 0.3s ease;
     }
 
-    /* ========== RECENT CONTENT STYLES ========== */
     .recent-list {
         padding: 0;
     }
@@ -1064,7 +1054,6 @@
         color: var(--gray);
     }
 
-    /* ========== RESPONSIVE STYLES ========== */
     @@media (max-width: 1200px) {
         .teacher-dashboard-grid {
             grid-template-columns: 1fr 1fr;
@@ -1155,7 +1144,6 @@
 </style>
 
 <script>
-    // Calendar functionality for Teacher Dashboard
     const teacherLessons = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
         (object)(Model?.TodayLessons != null && Model.TodayLessons.Any()
             ? Model.TodayLessons.GroupBy(l => l.LessonDate.Date.ToString("yyyy-MM-dd"))
@@ -1169,25 +1157,21 @@
         const year = currentDateTeacher.getFullYear();
         const month = currentDateTeacher.getMonth();
         
-        // Update month/year display
         const monthYear = currentDateTeacher.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         const monthElement = document.getElementById('monthYearTeacher');
         if (monthElement) {
             monthElement.textContent = monthYear;
         }
 
-        // Clear calendar
         const calendarDates = document.getElementById('calendarDatesTeacher');
         if (!calendarDates) return;
         
         calendarDates.innerHTML = '';
 
-        // Get first day of month and number of days
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const daysInPrevMonth = new Date(year, month, 0).getDate();
 
-        // Add previous month's dates
         for (let i = firstDay - 1; i >= 0; i--) {
             const dateEl = document.createElement('div');
             dateEl.className = 'calendar-date empty';
@@ -1195,7 +1179,6 @@
             calendarDates.appendChild(dateEl);
         }
 
-        // Add current month's dates
         const today = new Date();
         for (let day = 1; day <= daysInMonth; day++) {
             const dateEl = document.createElement('div');
@@ -1205,12 +1188,10 @@
             dateEl.className = 'calendar-date';
             dateEl.textContent = day;
 
-            // Mark today
             if (fullDate.toDateString() === today.toDateString()) {
                 dateEl.classList.add('today');
             }
 
-            // Check for lessons/sessions on this date
             if (teacherLessons && teacherLessons[dateStr] && teacherLessons[dateStr].length > 0) {
                 dateEl.classList.add('has-sessions');
             }
@@ -1218,9 +1199,8 @@
             calendarDates.appendChild(dateEl);
         }
 
-        // Add next month's dates
         const totalCells = calendarDates.children.length;
-        const remainingCells = 42 - totalCells; // 6 rows * 7 days
+        const remainingCells = 42 - totalCells;
         for (let day = 1; day <= remainingCells; day++) {
             const dateEl = document.createElement('div');
             dateEl.className = 'calendar-date empty';
@@ -1229,7 +1209,6 @@
         }
     }
 
-    // Navigation for Teacher Dashboard
     const prevBtn = document.getElementById('prevMonthTeacher');
     const nextBtn = document.getElementById('nextMonthTeacher');
     
@@ -1247,7 +1226,6 @@
         });
     }
 
-    // Initial render with safety check
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', renderCalendarTeacher);
     } else {

@@ -1,9 +1,6 @@
 namespace SmartCampus.Web.ViewModels
 {
 
-
-
-
     public class StudentDashboardViewModel
     {
 
@@ -70,7 +67,6 @@ namespace SmartCampus.Web.ViewModels
     {
         public Guid StudentId { get; set; }
         public string FullName { get; set; } = string.Empty;
-        public string StudentId_Number { get; set; } = string.Empty;
     }
 
     public class LessonOverviewVM

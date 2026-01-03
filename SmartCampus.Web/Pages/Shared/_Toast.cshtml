@@ -5,7 +5,6 @@
 <div id="toastContainerBottom" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; max-width: 420px;"></div>
 
 <style>
-    /* Toast Base Styles */
     .toast-notification {
         padding: 14px 16px;
         border-radius: 10px;
@@ -23,7 +22,6 @@
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    /* Success Toast */
     .toast-notification.success {
         background: linear-gradient(135deg, rgba(52, 199, 89, 0.95) 0%, rgba(34, 177, 76, 0.95) 100%);
         color: white;
@@ -42,7 +40,6 @@
         color: white;
     }
 
-    /* Danger Toast */
     .toast-notification.danger {
         background: linear-gradient(135deg, rgba(255, 59, 48, 0.95) 0%, rgba(229, 57, 53, 0.95) 100%);
         color: white;
@@ -61,7 +58,6 @@
         color: white;
     }
 
-    /* Warning Toast */
     .toast-notification.warning {
         background: linear-gradient(135deg, rgba(255, 193, 7, 0.95) 0%, rgba(255, 152, 0, 0.95) 100%);
         color: white;
@@ -80,7 +76,6 @@
         color: white;
     }
 
-    /* Info Toast */
     .toast-notification.info {
         background: linear-gradient(135deg, rgba(0, 102, 255, 0.95) 0%, rgba(13, 110, 253, 0.95) 100%);
         color: white;
@@ -99,7 +94,6 @@
         color: white;
     }
 
-    /* Toast Icon */
     .toast-icon {
         flex-shrink: 0;
         display: flex;
@@ -108,7 +102,6 @@
         min-width: 20px;
     }
 
-    /* Toast Message Container */
     .toast-message {
         flex: 1;
         display: flex;
@@ -128,7 +121,6 @@
         opacity: 0.95;
     }
 
-    /* Toast Close Button */
     .toast-close {
         margin-left: auto;
         padding: 4px 8px;
@@ -153,7 +145,6 @@
         transform: scale(0.95);
     }
 
-    /* Progress Bar */
     .toast-progress {
         position: absolute;
         bottom: 0;
@@ -163,7 +154,6 @@
         border-radius: 0 0 10px 0;
     }
 
-    /* Animations */
     @@keyframes slideInRight {
         from {
             opacity: 0;
@@ -217,7 +207,6 @@
         }
     }
 
-    /* Toast Bottom Position */
     .toast-notification.bottom-position {
         animation: slideInLeft 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -230,7 +219,6 @@
         animation: slideOutRight 0.3s ease-in forwards;
     }
 
-    /* Responsive Design */
     @@media (max-width: 600px) {
         #toastContainer,
         #toastContainerBottom {
@@ -250,7 +238,6 @@
         }
     }
 
-    /* Dark Mode Support */
     @@media (prefers-color-scheme: dark) {
         .toast-notification {
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -260,10 +247,8 @@
 </style>
 
 <script>
-    // Initialize toast system with enhanced features
     window.Toast = window.Toast || {};
 
-    // Configuration
     const toastConfig = {
         position: 'top-right',
         enableSound: false,
@@ -271,10 +256,8 @@
         showProgressBar: true,
     };
 
-    // Active toasts tracking
     let activeToasts = [];
 
-    // Sound effect for notifications (optional)
     const playNotificationSound = function() {
         if (!toastConfig.enableSound) return;
         try {
@@ -293,12 +276,9 @@
             
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.1);
-        } catch(e) {
-            // Silently fail if audio not available
-        }
+        } catch(e) {}
     };
 
-    // Main show function
     window.Toast.show = function(message, type = 'info', duration = 3000, options = {}) {
         const position = options.position || toastConfig.position;
         const containerId = position === 'bottom-right' ? 'toastContainerBottom' : 'toastContainer';
@@ -306,7 +286,6 @@
         
         if (!toastContainer) return;
 
-        // Check max toasts limit
         if (activeToasts.length >= toastConfig.maxToasts) {
             const oldestToast = activeToasts.shift();
             if (oldestToast && oldestToast.parentElement) {
@@ -315,13 +294,11 @@
             }
         }
 
-        // Create toast element
         const toast = document.createElement('div');
         const classes = ['toast-notification', type];
         if (position === 'bottom-right') classes.push('bottom-position');
         toast.className = classes.join(' ');
 
-        // Icon mapping
         const iconClass = {
             'success': 'check-circle',
             'danger': 'times-circle',
@@ -329,13 +306,11 @@
             'info': 'info-circle'
         }[type] || 'info-circle';
 
-        // Extract title if provided
         const title = options.title || '';
         const messageHtml = title 
             ? `<div class="toast-title">${title}</div><div class="toast-text">${message}</div>`
             : message;
 
-        // Build toast HTML
         toast.innerHTML = `
             <i class="fas fa-${iconClass} toast-icon"></i>
             <div class="toast-message">${messageHtml}</div>
@@ -345,7 +320,6 @@
             ${toastConfig.showProgressBar ? '<div class="toast-progress" style="animation: progressShrink ' + duration + 'ms linear forwards;"></div>' : ''}
         `;
 
-        // Add close button handler
         const closeBtn = toast.querySelector('.toast-close');
         const removeToast = () => {
             toast.classList.add('removing');
@@ -357,27 +331,22 @@
         
         closeBtn.onclick = removeToast;
 
-        // Append to container
         toastContainer.appendChild(toast);
         activeToasts.push(toast);
 
-        // Play notification sound
         playNotificationSound();
 
-        // Auto remove after duration
         const timeoutId = setTimeout(() => {
             if (toast.parentElement) {
                 removeToast();
             }
         }, duration);
 
-        // Store timeout for clearing if toast is closed early
         toast.timeoutId = timeoutId;
 
         return toast;
     };
 
-    // Convenience methods
     window.Toast.success = function(message, duration = 3000, options = {}) {
         return this.show(message, 'success', duration, options);
     };
@@ -394,7 +363,6 @@
         return this.show(message, 'info', duration, options);
     };
 
-    // Additional helper methods
     window.Toast.setPosition = function(position) {
         if (['top-right', 'bottom-right'].includes(position)) {
             toastConfig.position = position;

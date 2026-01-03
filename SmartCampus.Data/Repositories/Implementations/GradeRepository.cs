@@ -14,8 +14,7 @@ namespace SmartCampus.Data.Repositories.Implementations
         {
             return await DbSet.Include(g => g.Student)
                               .ThenInclude(s => s!.ApplicationUser)
-                              .Include(g => g.Course)
-                              .Include(g => g.HomeworkSubmission)
+                              .Include(g => g.Lesson)
                               .OrderByDescending(g => g.GradedDate)
                               .ToListAsync();
         }
@@ -25,20 +24,14 @@ namespace SmartCampus.Data.Repositories.Implementations
             return await DbSet.Where(g => g.StudentId == studentId)
                               .Include(g => g.Student)
                               .ThenInclude(s => s!.ApplicationUser)
-                              .Include(g => g.Course)
-                              .Include(g => g.HomeworkSubmission)
+                              .Include(g => g.Lesson)
                               .OrderByDescending(g => g.GradedDate)
                               .ToListAsync();
         }
 
         public async Task<IEnumerable<Grade>> GetByCourseIdAsync(Guid courseId)
         {
-            return await DbSet.Where(g => g.CourseId == courseId)
-                              .Include(g => g.Student)
-                              .ThenInclude(s => s!.ApplicationUser)
-                              .Include(g => g.Course)
-                              .OrderByDescending(g => g.GradedDate)
-                              .ToListAsync();
+            return await Task.FromResult(new List<Grade>());
         }
 
         public async Task<IEnumerable<Grade>> GetByGroupIdAsync(Guid groupId)
@@ -47,17 +40,14 @@ namespace SmartCampus.Data.Repositories.Implementations
                               .Include(g => g.Student)
                               .ThenInclude(s => s!.ApplicationUser)
                               .Include(g => g.Group)
-                              .Include(g => g.Course)
+                              .Include(g => g.Lesson)
                               .OrderByDescending(g => g.GradedDate)
                               .ToListAsync();
         }
 
         public async Task<Grade?> GetByHomeworkSubmissionIdAsync(Guid submissionId)
         {
-            return await DbSet.Include(g => g.Student)
-                              .ThenInclude(s => s!.ApplicationUser)
-                              .Include(g => g.HomeworkSubmission)
-                              .FirstOrDefaultAsync(g => g.HomeworkSubmissionId == submissionId);
+            return await Task.FromResult<Grade?>(null);
         }
 
         public async Task<decimal?> GetStudentAverageGradeAsync(Guid studentId)

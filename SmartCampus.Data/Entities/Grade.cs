@@ -17,15 +17,11 @@ namespace SmartCampus.Data.Entities
         [ForeignKey(nameof(StudentId))]
         public virtual Student? Student { get; set; }
 
-        public Guid? HomeworkSubmissionId { get; set; }
+        [Required]
+        public Guid LessonId { get; set; }
 
-        [ForeignKey(nameof(HomeworkSubmissionId))]
-        public virtual HomeworkSubmission? HomeworkSubmission { get; set; }
-
-        public Guid? CourseId { get; set; }
-
-        [ForeignKey(nameof(CourseId))]
-        public virtual Course? Course { get; set; }
+        [ForeignKey(nameof(LessonId))]
+        public virtual Lesson? Lesson { get; set; }
 
         public Guid? GroupId { get; set; }
 
@@ -40,9 +36,6 @@ namespace SmartCampus.Data.Entities
 
         [StringLength(500)]
         public string? Feedback { get; set; }
-
-        [StringLength(100)]
-        public string? GradeType { get; set; }
 
         public DateTime GradedDate { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }

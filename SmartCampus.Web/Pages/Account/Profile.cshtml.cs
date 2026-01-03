@@ -134,8 +134,6 @@ namespace SmartCampus.Web.Pages.Account
 
             try
             {
-                // Only allow phone number updates
-                // First Name, Last Name, and Email cannot be changed
                 var phoneNumberUpdated = false;
                 if (Input?.PhoneNumber != user.PhoneNumber)
                 {

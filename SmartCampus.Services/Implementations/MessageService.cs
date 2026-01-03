@@ -53,6 +53,31 @@ namespace SmartCampus.Services.Implementations
             return await _unitOfWork.MessageRepository.GetUnreadMessageCountAsync(receiverId);
         }
 
+        public async Task<IEnumerable<MessageDto>> GetUnreadMessagesAsync(string receiverId)
+        {
+            var messages = await _unitOfWork.MessageRepository.GetByReceiverIdAsync(receiverId);
+            var unreadMessages = messages.Where(m => !m.IsRead && !m.IsDeleted).ToList();
+            return _mapper.Map<IEnumerable<MessageDto>>(unreadMessages);
+        }
+
+        public async Task<Dictionary<string, int>> GetUnreadCountsByContactAsync(string userId)
+        {
+            try
+            {
+                var receivedMessages = await _unitOfWork.MessageRepository.GetByReceiverIdAsync(userId);
+                var unreadByContact = receivedMessages
+                    .Where(m => !m.IsRead && !m.IsDeleted)
+                    .GroupBy(m => m.SenderId)
+                    .ToDictionary(g => g.Key, g => g.Count());
+                return unreadByContact;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting unread counts by contact: {ex.Message}");
+                return new Dictionary<string, int>();
+            }
+        }
+
         public async Task<MessageDto> SendMessageAsync(string senderId, string receiverId, string content)
         {
             var message = new Message
@@ -79,6 +104,24 @@ namespace SmartCampus.Services.Implementations
                 message.IsRead = true;
                 message.ReadDate = DateTime.UtcNow;
                 _unitOfWork.MessageRepository.Update(message);
+                await _unitOfWork.SaveChangesAsync();
+            }
+        }
+
+        public async Task MarkConversationAsReadAsync(string userId, string contactId)
+        {
+            var messages = await _unitOfWork.MessageRepository.GetConversationAsync(userId, contactId);
+            var unreadMessages = messages.Where(m => m.ReceiverId == userId && !m.IsRead).ToList();
+
+            foreach (var message in unreadMessages)
+            {
+                message.IsRead = true;
+                message.ReadDate = DateTime.UtcNow;
+                _unitOfWork.MessageRepository.Update(message);
+            }
+
+            if (unreadMessages.Count > 0)
+            {
                 await _unitOfWork.SaveChangesAsync();
             }
         }

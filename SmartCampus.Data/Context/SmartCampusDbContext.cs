@@ -47,20 +47,12 @@ namespace SmartCampus.Data.Context
                 .HasForeignKey(s => s.GroupId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Student>()
-                .HasIndex(s => s.StudentId)
-                .IsUnique();
-
 
             modelBuilder.Entity<Teacher>()
                 .HasOne(t => t.ApplicationUser)
                 .WithOne(u => u.Teacher)
                 .HasForeignKey<Teacher>(t => t.ApplicationUserId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Teacher>()
-                .HasIndex(t => t.TeacherId)
-                .IsUnique();
 
 
             modelBuilder.Entity<Course>()
@@ -147,16 +139,10 @@ namespace SmartCampus.Data.Context
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Grade>()
-                .HasOne(g => g.HomeworkSubmission)
-                .WithOne(hs => hs.Grade)
-                .HasForeignKey<Grade>(g => g.HomeworkSubmissionId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Grade>()
-                .HasOne(g => g.Course)
-                .WithMany()
-                .HasForeignKey(g => g.CourseId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .HasOne(g => g.Lesson)
+                .WithMany(l => l.Grades)
+                .HasForeignKey(g => g.LessonId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Grade>()
                 .HasOne(g => g.Group)
@@ -181,6 +167,12 @@ namespace SmartCampus.Data.Context
                 .WithMany(l => l.AttendanceRecords)
                 .HasForeignKey(ar => ar.LessonId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AttendanceRecord>()
+                .HasOne(ar => ar.Teacher)
+                .WithMany()
+                .HasForeignKey(ar => ar.TeacherId)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
             modelBuilder.Entity<Announcement>()

@@ -47,12 +47,10 @@ namespace SmartCampus.Web.Pages.Schedule
 
         public async Task OnGetAsync(int? year = null, int? month = null)
         {
-            // Set current month based on parameters
             var now = DateTime.Now;
             int selectedYear = year ?? now.Year;
             int selectedMonth = month ?? now.Month;
 
-            // Validate month
             if (selectedMonth < 1) selectedMonth = 1;
             if (selectedMonth > 12) selectedMonth = 12;
             if (selectedYear < 2000) selectedYear = 2000;
@@ -96,7 +94,6 @@ namespace SmartCampus.Web.Pages.Schedule
                     lessons = await _lessonService.GetAllLessonsAsync();
                 }
 
-                // Get all lessons for the selected month
                 var monthStart = new DateTime(selectedYear, selectedMonth, 1);
                 var monthEnd = monthStart.AddMonths(1).AddDays(-1);
 
@@ -105,7 +102,6 @@ namespace SmartCampus.Web.Pages.Schedule
                     .OrderBy(l => l.LessonDate)
                     .ToList();
 
-                // Group by day
                 var groupedByDay = monthLessons
                     .GroupBy(l => l.LessonDate.Date)
                     .OrderBy(g => g.Key);

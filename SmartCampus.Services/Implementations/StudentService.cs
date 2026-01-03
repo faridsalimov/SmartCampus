@@ -36,12 +36,6 @@ namespace SmartCampus.Services.Implementations
             return _mapper.Map<StudentDto>(student);
         }
 
-        public async Task<StudentDto?> GetStudentByStudentIdAsync(string studentId)
-        {
-            var student = await _unitOfWork.StudentRepository.GetByStudentIdAsync(studentId);
-            return _mapper.Map<StudentDto>(student);
-        }
-
         public async Task<IEnumerable<StudentDto>> GetStudentsByGroupAsync(Guid groupId)
         {
             var students = await _unitOfWork.StudentRepository.GetByGroupIdAsync(groupId);
@@ -53,11 +47,18 @@ namespace SmartCampus.Services.Implementations
             if (studentDto == null)
                 throw new ArgumentNullException(nameof(studentDto));
 
-            if (string.IsNullOrWhiteSpace(studentDto.StudentId))
-                throw new InvalidOperationException("Student ID is required.");
+            if (studentDto.GroupId == Guid.Empty)
+                throw new InvalidOperationException("Group is required.");
+
+            if (string.IsNullOrWhiteSpace(studentDto.ApplicationUserId))
+                throw new InvalidOperationException("ApplicationUserId is required.");
 
             try
             {
+                var existingAppUser = await _unitOfWork.StudentRepository.GetByApplicationUserIdAsync(studentDto.ApplicationUserId);
+                if (existingAppUser != null)
+                    throw new InvalidOperationException("This user is already linked to another student record.");
+
                 var student = _mapper.Map<Student>(studentDto);
                 student.Id = Guid.NewGuid();
                 student.CreatedAt = DateTime.UtcNow;
@@ -79,11 +80,18 @@ namespace SmartCampus.Services.Implementations
                 throw new ArgumentNullException(nameof(studentDto));
 
             if (studentDto.Id == Guid.Empty)
-                throw new InvalidOperationException("Student ID is required for update.");
+                throw new InvalidOperationException("Student Id is required for update.");
+
+            if (studentDto.GroupId == Guid.Empty)
+                throw new InvalidOperationException("Group is required.");
 
             try
             {
-                var student = _mapper.Map<Student>(studentDto);
+                var student = await _unitOfWork.StudentRepository.GetByIdAsync(studentDto.Id);
+                if (student == null)
+                    throw new InvalidOperationException($"Student with Id {studentDto.Id} not found.");
+
+                student = _mapper.Map(studentDto, student);
                 student.UpdatedAt = DateTime.UtcNow;
 
                 _unitOfWork.StudentRepository.Update(student);
@@ -98,13 +106,13 @@ namespace SmartCampus.Services.Implementations
         public async Task DeleteStudentAsync(Guid id)
         {
             if (id == Guid.Empty)
-                throw new InvalidOperationException("Student ID is required.");
+                throw new InvalidOperationException("Student Id is required.");
 
             try
             {
                 var student = await _unitOfWork.StudentRepository.GetByIdAsync(id);
                 if (student == null)
-                    throw new InvalidOperationException($"Student with ID {id} not found.");
+                    throw new InvalidOperationException($"Student with Id {id} not found.");
 
                 _unitOfWork.StudentRepository.Delete(student);
                 await _unitOfWork.SaveChangesAsync();

@@ -23,12 +23,32 @@ namespace SmartCampus.Core.Mappings
                 .ForMember(dest => dest.Group, opt => opt.Ignore());
 
 
+            CreateMap<StudentDto, Student>()
+                .ForMember(dest => dest.ApplicationUser, opt => opt.Ignore())
+                .ForMember(dest => dest.ApplicationUserId, opt => opt.Ignore())
+                .ForMember(dest => dest.Group, opt => opt.Ignore())
+                .ForSourceMember(src => src.FullName, opt => opt.DoNotValidate())
+                .ForSourceMember(src => src.Email, opt => opt.DoNotValidate())
+                .ForSourceMember(src => src.PhoneNumber, opt => opt.DoNotValidate())
+                .ForSourceMember(src => src.GroupName, opt => opt.DoNotValidate())
+                .ForSourceMember(src => src.Password, opt => opt.DoNotValidate());
+
+
             CreateMap<Teacher, TeacherDto>()
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.ApplicationUser!.FullName))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.ApplicationUser!.Email))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.ApplicationUser!.PhoneNumber))
                 .ReverseMap()
                 .ForMember(dest => dest.ApplicationUser, opt => opt.Ignore());
+
+
+            CreateMap<TeacherDto, Teacher>()
+                .ForMember(dest => dest.ApplicationUser, opt => opt.Ignore())
+                .ForMember(dest => dest.ApplicationUserId, opt => opt.Ignore())
+                .ForSourceMember(src => src.FullName, opt => opt.DoNotValidate())
+                .ForSourceMember(src => src.Email, opt => opt.DoNotValidate())
+                .ForSourceMember(src => src.PhoneNumber, opt => opt.DoNotValidate())
+                .ForSourceMember(src => src.Password, opt => opt.DoNotValidate());
 
 
             CreateMap<Course, CourseDto>()
@@ -55,28 +75,18 @@ namespace SmartCampus.Core.Mappings
                 .ForMember(dest => dest.Teacher, opt => opt.Ignore());
 
 
-            CreateMap<HomeworkSubmission, HomeworkSubmissionDto>()
-                .ForMember(dest => dest.HomeworkTitle, opt => opt.MapFrom(src => src.Homework!.Title))
-                .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student!.ApplicationUser!.FullName))
-                .ReverseMap()
-                .ForMember(dest => dest.Homework, opt => opt.Ignore())
-                .ForMember(dest => dest.Student, opt => opt.Ignore());
-
-
             CreateMap<Grade, GradeDto>()
                 .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student != null && src.Student.ApplicationUser != null ? src.Student.ApplicationUser.FullName : "Unknown"))
-                .ForMember(dest => dest.GroupId, opt => opt.MapFrom(src => src.GroupId))
+                .ForMember(dest => dest.LessonTitle, opt => opt.MapFrom(src => src.Lesson != null ? src.Lesson.Title : ""))
                 .ReverseMap()
                 .ForMember(dest => dest.Student, opt => opt.Ignore())
-                .ForMember(dest => dest.Course, opt => opt.Ignore())
+                .ForMember(dest => dest.Lesson, opt => opt.Ignore())
                 .ForMember(dest => dest.Group, opt => opt.Ignore())
-                .ForMember(dest => dest.HomeworkSubmission, opt => opt.Ignore())
-                .ForMember(dest => dest.GradedByTeacher, opt => opt.Ignore())
-                .ForMember(dest => dest.CourseId, opt => opt.Condition(src => src.CourseId.HasValue && src.CourseId != Guid.Empty));
+                .ForMember(dest => dest.GradedByTeacher, opt => opt.Ignore());
 
 
             CreateMap<AttendanceRecord, AttendanceDto>()
-                .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student!.ApplicationUser!.FullName))
+                .ForMember(dest => dest.TeacherName, opt => opt.MapFrom(src => src.Teacher!.ApplicationUser!.FullName))
                 .ForMember(dest => dest.LessonTitle, opt => opt.MapFrom(src => src.Lesson!.Title))
                 .ReverseMap()
                 .ForMember(dest => dest.Student, opt => opt.Ignore())
@@ -96,6 +106,7 @@ namespace SmartCampus.Core.Mappings
                 .ForMember(dest => dest.SenderProfilePhoto, opt => opt.MapFrom(src => src.Sender!.ProfilePhoto))
                 .ForMember(dest => dest.ReceiverName, opt => opt.MapFrom(src => src.Receiver!.FullName))
                 .ForMember(dest => dest.ReceiverProfilePhoto, opt => opt.MapFrom(src => src.Receiver!.ProfilePhoto))
+                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
                 .ReverseMap()
                 .ForMember(dest => dest.Sender, opt => opt.Ignore())
                 .ForMember(dest => dest.Receiver, opt => opt.Ignore());

@@ -13,5 +13,6 @@ namespace SmartCampus.Core.DTOs
         public DateTime SentDate { get; set; }
         public bool IsRead { get; set; }
         public DateTime? ReadDate { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

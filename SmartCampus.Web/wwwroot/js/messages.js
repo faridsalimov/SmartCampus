@@ -4,8 +4,6 @@
     if (!window.location.pathname.includes('/Messages')) {
         return;
     }
-
-    console.log('Messages page loaded');
     
     let signalRLoaded = false;
     let attemptCount = 0;
@@ -34,13 +32,13 @@
     const receiverIdInput = document.getElementById('receiverId');
     const conversationsScroll = document.querySelector('.conversations-scroll');
 
-    if (!messageForm || !receiverIdInput) {
-        console.log('Message form not found - not on active chat page');
+    if (!conversationsScroll) {
+        console.log('Not on Messages page or conversations scroll not found');
         return;
     }
 
-    const receiverId = receiverIdInput.value;
-    console.log('Receiver ID:', receiverId);
+    let receiverId = receiverIdInput?.value || '';
+    console.log('Initial Receiver ID:', receiverId);
     
     let connection = null;
     try {
@@ -57,25 +55,42 @@
     }
     
     connection.on('ReceiveMessage', function(message) {
-        console.log('Message received:', message);
-        if (message.senderId === receiverId) {
+        console.log('ReceiveMessage event:', message);
+        
+        const senderId = message.senderId;
+        
+        if (receiverId && senderId === receiverId) {
+            console.log('Message is from current conversation, displaying...');
             displayMessage(message, 'received');
             
             if (connection && connection.state === signalR.HubConnectionState.Connected) {
-                connection.invoke('MarkAsRead', message.senderId)
+                connection.invoke('MarkAsRead', senderId)
                     .catch(err => console.error('Error marking as read:', err));
             }
+        } else {
+            console.log('No active conversation, updating conversation list...');
+            
+            const preview = message.content?.length > 50 
+                ? message.content.substring(0, 50) + "..." 
+                : message.content || "";
+            
+            updateConversationList({
+                contactId: senderId,
+                contactName: message.senderName || 'Unknown',
+                contactPhoto: message.senderProfilePhoto,
+                lastMessageDate: message.sentDate,
+                preview: preview,
+                isSender: false,
+                unreadCount: 1
+            });
         }
     });
 
     connection.on('MessageSent', function(message) {
-        console.log('Message sent confirmation:', message);
-        displayMessage({
-            ...message,
-            senderId: receiverId,
-            senderName: 'You',
-            content: message.content
-        }, 'sent');
+        console.log('MessageSent confirmation event:', message);
+        if (message && message.content) {
+            displayMessage(message, 'sent');
+        }
     });
 
     connection.on('UpdateConversation', function(data) {
@@ -93,14 +108,15 @@
         markMessagesAsReadUI(data);
     });
 
-    connection.on('UserOnline', function(userId) {
-        console.log('User online:', userId);
-        updateUserStatus(userId, true);
+    connection.on('UnreadCountUpdated', function(data) {
+        console.log('Unread count updated from hub:', data);
+        if (window.NotificationSystem) {
+            window.NotificationSystem.updateBadge(data.totalUnreadCount);
+        }
     });
 
-    connection.on('UserOffline', function(userId) {
-        console.log('User offline:', userId);
-        updateUserStatus(userId, false);
+    connection.on('NewMessageNotification', function(data) {
+        console.log('New message notification received on messages page:', data);
     });
 
     connection.on('Error', function(error) {
@@ -109,16 +125,18 @@
 
     connection.onreconnected(function() {
         console.log('Reconnected to SignalR');
+        sendBtn.disabled = false;
     });
 
     connection.onreconnecting(function() {
         console.log('Reconnecting to SignalR...');
+        sendBtn.disabled = true;
     });
     
     async function startConnection() {
         try {
             await connection.start();
-            console.log('Connected to messages hub');
+            console.log('Connected to messages hub - state:', connection.state);
             if (messageInput) {
                 messageInput.focus();
             }
@@ -134,49 +152,62 @@
         connection: connection,
         sendMessage: async function(content) {
             if (!connection || connection.state !== signalR.HubConnectionState.Connected) {
-                console.error('Not connected to hub');
+                console.error('Not connected to hub. State:', connection?.state);
+                alert('Not connected to messaging service. Please wait...');
                 return;
             }
-            const receiverId = receiverIdInput.value;
-            return await connection.invoke('SendMessage', receiverId, content);
+            const currentReceiverId = receiverIdInput.value;
+            console.log('Invoking SendMessage with receiverId:', currentReceiverId, 'content:', content);
+            return await connection.invoke('SendMessage', currentReceiverId, content);
         }
     };
     
-    messageForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const content = messageInput?.value?.trim();
+    if (messageForm) {
+        messageForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const content = messageInput?.value?.trim();
+            const currentReceiverId = receiverIdInput?.value;
 
-        if (!content || !receiverId) {
-            console.log('Empty message or no receiver');
-            return;
-        }
+            console.log('Form submitted. Content:', content, 'ReceiverID:', currentReceiverId, 'Connection state:', connection?.state);
 
-        if (!connection || connection.state !== signalR.HubConnectionState.Connected) {
-            console.error('Not connected to hub');
-            alert('Not connected to messaging service. Please refresh the page.');
-            return;
-        }
+            if (!content || !currentReceiverId) {
+                console.log('Empty message or no receiver');
+                return;
+            }
 
-        console.log('Sending message:', content);
-        messageInput.value = '';
-        messageInput.style.height = 'auto';
-        sendBtn.disabled = true;
+            if (!connection || connection.state !== signalR.HubConnectionState.Connected) {
+                console.error('Not connected to hub. State:', connection?.state);
+                alert('Not connected to messaging service. Reconnecting...');
+                return;
+            }
 
-        try {
-            await connection.invoke('SendMessage', receiverId, content);
-            console.log('Message sent successfully');
-            sendBtn.disabled = false;
-            messageInput.focus();
-        } catch (err) {
-            console.error('Error sending message:', err);
-            messageInput.value = content;
-            sendBtn.disabled = false;
-            alert('Error sending message. Please try again.');
-        }
-    });
+            console.log('Sending message via SignalR:', content);
+            
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            sendBtn.disabled = true;
+
+            try {
+                const result = await connection.invoke('SendMessage', currentReceiverId, content);
+                console.log('SendMessage invoke completed, result:', result);
+                sendBtn.disabled = false;
+                messageInput.focus();
+            } catch (err) {
+                console.error('Error sending message:', err);
+                messageInput.value = content;
+                sendBtn.disabled = false;
+                alert('Error sending message. Please try again.');
+            }
+        });
+    }
     
     function displayMessage(message, type) {
-        if (!messagesArea) return;
+        console.log('displayMessage called with:', message, 'type:', type);
+        
+        if (!messagesArea) {
+            console.error('messagesArea not found!');
+            return;
+        }
 
         const messageBubble = document.createElement('div');
         messageBubble.className = `message-bubble ${type}`;
@@ -237,12 +268,12 @@
         messagesArea.appendChild(messageBubble);
         
         setTimeout(() => {
-            messagesArea.scrollTop = messagesArea.scrollHeight;
+            if (messagesArea) {
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+            }
         }, 0);
 
-        updateChatHeaderTime(sentDate);
-
-        console.log('Message displayed');
+        console.log('Message displayed successfully');
     }
 
     function updateConversationList(data) {
@@ -252,6 +283,12 @@
         let conversationItem = document.querySelector(`[data-contact-id="${contactId}"]`);
 
         if (!conversationItem) {
+            const emptyState = conversationsScroll.querySelector('.empty-conversations');
+            if (emptyState) {
+                emptyState.style.display = 'none';
+                console.log('Empty state hidden');
+            }
+
             conversationItem = document.createElement('a');
             conversationItem.href = `?contactId=${contactId}`;
             conversationItem.className = 'conversation-item';
@@ -356,7 +393,6 @@
             sentMessages.forEach(bubble => {
                 const status = bubble.querySelector('.message-status');
                 if (status) {
-                    
                     const currentHTML = status.innerHTML;
                     if (!currentHTML.includes('fa-check-double')) {
                         status.innerHTML = '<i class="fas fa-check-double"></i>';
@@ -391,10 +427,6 @@
         console.log('Conversation unread badge updated:', data);
     }
     
-    function updateUserStatus(userId, isOnline) {
-        console.log('User', userId, 'is', isOnline ? 'online' : 'offline');
-    }
-    
     function updateChatHeaderTime(sentDate) {
         const chatHeaderTime = document.getElementById('chatHeaderTime');
         if (!chatHeaderTime) return;
@@ -411,7 +443,6 @@
         }
 
         chatHeaderTime.textContent = timeText;
-        console.log('Chat header time updated:', timeText);
     }
     
     function getTimeDisplay(date) {
@@ -439,6 +470,17 @@
                 messageForm.dispatchEvent(new Event('submit'));
             }
         });
+    }
+
+    if (receiverId && connection.state === signalR.HubConnectionState.Connected) {
+        console.log('Marking initial conversation as read:', receiverId);
+        try {
+            await connection.invoke('MarkAsRead', receiverId);
+            console.log('Initial conversation marked as read');
+            await connection.invoke('GetUnreadCount');
+        } catch (err) {
+            console.error('Error marking initial conversation as read:', err);
+        }
     }
 
     console.log('Messages hub initialized successfully');

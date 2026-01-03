@@ -24,7 +24,6 @@
         border-radius: 10px;
     }
 
-    /* ===== CONVERSATIONS LIST (LEFT SIDE) ===== */
     .conversations-list {
         width: 360px;
         border-right: 1px solid #e5e5ea;
@@ -105,6 +104,8 @@
         flex: 1;
         overflow-y: auto;
         overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
     }
 
     .conversation-item {
@@ -199,6 +200,7 @@
     }
 
     .empty-conversations {
+        flex: 1;
         padding: 40px 20px;
         text-align: center;
         color: #a1a1a6;
@@ -214,7 +216,11 @@
         margin-bottom: 12px;
     }
 
-    /* ===== CHAT VIEW (RIGHT SIDE) ===== */
+    .empty-conversations p {
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+
     .chat-view {
         flex: 1;
         display: flex;
@@ -326,12 +332,10 @@
         flex-shrink: 0;
     }
 
-    /* Hide all message bubble avatars */
     .message-bubble-avatar {
         display: none;
     }
 
-    /* Hide avatars in sent messages */
     .message-bubble.sent .message-bubble-avatar {
         display: none;
     }
@@ -402,7 +406,6 @@
         display: none;
     }
 
-    /* ===== INPUT AREA ===== */
     .chat-input-area {
         padding: 16px 24px;
         border-top: 1px solid #e5e5ea;
@@ -469,7 +472,6 @@
         transform: none;
     }
 
-    /* ===== EMPTY STATE ===== */
     .empty-chat {
         flex: 1;
         display: flex;
@@ -501,7 +503,6 @@
         font-size: 0.95rem;
     }
 
-    /* ===== SCROLLBAR STYLING ===== */
     .conversations-scroll::-webkit-scrollbar,
     .messages-area::-webkit-scrollbar {
         width: 6px;
@@ -523,7 +524,6 @@
         background: #d1d1d6;
     }
 
-    /* ===== RESPONSIVE ===== */
     @@media (max-width: 992px) {
         .messages-container {
             flex-direction: column;
@@ -568,7 +568,7 @@
                 @foreach (var kvp in Model.Conversations.OrderByDescending(x => x.Value.LastMessageDate))
                 {
                     var contactId = kvp.Key;
-                    var (contactName, lastMessageDate, hasUnread, messages, contactPhoto) = kvp.Value;
+                    var (contactName, lastMessageDate, hasUnread, unreadCount, messages, contactPhoto) = kvp.Value;
                     var isActive = Model.SelectedContactId == contactId;
                     var lastMessage = messages.FirstOrDefault();
                     var previewText = lastMessage?.Content?.Length > 50 
@@ -583,9 +583,6 @@
                             <div class="conversation-header-row">
                                 <span class="conversation-name">@contactName</span>
                                 <span class="conversation-time">@GetTimeDisplay(lastMessageDate)</span>
-                                @{
-                                    var unreadCount = messages.Count(m => m.ReceiverId == Model.CurrentUserId && !m.IsRead);
-                                }
                                 @if (unreadCount > 0)
                                 {
                                     <span class="conversation-unread-badge" data-unread-count="@unreadCount">@(unreadCount > 99 ? "99+" : unreadCount)</span>
@@ -607,7 +604,7 @@
                 <div class="empty-conversations">
                     <i class="fas fa-comments"></i>
                     <p>No conversations yet</p>
-                    <small style="color: #a1a1a6; margin-top: 8px;">Start a new chat to begin messaging</small>
+                    <small style="color: #a1a1a6;">Start a new chat to begin messaging</small>
                 </div>
             }
         </div>
@@ -773,14 +770,12 @@
             }
         }
 
-        // Close modal when clicking outside
         document.getElementById('newChatModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 hideNewChatModal();
             }
         });
 
-        // Search conversations
         document.getElementById('searchInput')?.addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             document.querySelectorAll('.conversation-item').forEach(item => {
@@ -789,7 +784,6 @@
             });
         });
 
-        // Handle textarea auto-resize
         const textarea = document.getElementById('messageInput');
         if (textarea) {
             textarea.addEventListener('input', function() {
@@ -815,29 +809,33 @@
             }
         }
 
-        // Mark as read when conversation is loaded
-        const selectedContactId = document.querySelector('[data-contact-id].active')?.getAttribute('data-contact-id');
-        if (selectedContactId && window.messagesHub && window.messagesHub.connection) {
-            const connection = window.messagesHub.connection;
-            if (connection.state === signalR.HubConnectionState.Connected) {
-                connection.invoke('MarkAsRead', selectedContactId)
-                    .then(() => {
-                        console.log('Messages marked as read on page load');
-                        // Update badge after marking as read
-                        if (window.updateUnreadBadge) {
-                            window.updateUnreadBadge();
-                        }
-                    })
-                    .catch(err => console.error('Error marking as read:', err));
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectedContactId = document.querySelector('[data-contact-id].active')?.getAttribute('data-contact-id');
+            if (selectedContactId) {
+                const waitForHub = setInterval(() => {
+                    if (window.messagesHub && window.messagesHub.connection && 
+                        window.messagesHub.connection.state === signalR.HubConnectionState.Connected) {
+                        clearInterval(waitForHub);
+                        
+                        window.messagesHub.connection.invoke('MarkAsRead', selectedContactId)
+                            .then(() => {
+                                if (window.NotificationSystem) {
+                                    window.NotificationSystem.getHub().invoke('GetUnreadCount')
+                                        .catch(err => console.error('Error getting unread count:', err));
+                                }
+                            })
+                            .catch(err => console.error('Error marking as read:', err));
+                    }
+                }, 100);
+                
+                setTimeout(() => clearInterval(waitForHub), 10000);
             }
-        }
 
-        // Scroll to bottom of messages when page loads
-        const messagesArea = document.getElementById('messagesArea');
-        if (messagesArea) {
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-            console.log('Scrolled to bottom of messages');
-        }
+            const messagesArea = document.getElementById('messagesArea');
+            if (messagesArea) {
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+            }
+        });
     </script>
 }
 

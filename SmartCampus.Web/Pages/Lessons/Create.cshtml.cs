@@ -16,6 +16,8 @@ namespace SmartCampus.Web.Pages.Lessons
         private readonly ILessonService _lessonService;
         private readonly IGroupService _groupService;
         private readonly ITeacherService _teacherService;
+        private readonly IAttendanceService _attendanceService;
+        private readonly IStudentService _studentService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly UserContextHelper _userContextHelper;
 
@@ -23,12 +25,16 @@ namespace SmartCampus.Web.Pages.Lessons
             ILessonService lessonService,
             IGroupService groupService,
             ITeacherService teacherService,
+            IAttendanceService attendanceService,
+            IStudentService studentService,
             UserManager<ApplicationUser> userManager,
             UserContextHelper userContextHelper)
         {
             _lessonService = lessonService;
             _groupService = groupService;
             _teacherService = teacherService;
+            _attendanceService = attendanceService;
+            _studentService = studentService;
             _userManager = userManager;
             _userContextHelper = userContextHelper;
         }
@@ -37,6 +43,7 @@ namespace SmartCampus.Web.Pages.Lessons
         public LessonDto Lesson { get; set; } = new();
 
         public IList<GroupDto> Groups { get; set; } = new List<GroupDto>();
+        public IList<StudentDto> SelectedGroupStudents { get; set; } = new List<StudentDto>();
 
         public async Task OnGetAsync()
         {
@@ -119,8 +126,18 @@ namespace SmartCampus.Web.Pages.Lessons
                     }
                 }
 
-                await _lessonService.CreateLessonAsync(Lesson);
-                ToastHelper.ShowSuccess(this, "Lesson created successfully.");
+                var createdLesson = await _lessonService.CreateLessonAsync(Lesson);
+                
+                try
+                {
+                    await _attendanceService.CreateBulkAttendanceForLessonAsync(createdLesson.Id);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Warning: Could not create attendance records: {ex.Message}");
+                }
+
+                ToastHelper.ShowSuccess(this, "Lesson created successfully with attendance records.");
                 return RedirectToPage("Index");
             }
             catch (Exception ex)
@@ -128,6 +145,19 @@ namespace SmartCampus.Web.Pages.Lessons
                 ModelState.AddModelError(string.Empty, $"Error creating lesson: {ex.Message}");
                 await OnGetAsync();
                 return Page();
+            }
+        }
+
+        public async Task<IActionResult> OnGetStudentsByGroupAsync(Guid groupId)
+        {
+            try
+            {
+                var students = await _studentService.GetStudentsByGroupAsync(groupId);
+                return new JsonResult(students.ToList());
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { error = ex.Message });
             }
         }
     }

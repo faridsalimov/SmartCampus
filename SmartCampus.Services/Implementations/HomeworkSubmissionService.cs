@@ -61,30 +61,10 @@ namespace SmartCampus.Services.Implementations
             if (submission == null)
                 throw new KeyNotFoundException($"Submission with ID {submissionId} not found.");
 
-
             submission.Status = "Graded";
             submission.UpdatedAt = DateTime.UtcNow;
 
             _unitOfWork.HomeworkSubmissionRepository.Update(submission);
-
-
-            var grade = new Grade
-            {
-                Id = Guid.NewGuid(),
-                StudentId = submission.StudentId,
-                CourseId = null,
-                GroupId = submission.Homework?.GroupId ?? Guid.Empty,
-                Score = score,
-                LetterGrade = GetLetterGrade(score),
-                Feedback = comments,
-                GradeType = "Submission",
-                GradedDate = DateTime.UtcNow,
-                HomeworkSubmissionId = submissionId
-            };
-
-            await _unitOfWork.GradeRepository.AddAsync(grade);
-            submission.Grade = grade;
-
             await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<HomeworkSubmissionDto>(submission);

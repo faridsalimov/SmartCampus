@@ -74,7 +74,6 @@
     gap: 8px;
 }
 
-/* ===== USER DROPDOWN ===== */
 .header-user-btn {
     width: 40px;
     height: 40px;
@@ -132,7 +131,6 @@
     object-fit: cover;
 }
 
-/* User Dropdown Menu */
 .header-user-dropdown {
     border: 1px solid #e5e5ea;
     border-radius: 12px;
@@ -230,7 +228,6 @@
     color: #ff3b30;
 }
 
-/* ===== SIDEBAR NAVIGATION ===== */
 .sidebar-nav {
     position: fixed;
     left: 0;
@@ -251,7 +248,6 @@
     width: 250px;
 }
 
-/* Brand */
 .sidebar-brand {
     display: flex;
     align-items: center;
@@ -294,7 +290,6 @@
     opacity: 1;
 }
 
-/* Toggle Button */
 .sidebar-toggle-btn {
     width: 40px;
     height: 40px;
@@ -316,7 +311,6 @@
     transform: scale(1.05);
 }
 
-/* Menu */
 .sidebar-menu {
     list-style: none;
     padding: 0;
@@ -404,7 +398,6 @@
     opacity: 1;
 }
 
-/* Divider */
 .sidebar-divider {
     height: 1px;
     background: #e5e5ea;
@@ -412,7 +405,6 @@
     list-style: none;
 }
 
-/* Overlay */
 .sidebar-overlay {
     position: fixed;
     top: 64px;
@@ -443,7 +435,6 @@
     padding-left: 250px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .header-search {
         display: none;
@@ -480,4 +471,66 @@
 
 .fw-500 {
     font-weight: 500 !important;
+}
+
+.sidebar-menu-icon .sidebar-notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    background: #ff3b30;
+    color: white;
+    border-radius: 9px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(255, 59, 48, 0.3);
+    animation: badgePulse 2s infinite;
+    transform: scale(0.9);
+}
+
+.sidebar-menu-icon .sidebar-notification-badge[style*="display: none"] {
+    animation: none;
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.9;
+    }
+}
+
+@keyframes badgeShake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-3px);
+    }
+    75% {
+        transform: translateX(3px);
+    }
+}
+
+.notification-badge.active-notification {
+    animation: badgeShake 0.5s ease-in-out;
+}
+
+.sidebar-messages-link:hover .sidebar-notification-badge {
+    box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4);
+}
+
+@media (max-width: 768px) {
+    .sidebar-menu-icon .sidebar-notification-badge {
+        right: -2px;
+        top: -2px;
+    }
 }

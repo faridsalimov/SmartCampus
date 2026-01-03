@@ -89,7 +89,6 @@ namespace SmartCampus.Web.Pages.Announcements
 
                 var userRoles = await _userManager.GetRolesAsync(user);
 
-                // Only Admin can delete
                 if (!userRoles.Contains("Admin"))
                 {
                     return Unauthorized();

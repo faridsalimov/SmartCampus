@@ -118,10 +118,6 @@ body {
     font-feature-settings: "cv11" 1;
 }
 
-/* ================================================
-   TYPOGRAPHY
-   ================================================ */
-
 h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     line-height: 1.2;
@@ -170,10 +166,6 @@ a {
 a:hover {
     color: var(--primary-dark);
 }
-
-/* ================================================
-   BUTTONS
-   ================================================ */
 
 .btn {
     font-weight: 500;
@@ -259,10 +251,6 @@ a:hover {
     cursor: not-allowed;
 }
 
-/* ================================================
-   FORMS
-   ================================================ */
-
 .form-control, .form-select {
     border: 1.5px solid var(--gray-300);
     border-radius: 10px;
@@ -323,7 +311,6 @@ a:hover {
     font-weight: 600;
 }
 
-/* Select size variations */
 .form-select.form-select-sm {
     padding: 0.5rem 2rem 0.5rem 0.75rem;
     font-size: var(--font-size-sm);
@@ -336,7 +323,6 @@ a:hover {
     border-radius: 12px;
 }
 
-/* Custom select wrapper */
 .select-wrapper {
     position: relative;
     display: inline-block;
@@ -358,10 +344,6 @@ a:hover {
     font-size: var(--font-size-sm);
     color: var(--gray-600);
 }
-
-/* ================================================
-   CARDS
-   ================================================ */
 
 .card {
     border: 1px solid var(--gray-200);
@@ -398,10 +380,6 @@ a:hover {
     font-size: var(--font-size-sm);
     margin-top: 0.5rem;
 }
-
-/* ================================================
-   ALERTS & TOASTS
-   ================================================ */
 
 .alert {
     border: none;
@@ -442,10 +420,6 @@ a:hover {
     font-size: 1.25rem;
     flex-shrink: 0;
 }
-
-/* ================================================
-   ANIMATIONS
-   ================================================ */
 
 @keyframes slideUp {
     from {
@@ -523,10 +497,6 @@ a:hover {
     animation: slideInRight var(--transition-base);
 }
 
-/* ================================================
-   PAGE HEADER
-   ================================================ */
-
 .page-header {
     background: linear-gradient(135deg, rgba(0, 102, 255, 0.05) 0%, rgba(94, 92, 230, 0.05) 100%);
     border-bottom: 1px solid var(--gray-200);
@@ -552,11 +522,6 @@ a:hover {
     flex-wrap: wrap;
 }
 
-/* ================================================
-   MODAL COMPONENT (Consolidated)
-   ================================================ */
-
-/* Bootstrap Modal Customization */
 .modal-content {
     border: none;
     border-radius: var(--radius-lg);
@@ -613,7 +578,6 @@ a:hover {
     opacity: 1;
 }
 
-/* Modal Backdrop */
 .modal-backdrop {
     background-color: rgba(0, 0, 0, 0.5);
     animation: fadeIn var(--transition-base);
@@ -630,7 +594,6 @@ a:hover {
     opacity: 1;
 }
 
-/* Alert/Confirmation Modal Styles */
 .alert-modal-danger {
     background: linear-gradient(135deg, var(--danger-color) 0%, #e62e24 100%);
 }
@@ -647,7 +610,6 @@ a:hover {
     background: linear-gradient(135deg, var(--success-color) 0%, var(--success-dark) 100%);
 }
 
-/* Custom Modal (Legacy - for backward compatibility) */
 .modal-soft {
     display: none;
     position: fixed;
@@ -722,7 +684,6 @@ a:hover {
     justify-content: flex-end;
 }
 
-/* Modal Button Styling */
 .modal-footer .btn {
     padding: 0.625rem 1.25rem;
     font-size: var(--font-size-sm);
@@ -743,7 +704,6 @@ a:hover {
     box-shadow: var(--shadow-sm);
 }
 
-/* Modal Size Variants */
 .modal-sm .modal-dialog {
     max-width: 400px;
 }
@@ -756,7 +716,6 @@ a:hover {
     max-width: 100%;
 }
 
-/* Responsive Modal */
 @media (max-width: 576px) {
     .modal-content-soft {
         width: 95%;
@@ -780,7 +739,6 @@ a:hover {
     }
 }
 
-/* Accessibility */
 .modal:focus {
     outline: none;
 }
@@ -789,10 +747,6 @@ a:hover {
     outline: 3px solid var(--primary-color);
     outline-offset: 2px;
 }
-
-/* ================================================
-   TABLES
-   ================================================ */
 
 .table {
     border-collapse: collapse;
@@ -824,10 +778,6 @@ a:hover {
     border-bottom: none;
 }
 
-/* ================================================
-   BADGES
-   ================================================ */
-
 .badge {
     padding: 0.375rem 0.75rem;
     border-radius: var(--radius-md);
@@ -856,10 +806,6 @@ a:hover {
     background: rgba(255, 149, 0, 0.1);
     color: var(--warning-color);
 }
-
-/* ================================================
-   PAGINATION
-   ================================================ */
 
 .pagination-soft {
     display: flex;
@@ -891,10 +837,6 @@ a:hover {
     color: white;
     border-color: var(--primary-color);
 }
-
-/* ================================================
-   RESPONSIVE DESIGN
-   ================================================ */
 
 @media (max-width: 768px) {
     .sidebar-soft {
@@ -963,10 +905,6 @@ a:hover {
         font-size: 1.5rem !important;
     }
 }
-
-/* ================================================
-   UTILITY CLASSES
-   ================================================ */
 
 .text-muted {
     color: var(--gray-400);
@@ -1052,11 +990,6 @@ a:hover {
     box-shadow: var(--shadow-lg);
 }
 
-
-/* ================================================
-   ACTION BUTTONS (Unified design for table action icons)
-   ================================================ */
-
 .actions-cell {
     display: flex;
     gap: 0.5rem;
@@ -1096,43 +1029,38 @@ a:hover {
     pointer-events: none;
 }
 
-/* Intent variants */
 .action-btn.view {
-    color: #0a69ff; /* vivid blue */
+    color: #0a69ff;
 }
 
 .action-btn.edit {
-    color: #ff9b3f; /* orange */
+    color: #ff9b3f;
 }
 
 .action-btn.delete {
-    color: #ff3b30; /* red */
+    color: #ff3b30;
 }
 
 .action-btn.success {
     color: var(--success-color);
 }
 
-/* Outline variant for less emphasis */
 .action-btn.outline {
     background: transparent;
     border: 1px solid var(--gray-200);
 }
 
-/* Small size for tight tables */
 .action-btn-sm {
     width: 34px;
     height: 34px;
     font-size: 0.95rem;
 }
 
-/* Accessibility: focus state */
 .action-btn:focus {
     outline: none;
     box-shadow: 0 0 0 4px rgba(0,102,255,0.12);
 }
 
-/* Group wrapper when actions have a header */
 .actions-header {
     display: flex;
     align-items: center;
@@ -1144,12 +1072,10 @@ a:hover {
     color: var(--gray-800);
 }
 
-/* Utility for hidden-by-permission */
 .hidden-by-permission {
     display: none !important;
 }
 
-/* Responsive adjustments */
 @media (max-width: 576px) {
     .action-btn { width: 36px; height: 36px; }
     .action-btn-sm { width: 30px; height: 30px; }

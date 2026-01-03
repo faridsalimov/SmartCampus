@@ -52,32 +52,76 @@ namespace SmartCampus.Services.Implementations
 
         public async Task<TeacherDto> CreateTeacherAsync(TeacherDto teacherDto)
         {
-            var teacher = _mapper.Map<Teacher>(teacherDto);
-            teacher.Id = Guid.NewGuid();
-            teacher.CreatedAt = DateTime.UtcNow;
+            if (teacherDto == null)
+                throw new ArgumentNullException(nameof(teacherDto));
 
-            await _unitOfWork.TeacherRepository.AddAsync(teacher);
-            await _unitOfWork.SaveChangesAsync();
+            if (string.IsNullOrWhiteSpace(teacherDto.ApplicationUserId))
+                throw new InvalidOperationException("ApplicationUserId is required.");
 
-            return _mapper.Map<TeacherDto>(teacher);
+            try
+            {
+                var existingAppUser = await _unitOfWork.TeacherRepository.GetByApplicationUserIdAsync(teacherDto.ApplicationUserId);
+                if (existingAppUser != null)
+                    throw new InvalidOperationException("This user is already linked to another teacher record.");
+
+                var teacher = _mapper.Map<Teacher>(teacherDto);
+                teacher.Id = Guid.NewGuid();
+                teacher.CreatedAt = DateTime.UtcNow;
+
+                await _unitOfWork.TeacherRepository.AddAsync(teacher);
+                await _unitOfWork.SaveChangesAsync();
+
+                return _mapper.Map<TeacherDto>(teacher);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to create teacher: {ex.Message}", ex);
+            }
         }
 
         public async Task UpdateTeacherAsync(TeacherDto teacherDto)
         {
-            var teacher = _mapper.Map<Teacher>(teacherDto);
-            teacher.UpdatedAt = DateTime.UtcNow;
+            if (teacherDto == null)
+                throw new ArgumentNullException(nameof(teacherDto));
 
-            _unitOfWork.TeacherRepository.Update(teacher);
-            await _unitOfWork.SaveChangesAsync();
+            if (teacherDto.Id == Guid.Empty)
+                throw new InvalidOperationException("Teacher Id is required for update.");
+
+            try
+            {
+                var teacher = await _unitOfWork.TeacherRepository.GetByIdAsync(teacherDto.Id);
+                if (teacher == null)
+                    throw new InvalidOperationException($"Teacher with Id {teacherDto.Id} not found.");
+
+                teacher = _mapper.Map(teacherDto, teacher);
+                teacher.UpdatedAt = DateTime.UtcNow;
+
+                _unitOfWork.TeacherRepository.Update(teacher);
+                await _unitOfWork.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to update teacher: {ex.Message}", ex);
+            }
         }
 
         public async Task DeleteTeacherAsync(Guid id)
         {
-            var teacher = await _unitOfWork.TeacherRepository.GetByIdAsync(id);
-            if (teacher != null)
+            if (id == Guid.Empty)
+                throw new InvalidOperationException("Teacher Id is required.");
+
+            try
             {
+                var teacher = await _unitOfWork.TeacherRepository.GetByIdAsync(id);
+                if (teacher == null)
+                    throw new InvalidOperationException($"Teacher with Id {id} not found.");
+
                 _unitOfWork.TeacherRepository.Delete(teacher);
                 await _unitOfWork.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to delete teacher: {ex.Message}", ex);
             }
         }
     }

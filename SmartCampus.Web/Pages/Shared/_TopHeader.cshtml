@@ -44,7 +44,7 @@
                         <div class="user-card-info">
                             <h6 class="user-card-name">@userFullName</h6>
                             <p class="user-card-role">
-                                @(User.IsInRole("Admin") ? "Administrator" : User.IsInRole("Teacher") ? "Teacher" : User.IsInRole("Student") ? "Student" : "User")
+                                @(User.IsInRole("Admin") ? "Admin" : User.IsInRole("Teacher") ? "Teacher" : User.IsInRole("Student") ? "Student" : "User")
                             </p>
                         </div>
                     </div>
@@ -70,8 +70,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('TopHeader script loaded');
-    
     const sidebarNav = document.getElementById('sidebarNav');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     const toggleBtn = document.getElementById('headerToggleBtn');
@@ -81,34 +79,25 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    // Toggle sidebar on button click
     toggleBtn.addEventListener('click', function(e) {
-        console.log('Toggle button clicked');
         e.stopPropagation();
         sidebarNav.classList.toggle('expanded');
         sidebarOverlay.classList.toggle('active');
-        console.log('Sidebar expanded:', sidebarNav.classList.contains('expanded'));
     });
 
-    // Close sidebar when clicking on overlay
     sidebarOverlay.addEventListener('click', function() {
-        console.log('Overlay clicked');
         sidebarNav.classList.remove('expanded');
         sidebarOverlay.classList.remove('active');
     });
 
-    // Close sidebar when clicking a menu link
     const menuLinks = document.querySelectorAll('.sidebar-menu-link');
-    console.log('Menu links found:', menuLinks.length);
     menuLinks.forEach(link => {
         link.addEventListener('click', function() {
-            console.log('Menu link clicked');
             sidebarNav.classList.remove('expanded');
             sidebarOverlay.classList.remove('active');
         });
     });
 
-    // Close sidebar when clicking outside
     document.addEventListener('click', function(event) {
         const isInSidebar = sidebarNav.contains(event.target);
         const isToggleBtn = toggleBtn.contains(event.target);

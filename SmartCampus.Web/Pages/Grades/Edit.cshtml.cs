@@ -15,23 +15,20 @@ namespace SmartCampus.Web.Pages.Grades
     {
         private readonly IGradeService _gradeService;
         private readonly IStudentService _studentService;
-        private readonly ICourseService _courseService;
-        private readonly IGroupService _groupService;
+        private readonly ILessonService _lessonService;
         private readonly UserContextHelper _userContextHelper;
         private readonly ILogger<EditModel> _logger;
 
         public EditModel(
             IGradeService gradeService,
             IStudentService studentService,
-            ICourseService courseService,
-            IGroupService groupService,
+            ILessonService lessonService,
             UserContextHelper userContextHelper,
             ILogger<EditModel> logger)
         {
             _gradeService = gradeService;
             _studentService = studentService;
-            _courseService = courseService;
-            _groupService = groupService;
+            _lessonService = lessonService;
             _userContextHelper = userContextHelper;
             _logger = logger;
         }
@@ -40,8 +37,6 @@ namespace SmartCampus.Web.Pages.Grades
         public GradeDto Grade { get; set; } = new();
 
         public IList<StudentDto> AvailableStudents { get; set; } = new List<StudentDto>();
-        public IList<CourseDto> AvailableCourses { get; set; } = new List<CourseDto>();
-        public IList<GroupDto> UserGroups { get; set; } = new List<GroupDto>();
 
         public async Task<IActionResult> OnGetAsync(Guid id)
         {
@@ -59,7 +54,6 @@ namespace SmartCampus.Web.Pages.Grades
                     return NotFound();
                 }
 
-
                 var hasPermission = await VerifyGradeAccessAsync(userId, grade);
                 if (!hasPermission)
                 {
@@ -69,29 +63,11 @@ namespace SmartCampus.Web.Pages.Grades
 
                 Grade = grade;
 
-                if (User.IsInRole("Admin"))
+                if (grade.GroupId.HasValue)
                 {
-                    AvailableStudents = (await _studentService.GetAllStudentsAsync()).ToList();
-                    AvailableCourses = (await _courseService.GetAllCoursesAsync()).ToList();
-                    UserGroups = (await _groupService.GetAllGroupsAsync()).ToList();
-                }
-                else if (User.IsInRole("Teacher"))
-                {
-                    var teachingGroupIds = await _userContextHelper.GetTeacherGroupIdsAsync(userId);
-
                     var allStudents = await _studentService.GetAllStudentsAsync();
                     AvailableStudents = allStudents
-                        .Where(s => teachingGroupIds.Contains(s.GroupId))
-                        .ToList();
-
-                    var allCourses = await _courseService.GetAllCoursesAsync();
-                    AvailableCourses = allCourses
-                        .Where(c => c.GroupId.HasValue && teachingGroupIds.Contains(c.GroupId.Value))
-                        .ToList();
-
-                    var allGroups = await _groupService.GetAllGroupsAsync();
-                    UserGroups = allGroups
-                        .Where(g => teachingGroupIds.Contains(g.Id))
+                        .Where(s => s.GroupId == grade.GroupId)
                         .ToList();
                 }
 
@@ -115,21 +91,22 @@ namespace SmartCampus.Web.Pages.Grades
 
             if (!ModelState.IsValid)
             {
-                await ReloadFormDataAsync(userId);
+                await LoadFormDataAsync();
                 return Page();
             }
 
             try
             {
-
                 var hasPermission = await VerifyGradeAccessAsync(userId, Grade);
                 if (!hasPermission)
                 {
                     _logger.LogWarning($"User {userId} attempted unauthorized update of grade {Grade.Id}");
                     ModelState.AddModelError(string.Empty, "You don't have permission to modify this grade.");
-                    await ReloadFormDataAsync(userId);
+                    await LoadFormDataAsync();
                     return Page();
                 }
+
+                Grade.LetterGrade = GetLetterGrade(Grade.Score);
 
                 await _gradeService.UpdateGradeAsync(Grade);
                 _logger.LogInformation($"User {userId} updated grade {Grade.Id}");
@@ -140,7 +117,7 @@ namespace SmartCampus.Web.Pages.Grades
             {
                 _logger.LogError(ex, "Error updating grade");
                 ModelState.AddModelError(string.Empty, $"Error updating grade: {ex.Message}");
-                await ReloadFormDataAsync(userId);
+                await LoadFormDataAsync();
                 return Page();
             }
         }
@@ -152,50 +129,44 @@ namespace SmartCampus.Web.Pages.Grades
 
             if (User.IsInRole("Teacher"))
             {
-                if (!grade.GroupId.HasValue)
+                var lesson = await _lessonService.GetLessonByIdAsync(grade.LessonId);
+                if (lesson == null)
                     return false;
 
-                var teachingGroupIds = await _userContextHelper.GetTeacherGroupIdsAsync(userId);
-                return teachingGroupIds.Contains(grade.GroupId.Value);
+                return lesson.TeacherId.ToString() == userId || (await _userContextHelper.IsTeacherTeachingGroupAsync(Guid.Parse(userId), lesson.GroupId));
             }
 
             return false;
         }
 
-        private async Task ReloadFormDataAsync(string userId)
+        private async Task LoadFormDataAsync()
         {
             try
             {
-                if (User.IsInRole("Admin"))
+                if (Grade.GroupId.HasValue)
                 {
-                    AvailableStudents = (await _studentService.GetAllStudentsAsync()).ToList();
-                    AvailableCourses = (await _courseService.GetAllCoursesAsync()).ToList();
-                    UserGroups = (await _groupService.GetAllGroupsAsync()).ToList();
-                }
-                else if (User.IsInRole("Teacher"))
-                {
-                    var teachingGroupIds = await _userContextHelper.GetTeacherGroupIdsAsync(userId);
-
                     var allStudents = await _studentService.GetAllStudentsAsync();
                     AvailableStudents = allStudents
-                        .Where(s => teachingGroupIds.Contains(s.GroupId))
-                        .ToList();
-
-                    var allCourses = await _courseService.GetAllCoursesAsync();
-                    AvailableCourses = allCourses
-                        .Where(c => c.GroupId.HasValue && teachingGroupIds.Contains(c.GroupId.Value))
-                        .ToList();
-
-                    var allGroups = await _groupService.GetAllGroupsAsync();
-                    UserGroups = allGroups
-                        .Where(g => teachingGroupIds.Contains(g.Id))
+                        .Where(s => s.GroupId == Grade.GroupId)
                         .ToList();
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error reloading form data");
+                _logger.LogError(ex, "Error loading form data");
             }
+        }
+
+        private string GetLetterGrade(decimal score)
+        {
+            return score switch
+            {
+                >= 90 => "A",
+                >= 80 => "B",
+                >= 70 => "C",
+                >= 60 => "D",
+                _ => "F"
+            };
         }
     }
 }

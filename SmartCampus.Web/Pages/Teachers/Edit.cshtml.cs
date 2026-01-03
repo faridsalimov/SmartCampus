@@ -43,6 +43,12 @@ namespace SmartCampus.Web.Pages.Teachers
 
             try
             {
+                if (string.IsNullOrWhiteSpace(Teacher.Department))
+                    Teacher.Department = null;
+
+                if (string.IsNullOrWhiteSpace(Teacher.Specialization))
+                    Teacher.Specialization = null;
+
                 await _teacherService.UpdateTeacherAsync(Teacher);
                 ToastHelper.ShowSuccess(this, "Teacher updated successfully.");
                 return RedirectToPage("Index");

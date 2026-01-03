@@ -53,8 +53,28 @@
                                 <i class="fas fa-envelope me-1"></i>Email <span class="text-danger">*</span>
                             </label>
                             <input asp-for="Teacher.Email" class="form-control" type="email" placeholder="teacher@university.edu" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
-                            <small class="form-text text-muted">Valid email address</small>
+                            <small class="form-text text-muted">Valid email address (used as username)</small>
                             <span asp-validation-for="Teacher.Email" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Teacher.Password" class="form-label">
+                                <i class="fas fa-lock me-1"></i>Password <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Teacher.Password" class="form-control" type="password" placeholder="Enter password" required style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Minimum 6 characters</small>
+                            <span asp-validation-for="Teacher.Password" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Teacher.Department" class="form-label">
+                                <i class="fas fa-building me-1"></i>Department
+                            </label>
+                            <input asp-for="Teacher.Department" class="form-control" placeholder="e.g., Computer Science" style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Academic department</small>
+                            <span asp-validation-for="Teacher.Department" class="text-danger small d-block mt-1"></span>
                         </div>
                     </div>
 
@@ -69,23 +89,13 @@
                             <span asp-validation-for="Teacher.PhoneNumber" class="text-danger small d-block mt-1"></span>
                         </div>
                         <div class="col-md-6 mb-4">
-                            <label asp-for="Teacher.Department" class="form-label">
-                                <i class="fas fa-building me-1"></i>Department
+                            <label asp-for="Teacher.Specialization" class="form-label">
+                                <i class="fas fa-graduation-cap me-1"></i>Specialization
                             </label>
-                            <input asp-for="Teacher.Department" class="form-control" placeholder="e.g., Computer Science" style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
-                            <small class="form-text text-muted">Academic department</small>
-                            <span asp-validation-for="Teacher.Department" class="text-danger small d-block mt-1"></span>
+                            <input asp-for="Teacher.Specialization" class="form-control" placeholder="e.g., Software Engineering" style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
+                            <small class="form-text text-muted">Teacher's area of specialization</small>
+                            <span asp-validation-for="Teacher.Specialization" class="text-danger small d-block mt-1"></span>
                         </div>
-                    </div>
-
-                    
-                    <div class="mb-4">
-                        <label asp-for="Teacher.Specialization" class="form-label">
-                            <i class="fas fa-graduation-cap me-1"></i>Specialization
-                        </label>
-                        <input asp-for="Teacher.Specialization" class="form-control" placeholder="e.g., Software Engineering" style="border: 1.5px solid #e5e5ea; border-radius: 8px;" />
-                        <small class="form-text text-muted">Teacher's area of specialization</small>
-                        <span asp-validation-for="Teacher.Specialization" class="text-danger small d-block mt-1"></span>
                     </div>
                 </div>
 
@@ -115,12 +125,12 @@
             <div class="card-body">
                 <div class="mb-3">
                     <small class="text-muted d-block mb-2">
-                        <strong>Full Name:</strong> Enter the teacher's complete name.
+                        <strong>Email:</strong> This will be used as the teacher's login username.
                     </small>
                 </div>
                 <div class="mb-3">
                     <small class="text-muted d-block mb-2">
-                        <strong>Email:</strong> Ensure the email address is valid and active.
+                        <strong>Password:</strong> Must be at least 6 characters long.
                     </small>
                 </div>
                 <div class="mb-3">
@@ -140,7 +150,6 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        // Bootstrap form validation
         (function() {
             'use strict';
             window.addEventListener('load', function() {

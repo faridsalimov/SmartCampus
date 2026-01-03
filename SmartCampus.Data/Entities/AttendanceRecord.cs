@@ -3,9 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmartCampus.Data.Entities
 {
-
-
-
     public class AttendanceRecord
     {
         [Key]
@@ -23,10 +20,18 @@ namespace SmartCampus.Data.Entities
         [ForeignKey(nameof(LessonId))]
         public virtual Lesson? Lesson { get; set; }
 
+        [Required]
+        public Guid TeacherId { get; set; }
+
+        [ForeignKey(nameof(TeacherId))]
+        public virtual Teacher? Teacher { get; set; }
+
         [StringLength(50)]
         public string? Status { get; set; }
 
         public DateTime AttendanceDate { get; set; } = DateTime.UtcNow;
+
+        public DateTime? SessionStartTime { get; set; }
 
         [StringLength(500)]
         public string? Remarks { get; set; }
